@@ -5,7 +5,7 @@ defmodule KamanskyWeb.LiveHelpers do
   def assign_defaults(socket, session) do
     socket
     |> assign(:logged_in, Map.get(session, "logged_in", false))
-    |> assign(:timezone, get_connect_params(socket)["timezone"] || "America/New York")
+    |> assign(:timezone, get_connect_params(socket)["timezone"] || "America/New_York")
   end
 
   def live_confirmation_modal(socket, opts) do
