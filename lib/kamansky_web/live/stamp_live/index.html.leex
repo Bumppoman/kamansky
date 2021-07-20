@@ -1,0 +1,104 @@
+<section class="section-wrapper">
+  <%= if live_flash(@flash, :info) do %>
+    <div
+      id="stamp-success-message"
+      class="disappearing-success-message"
+      phx-hook="disappearingSuccessMessage"
+    >
+      <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
+    </div>
+  <% end %>
+  <div class="text-end mb-2">
+    <%= live_patch "Add New Stamp",
+      to: Routes.stamp_index_path(@socket, :new, status: @live_action),
+      class: "btn btn-primary"
+    %>
+  </div>
+  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
+    id: "stamps-kamansky-data-table",
+    headers:
+      [
+        "Scott Number",
+        "Grade",
+        "Price Paid",
+        "Flaws",
+        "Actions",
+      ],
+    data_count: @data_count,
+    data_locator: @data_locator,
+    data_source: @data_source,
+    empty_message: "There are no stamps to display.",
+    options: [
+      go_to_record: Map.get(assigns, :go_to_record),
+      sort: 0
+    ]
+  do %>
+    <td>
+      <%= live_patch @item.scott_number,
+        to: Routes.stamp_index_path(@socket, :show, @item, status: @item.status)
+      %>
+    </td>
+    <td><%= Stamp.formatted_grade(@item) %></td>
+    <td><%= format_decimal_as_currency(Stamp.total_cost(@item)) %></td>
+    <td><%= Stamp.formatted_flaws(@item) %></td>
+    <td>
+      <%= live_patch to: Routes.stamp_index_path(@socket, :edit, @item, status: @item.status), class: "action-icon" do %>
+        <i class="material-icons">edit</i>
+      <% end %>
+      <%= if @item.status == :collection do %>
+        <%= live_patch to: Routes.stamp_index_path(@socket, :move_to_stock, @item, status: @item.status),
+          class: "action-icon"
+        do %>
+          <i class="material-icons">inventory_2</i>
+        <% end %>
+      <% end %>
+      <%= if @item.status != :listed do %>
+        <%= live_patch to: Routes.stamp_index_path(@socket, :sell, @item, status: @item.status), class: "action-icon" do %>
+          <i class="material-icons">attach_money</i>
+        <% end %>
+      <% end %>
+    </td>
+  <% end %>
+</section>
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket,
+    KamanskyWeb.StampLive.FormComponent,
+    action: @live_action,
+    form_id: "stamp-form",
+    id: "stamp-form-modal",
+    stamp: @stamp,
+    status: @status,
+    title: (if @live_action == :new, do: "Add New Stamp", else: "Edit Stamp"),
+    return_to: Routes.stamp_index_path(@socket, @status)
+  %>
+<% end %>
+<%= if @live_action == :show do %>
+  <%= live_modal @socket,
+    KamanskyWeb.StampLive.DetailComponent,
+    footer: false,
+    id: "stamp-detail-modal",
+    stamp: @stamp,
+    title: "View Stamp",
+    return_to: Routes.stamp_index_path(@socket, @status)
+  %>
+<% end %>
+<%= if @live_action == :move_to_stock do %>
+  <%= live_confirmation_modal @socket,
+    message: "Are you sure you want to move this stamp to stock?",
+    return_to: Routes.stamp_index_path(@socket, @status),
+    success: :move_to_stock,
+    title: "Move Stamp To Stock"
+  %>
+<% end %>
+<%= if @live_action == :sell do %>
+  <%= live_modal @socket,
+    KamanskyWeb.StampLive.ListingFormComponent,
+    action: @live_action,
+    form_id: "list-stamp-form",
+    id: "list-stamp-form-modal",
+    stamp: @stamp,
+    status: @status,
+    title: "List Stamp for Sale",
+    return_to: Routes.stamp_index_path(@socket, @status)
+  %>
+<% end %>

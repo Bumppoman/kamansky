@@ -1,0 +1,119 @@
+/* This file is for your main application css. */
+@import "../node_modules/nprogress/nprogress.css";
+
+@import '_variables';
+
+@import "~bootstrap/scss/bootstrap";
+@import '~choices.js/public/assets/styles/choices.min';
+
+@import 'datatable';
+
+a > *, button > * {
+  pointer-events: none;
+}
+
+a[data-bs-toggle]:hover, a.photo-display-link:hover {
+  cursor: pointer;
+}
+
+a.photo-display-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+main {
+  margin: 0 auto;
+  width: 90%;
+}
+
+.choices, .choices__inner {
+  min-height: 42px !important;
+  max-height: 42px !important;
+}
+
+.choices__inner {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0;
+}
+
+.choices:not(.is-disabled):focus .choices__inner {
+  color: #495057;
+  background-color: #fff;
+  border-color: #8ec2f3;
+  outline: 0;
+  box-shadow: none;
+}
+
+.choices__list--dropdown .choices__item--selectable {
+  padding-right: 0;
+}
+
+.choices__list--single {
+  line-height: 100%;
+}
+
+.disappearing-success-message {
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.drag-and-drop-file-dropzone, .drag-and-drop-file-preview {
+  text-align: center;
+  
+  i, p {
+    opacity: 0.6;
+  }
+  
+  input[type="file"] {
+    display: none;
+  }
+}
+
+.form-control {
+  border-radius: 0;
+  font-size: 0.875rem;
+}
+
+.form-control:not(textarea), .choices__inner {
+  height: 42px !important;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  
+  &.required label.form-control-label:first-child {
+    font-weight: bold;
+    
+      &:after {
+        content: " *";
+      }
+    }
+  
+  .form-control-label {
+    margin-bottom: 0.5rem;
+  }
+  
+  .input-group input {
+    height: 100%;
+  }
+  
+  .input-group-append, .input-group-prepend {
+    display: flex;
+    @include border-radius(0);
+  }
+  
+  .input-group-text { 
+    @include border-radius(0);
+    
+    i {
+      font-size: 16pt;
+      opacity: 0.6;
+    }
+  }
+}
+
+.hidden {
+  max-height: 0;
+  transition: max-height 750ms ease-out;
+}

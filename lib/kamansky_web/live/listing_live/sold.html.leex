@@ -1,0 +1,58 @@
+<section class="section-wrapper">
+  <%= if live_flash(@flash, :info) do %>
+  <div
+    id="listings-success-message"
+    class="disappearing-success-message"
+    phx-hook="disappearingSuccessMessage"
+  >
+    <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
+  </div>
+  <% end %>
+  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
+    id: "sold-listings-kamansky-data-table",
+    headers:
+      [
+        "Scott Number",
+        "Date of Sale",
+        "Sale Price",
+        "Shipping Price",
+        "Stamp Cost",
+        "Selling Fees",
+        "Shipping Cost",
+        "Supply Cost",
+        "Gross Profit",
+        "Net Profit/Loss"
+      ],
+    data_count: @data_count,
+    data_locator: @data_locator,
+    data_source: @data_source,
+    empty_message: "There are no listings to display.",
+    options: [
+      go_to_record: Map.get(assigns, :go_to_record),
+      sort: %{direction: :desc, column: 1}
+    ]
+  do %>
+    <td><%= @item.stamp.scott_number %></td>
+    <td><%= Calendar.strftime(@item.order.ordered_at, "%B %-d, %Y") %></td>
+    <td class="text-success"><%= format_decimal_as_currency(@item.sale_price) %></td>
+    <td class="text-success"><%= format_decimal_as_currency(Listing.shipping_price(@item)) %></td>
+    <td class="text-danger"><%= format_decimal_as_currency(Stamp.total_cost(@item.stamp)) %></td>
+    <td class="text-danger"><%= format_decimal_as_currency(@item.selling_fees) %></td>
+    <td class="text-danger"><%= format_decimal_as_currency(Listing.shipping_cost(@item)) %></td>
+    <td class="text-danger"><%= format_decimal_as_currency(Listing.supply_cost(@item)) %></td>
+    <td class="<%= if Decimal.gt?(Listing.gross_profit(@item), 0), do: "text-success", else: "text-danger" %>">
+      <%= format_decimal_as_currency(Listing.gross_profit(@item)) %>
+    </td>
+    <td class="<%= if Decimal.gt?(Listing.net_profit(@item), 0), do: "text-success", else: "text-danger" %>">
+      <%= format_decimal_as_currency(Listing.net_profit(@item)) %>
+    </td>
+  <% end %>
+  <ul class="nav nav-pills justify-content-center">
+    <li class="nav-item">
+      <%= live_patch "Active", to: Routes.listing_active_path(@socket, :index), class: "nav-link" %>
+    </li>
+    <li class="nav-item">
+      <%= live_patch "Sold", to: Routes.listing_sold_path(@socket, :index), class: "nav-link active" %>
+    </li>
+  </ul>
+</section>

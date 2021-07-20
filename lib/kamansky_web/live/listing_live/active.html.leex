@@ -1,0 +1,63 @@
+<section class="section-wrapper">
+  <%= if live_flash(@flash, :info) do %>
+  <div
+    id="listings-success-message"
+    class="disappearing-success-message"
+    phx-hook="disappearingSuccessMessage"
+  >
+    <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
+  </div>
+  <% end %>
+  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
+    id: "listings-kamansky-data-table",
+    headers:
+      [
+        "Scott Number",
+        "Inventory Key",
+        "Grade",
+        "Price",
+        "Listing Date",
+        "Actions"
+      ],
+    data_count: @data_count,
+    data_locator: @data_locator,
+    data_source: @data_source,
+    empty_message: "There are no listings to display.",
+    options: [
+      go_to_record: Map.get(assigns, :go_to_record),
+      sort: 0
+    ]
+  do %>
+    <td><%= @item.stamp.scott_number %></td>
+    <td>#<%= @item.stamp.inventory_key %></td>
+    <td>
+      <span><%= Stamp.formatted_grade(@item.stamp) %></span>
+      <%= if Stamp.flaws?(@item.stamp) do %>
+        <sup class="fs-6">
+          <a
+            tabindex="0"
+            title="Flaws"
+            data-bs-content="flaws"
+            data-bs-toggle="popover"
+            data-bs-trigger="focus"
+          >*</a>
+        </sup>
+      <% end %>
+    </td>
+    <td><%= format_decimal_as_currency(@item.listing_price) %></td>
+    <td><%= Calendar.strftime(@item.inserted_at, "%B %-d, %Y") %></td>
+    <td>
+      <a class="action-icon">
+        <i class="material-icons">add_shopping_cart</i>
+      </a>
+    </td>
+  <% end %>
+  <ul class="nav nav-pills justify-content-center">
+    <li class="nav-item">
+      <%= live_patch "Active", to: Routes.listing_active_path(@socket, :index), class: "nav-link active" %>
+    </li>
+    <li class="nav-item">
+      <%= live_patch "Sold", to: Routes.listing_sold_path(@socket, :index), class: "nav-link" %>
+    </li>
+  </ul>
+</section>

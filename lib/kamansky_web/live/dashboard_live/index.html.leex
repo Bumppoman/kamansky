@@ -1,0 +1,83 @@
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h4 class="card-title">Collection</h4>
+        <p class="card-text">
+          <span>Total cost: <%= format_decimal_as_currency(@collection_cost) %></span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h4 class="card-title">Stock</h4>
+        <p class="card-text">
+          <span>Total cost: <%= format_decimal_as_currency(@stock_cost) %></span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h4 class="card-title">Listings</h4>
+        <p class="card-text">
+          <ul class="list-unstyled">
+            <li>Total cost: <%= format_decimal_as_currency(@listed_cost) %></li>
+            <li>Total listing price: <%= format_decimal_as_currency(@listing_price) %></li>
+          </ul>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h4 class="card-title">Sales</h4>
+        <p class="card-text">
+          <ul class="list-unstyled">
+            <li>Total orders: <%= @total_orders %> (<%= @total_stamps_in_all_orders %> stamps)</li>
+            <li>Total stamp cost: <%= format_decimal_as_currency(@total_sold_stamp_cost) %></li>
+            <li>Gross profit: <%= format_decimal_as_currency(@total_gross_profit) %></li>
+            <li>Net profit: <%= format_decimal_as_currency(@total_net_profit) %></li>
+          </ul>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Month to Date</h4>
+        <p class="card-text">
+          <ul class="list-unstyled">
+            <li>Purchased for collection: <%= @stamps_this_month_for_collection %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_collection) %></li>
+            <li>Purchased for stock: <%= @stamps_this_month_for_stock %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_stock) %></li>
+            <li>Purchased and listed: <%= @stamps_this_month_for_listings %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_listings) %></li>
+            <li>Orders: <%= @orders_this_month %> orders (<%= @stamps_in_orders_this_month %> stamps) for <%= format_decimal_as_currency(@net_profit_this_month) %> net profit</li>
+          </ul>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6"></div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Previous Month</h4>
+        <p class="card-text">
+          <ul class="list-unstyled">
+            <li>Purchased for collection: <%= @stamps_last_month_for_collection %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_collection) %></li>
+            <li>Purchased for stock: <%= @stamps_last_month_for_stock %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_stock) %></li>
+            <li>Purchased and listed: <%= @stamps_last_month_for_listings %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_listings) %></li>
+            <li>Orders: <%= @orders_last_month %> orders (<%= @stamps_in_orders_last_month %> stamps) for <%= format_decimal_as_currency(@net_profit_last_month) %> net profit</li>
+          </ul>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

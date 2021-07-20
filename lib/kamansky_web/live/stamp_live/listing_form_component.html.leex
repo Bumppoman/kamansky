@@ -1,0 +1,55 @@
+<%= f = form_for @changeset,
+  "#",
+  id: @form_id,
+  phx_target: @myself,
+  phx_change: "validate",
+  phx_submit: "submit"
+%>
+  <div class="row">
+    <div class="col-md-4 form-group">
+      <label class="form-control-label">Scott Number</label>
+      <p><%= @stamp.scott_number %></p>
+    </div>
+    <div class="col-md-4 form-group">
+      <label class="form-control-label">Grade</label>
+      <p><%= Stamp.formatted_grade(@stamp) %></p>
+    </div>
+    <div class="col-md-4 form-group">
+      <label class="form-control-label">Price Paid</label>
+      <p><%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 form-group required">
+      <%= label f, :listing_price, "Price", class: "form-control-label" %>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">
+            <i class="material-icons">attach_money</i>
+          </span>
+        </div>
+        <%= text_input f, :listing_price, class: "form-control" %>
+      </div>
+    </div>
+    <div class="col-md-6 form-group required">
+      <label class="form-control-label">Supply Cost</label>
+      <%= text_input f,
+        :individual_supply_cost,
+        class: "form-control",
+        value: (if @stamp.format in [:single, :pair], do: "0.03", else: "0.13")
+      %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col form-group required">
+      <label class="form-control-label">List On</label>
+      <div class="form-check">
+        <%= checkbox f,
+          :hipstamp,
+          checked: true
+        %>
+        <label class="form-check-label">Hipstamp</label>
+      </div>
+    </div>
+  </div>
+</form>

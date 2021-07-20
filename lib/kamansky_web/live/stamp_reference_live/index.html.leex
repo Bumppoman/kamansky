@@ -1,0 +1,53 @@
+<section class="section-wrapper">
+  <%= if live_flash(@flash, :info) do %>
+  <div
+    id="stamp_references-success-message"
+    class="disappearing-success-message"
+    phx-hook="disappearingSuccessMessage"
+  >
+    <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
+  </div>
+  <% end %>
+  <div class="text-end mb-2">
+    <%= live_patch "Add New Stamp Reference",
+      to: Routes.stamp_reference_index_path(@socket, :new),
+      class: "btn btn-primary"
+    %>
+  </div>
+  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
+    id: "stamp-references-kamansky-data-table",
+    headers:
+      [
+        "Scott Number",
+        "Description",
+        "Actions",
+      ],
+    data_count: @data_count,
+    data_locator: @data_locator,
+    data_source: @data_source,
+    empty_message: "There are no stamp references to display.",
+    options: [
+      go_to_record: @go_to_record,
+      sort: 0
+    ]
+  do %>
+  <td><%= @item.scott_number %></td>
+  <td><%= StampReference.description(@item) %></td>
+  <td>
+    <%= live_patch to: Routes.stamp_reference_index_path(@socket, :edit, @item), class: "action-icon" do %>
+      <i class="material-icons">edit</i>
+    <% end %>
+  </td>
+  <% end %>
+</section>
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket,
+    KamanskyWeb.StampReferenceLive.FormComponent,
+    action: @live_action,
+    form_id: "stamp-reference-form",
+    id: "stamp-reference-form-modal",
+    stamp_reference: @stamp_reference,
+    title: (if @live_action == :new, do: "Add New Stamp Reference", else: "Edit Stamp Reference"),
+    return_to: Routes.stamp_reference_index_path(@socket, :index)
+  %>
+<% end %>

@@ -1,0 +1,48 @@
+<div class="d-flex">
+  <div class="me-5">
+    <div>
+      <img
+        height="200"
+        src="<%= Routes.static_path(@socket, front_photo_path(@stamp)) %>"
+      />
+      <%= unless is_nil(@stamp.front_photo) or is_nil(@stamp.rear_photo) do %>
+        <div class="text-center mt-2">
+          <a class="photo-display-link">Front</a> |
+          <a
+            class="photo-display-link"
+            data-action="stamp-detail#displayRear"
+            data-stamp-detail-target="photoDisplayRearLink"
+          >Rear</a>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div>
+    <h4><%= StampReference.description(@stamp.stamp_reference) %></h4>
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Grade</th>
+          <td><%= Stamp.formatted_grade(@stamp) %></td>
+        </tr>
+        <tr>
+          <th>Cost</th>
+          <td>
+            <%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %>
+            (<%= format_decimal_as_currency(@stamp.cost) %> stamp/<%= format_decimal_as_currency(@stamp.purchase_fees) %> fees)
+          </td>
+        </tr>
+        <tr>
+          <th>History</th>
+          <td><%= raw formatted_history(@stamp) %></td>
+        </tr>
+        <%= if @stamp.inventory_key do %>
+          <tr>
+            <th>Inventory Key</th>
+            <td><%= @stamp.inventory_key %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

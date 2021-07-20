@@ -1,0 +1,105 @@
+<section class="section-wrapper">
+  <%= if live_flash(@flash, :info) do %>
+    <div
+      id="stamp-success-message"
+      class="disappearing-success-message"
+      phx-hook="disappearingSuccessMessage"
+    >
+      <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
+    </div>
+  <% end %>
+  <div class="text-end mb-2">
+    <%= live_patch "Create Order",
+      to: Routes.order_index_path(@socket, :new),
+      class: "btn btn-primary"
+    %>
+  </div>
+  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
+    id: "orders-kamansky-data-table",
+    headers:
+      [
+        "Order Number",
+        "Date",
+        "Total",
+        "Net Profit/Loss",
+        "Actions"
+      ],
+    data_count: @data_count,
+    data_locator: @data_locator,
+    data_source: @data_source,
+    empty_message: "There are no orders to display.",
+    options: [
+      go_to_record: Map.get(assigns, :go_to_record),
+      sort: %{column: 1, direction: :desc}
+    ]
+  do %>
+    <td>
+      <%= live_redirect "##{Order.order_number(@item)}", to: Routes.order_show_path(@socket, :show, @item) %>
+    </td>
+    <td><%= Calendar.strftime(@item.ordered_at, "%B %-d, %Y") %></td>
+    <td><%= format_decimal_as_currency(Order.total_paid(@item)) %></td>
+    <td class="<%= if Decimal.gt?(Order.net_profit(@item), 0), do: "text-success", else: "text-danger" %>">
+      <%= format_decimal_as_currency(Order.net_profit(@item)) %>
+    </td>
+    <td>
+      <%= cond do %>
+        <% Order.pending?(@item) -> %>
+          <%= live_patch to: Routes.order_index_path(@socket, :mark_processed, @item), class: "action-icon" do %>
+            <i class="material-icons">precision_manufacturing</i>
+          <% end %>
+        <% Order.processed?(@item) -> %>
+          <%= live_patch to: Routes.order_index_path(@socket, :mark_shipped, @item), class: "action-icon" do %>
+            <i class="material-icons">local_shipping</i>
+          <% end %>
+        <% Order.shipped?(@item) -> %>
+          <%= live_patch to: Routes.order_index_path(@socket, :mark_completed, @item), class: "action-icon" do %>
+            <i class="material-icons">done</i>
+          <% end %>
+        <% true -> %>
+      <% end %>
+    </td>
+  <% end %>
+  <ul class="nav nav-pills justify-content-center">
+    <li class="nav-item">
+      <%= live_patch "Pending",
+        to: Routes.order_index_path(@socket, :pending),
+        class: ["nav-link"] ++ (if @live_action == :pending, do: [" active"], else: [])
+      %>
+    </li>
+    <li class="nav-item">
+      <%= live_patch "Finalized",
+        to: Routes.order_index_path(@socket, :finalized),
+        class: ["nav-link"] ++ (if @live_action == :finalized, do: [" active"], else: [])
+      %>
+    </li>
+    <li class="nav-item">
+      <%= live_patch "Processed",
+        to: Routes.order_index_path(@socket, :processed),
+        class: ["nav-link"] ++ (if @live_action == :processed, do: [" active"], else: [])
+      %>
+    </li>
+    <li class="nav-item">
+      <%= live_patch "Shipped",
+        to: Routes.order_index_path(@socket, :shipped),
+        class: ["nav-link"] ++ (if @live_action == :shipped, do: [" active"], else: [])
+      %>
+    </li>
+    <li class="nav-item">
+      <%= live_patch "Completed",
+        to: Routes.order_index_path(@socket, :completed),
+        class: ["nav-link"] ++ (if @live_action == :completed, do: [" active"], else: [])
+      %>
+    </li>
+  </ul>
+</section>
+<%= if @live_action == :new do %>
+  <%= live_modal @socket,
+    KamanskyWeb.OrderLive.FormComponent,
+    action: @live_action,
+    form_id: "order-form",
+    id: "order-form-modal",
+    order: @order,
+    title: "Create Order",
+    return_to: Routes.order_index_path(@socket, :pending)
+  %>
+<% end %>

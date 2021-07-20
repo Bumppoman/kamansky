@@ -1,0 +1,79 @@
+<header>
+  <%= if @logged_in do %>
+    <nav class="navbar navbar-expand-md navbar-light">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item me-5">
+          <%= live_redirect "Dashboard",
+            to: Routes.dashboard_index_path(@socket, :index),
+            class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.DashboardLive.Index, do: [" active"], else: []))
+          %>
+        </li>
+        <li class="nav-item me-5">
+          <%= live_redirect "Collection",
+              to: Routes.stamp_index_path(@socket, :collection),
+              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.StampLive.Index && @live_action == :collection, do: [" active"], else: []))
+          %>
+        </li>
+        <li class="nav-item me-5">
+          <%= live_redirect "Stock",
+              to: Routes.stamp_index_path(@socket, :stock),
+              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.StampLive.Index && @live_action == :stock, do: [" active"], else: []))
+          %>
+        </li>
+        <li class="nav-item me-5">
+          <%= live_redirect "Listings",
+              to: Routes.listing_active_path(@socket, :index),
+              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.ListingLive.Active or @socket.view == KamanskyWeb.ListingLive.Sold, do: [" active"], else: []))
+          %>
+        </li>
+        <li class="nav-item me-5">
+          <%= live_redirect "Orders",
+              to: Routes.order_index_path(@socket, :pending),
+              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.OrderLive.Index, do: [" active"], else: []))
+          %>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            data-bs-toggle="dropdown"
+          >Admin</a>
+          <ul class="dropdown-menu">
+            <li>
+              <%= live_redirect "Stamp References",
+                to: Routes.stamp_reference_index_path(@socket, :index),
+                class: "dropdown-item"
+              %>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  <% else %>
+    <%= f = form_for :login,
+      Routes.session_path(@socket, :create),
+      class: "row row-cols-md-auto p-3 align-items-center justify-content-center"
+    %>
+      <div class="col">
+        <%= label f, :username, class: "visually-hidden" %>
+        <%= text_input f, :username, class: "form-control", placeholder: "Username" %>
+      </div>
+      <div class="col">
+        <%= label f, :password, class: "visually-hidden" %>
+        <%= password_input f, :password, class: "form-control", placeholder: "Password" %>
+      </div>
+      <div class="col">
+        <%= submit "Login", class: "btn btn-primary" %>
+      </div>
+    </form>
+  <% end %>
+</header>
+<main role="main">
+  <%= if @logged_in do %>
+    <%= @inner_content %>
+  <% else %>
+    <div>
+      <h1>Bumppoman Industries</h1>
+      <p>Please log in.</p>
+    </div>
+  <% end %>
+</main>
