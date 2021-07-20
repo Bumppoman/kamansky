@@ -185,11 +185,11 @@ defmodule Kamansky.Stamps.Stamp do
     h =
       if stamp.moved_to_stock_at != stamp.inserted_at do
         [
-          "Added to collection on #{Calendar.strftime(stamp.inserted_at, "%B %-d, %Y")}",
-          (if stamp.status == :stock, do: "Moved to stock on #{Calendar.strftime(stamp.moved_to_stock_at, "%B %-d, %Y")}")
+          "Added to collection on #{formatted_date(stamp.inserted_at)}",
+          (if stamp.status == :stock, do: "Moved to stock on #{formatted_date(stamp.moved_to_stock_at)}")
         ]
       else
-        ["Added to stock on #{Calendar.strftime(stamp.moved_to_stock_at, "%B %-d, %Y")}"]
+        ["Added to stock on #{formatted_date(stamp.moved_to_stock_at)}"]
       end
 
     #unless is_nil(stamp.listing) do

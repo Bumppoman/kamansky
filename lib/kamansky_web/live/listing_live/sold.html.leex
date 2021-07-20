@@ -33,7 +33,7 @@
     ]
   do %>
     <td><%= @item.stamp.scott_number %></td>
-    <td><%= Calendar.strftime(@item.order.ordered_at, "%B %-d, %Y") %></td>
+    <td><%= formatted_date(@item.order.ordered_at) %></td>
     <td class="text-success"><%= format_decimal_as_currency(@item.sale_price) %></td>
     <td class="text-success"><%= format_decimal_as_currency(Listing.shipping_price(@item)) %></td>
     <td class="text-danger"><%= format_decimal_as_currency(Stamp.total_cost(@item.stamp)) %></td>

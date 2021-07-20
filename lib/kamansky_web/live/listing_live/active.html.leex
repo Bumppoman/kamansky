@@ -45,7 +45,7 @@
       <% end %>
     </td>
     <td><%= format_decimal_as_currency(@item.listing_price) %></td>
-    <td><%= Calendar.strftime(@item.inserted_at, "%B %-d, %Y") %></td>
+    <td><%= formatted_date(@item.inserted_at) %></td>
     <td>
       <a class="action-icon">
         <i class="material-icons">add_shopping_cart</i>
