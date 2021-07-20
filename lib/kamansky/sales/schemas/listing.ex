@@ -1,5 +1,6 @@
 defmodule Kamansky.Sales.Listings.Listing do
   use Ecto.Schema
+  @timestamps_opts [type: :utc_datetime]
 
   import Ecto.Changeset
 

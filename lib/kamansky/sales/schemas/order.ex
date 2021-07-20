@@ -1,5 +1,6 @@
 defmodule Kamansky.Sales.Orders.Order do
   use Ecto.Schema
+  @timestamps_opts [type: :utc_datetime]
 
   import Ecto.Changeset
 
@@ -7,7 +8,7 @@ defmodule Kamansky.Sales.Orders.Order do
   alias Kamansky.Stamps.Stamp
 
   schema "orders" do
-    field :ordered_at, :utc_datetime_usec
+    field :ordered_at, :utc_datetime
     field :item_price, :decimal
     field :shipping_price, :decimal
     field :selling_fees, :decimal
@@ -21,11 +22,9 @@ defmodule Kamansky.Sales.Orders.Order do
     field :state, :string
     field :zip, :string
     field :email, :string
-    field :processed_at, :utc_datetime_usec
-    field :shipped_at, :utc_datetime_usec
-    field :completed_at, :utc_datetime_usec
-
-    field :listings_count, :map, virtual: true
+    field :processed_at, :utc_datetime
+    field :shipped_at, :utc_datetime
+    field :completed_at, :utc_datetime
 
     has_many :listings, Kamansky.Sales.Listings.Listing
   end
