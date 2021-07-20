@@ -1,5 +1,6 @@
 defmodule Kamansky.Stamps.Stamp do
   use Ecto.Schema
+  @timestamps_opts [type: :utc_datetime]
 
   import Ecto.Changeset
   import Kamansky.Helpers
@@ -88,7 +89,7 @@ defmodule Kamansky.Stamps.Stamp do
     field :thin_spot, :boolean, default: false
     field :toning, :boolean, default: false
     timestamps(updated_at: false)
-    field :moved_to_stock_at, :naive_datetime
+    field :moved_to_stock_at, :utc_datetime
 
     belongs_to :front_photo, Kamansky.Attachments.Attachment
     belongs_to :rear_photo, Kamansky.Attachments.Attachment
