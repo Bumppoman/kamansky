@@ -93,8 +93,7 @@
   </ul>
 </section>
 <%= if @live_action in [:edit, :new] do %>
-  <%= live_modal @socket,
-    KamanskyWeb.OrderLive.FormComponent,
+  <%= live_modal KamanskyWeb.OrderLive.FormComponent,
     action: @live_action,
     form_id: "order-form",
     id: "order-form-modal",
@@ -103,11 +102,12 @@
     return_to: Routes.order_index_path(@socket, :pending)
   %>
 <% end %>
-<%= if @live_action in [:mark_processed] do %>
-  <%= live_confirmation_modal @socket,
+<%= if @live_action in [:mark_completed, :mark_processed, :mark_shipped] do %>
+  <%= live_confirmation_modal
     message: "Are you sure you want to mark this order as #{@marking_action}?",
     return_to: Routes.order_index_path(@socket, @order.status),
     success: @live_action,
-    title: @page_title
+    title: @page_title,
+    type: :confirmation_large
   %>
 <% end %>

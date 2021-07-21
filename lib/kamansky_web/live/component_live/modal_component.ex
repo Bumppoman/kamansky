@@ -41,5 +41,6 @@ defmodule KamanskyWeb.ComponentLive.ModalComponent do
   end
 
   defp size_for_type(:confirmation), do: "modal-sm"
+  defp size_for_type(:confirmation_large), do: ""
   defp size_for_type(_), do: "modal-lg"
 end

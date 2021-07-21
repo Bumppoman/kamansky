@@ -8,11 +8,17 @@ defmodule KamanskyWeb.LiveHelpers do
     |> assign(:timezone, get_connect_params(socket)["timezone"] || "America/New_York")
   end
 
-  def live_confirmation_modal(socket, opts) do
+  def live_confirmation_modal(_socket, opts), do: live_confirmation_modal(opts)
+  def live_confirmation_modal(opts) do
     live_modal(
-      socket,
       KamanskyWeb.ComponentLive.ConfirmationModalComponent,
-      Keyword.merge(opts, [button_action: Keyword.get(opts, :success), type: :confirmation])
+      Keyword.merge(
+        opts,
+        [
+          button_action: Keyword.get(opts, :success),
+          type: Keyword.get(opts, :type, :confirmation)
+        ]
+      )
     )
   end
 
@@ -30,7 +36,8 @@ defmodule KamanskyWeb.LiveHelpers do
         stamp: @stamp,
         return_to: Routes.stamp_index_path(@socket, :index) %>
   """
-  def live_modal(_socket, component, opts) do
+  def live_modal(_socket, component, opts), do: live_modal(component, opts)
+  def live_modal(component, opts) do
     path = Keyword.fetch!(opts, :return_to)
     modal_opts = [id: :modal, return_to: path, component: component, opts: opts]
     live_component(KamanskyWeb.ComponentLive.ModalComponent, modal_opts)
