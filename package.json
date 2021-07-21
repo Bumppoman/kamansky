@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@rbarilani/remove-source-map-url-webpack-plugin": "^1.1.0"
+  }
+}

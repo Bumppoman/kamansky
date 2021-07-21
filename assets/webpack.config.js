@@ -3,6 +3,7 @@ const glob = require('glob');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const RemoveSourceMapUrlWebpackPlugin = require('@rbarilani/remove-source-map-url-webpack-plugin');
 
 module.exports = (env, options) => {
   const devMode = options.mode !== 'production';
@@ -21,7 +22,7 @@ module.exports = (env, options) => {
       path: path.resolve(__dirname, '../priv/static/js'),
       publicPath: '/js/'
     },
-    devtool: undefined,//devMode ? 'source-map' : undefined,
+    devtool: devMode ? 'source-map' : undefined,
     module: {
       rules: [
         {
@@ -47,6 +48,9 @@ module.exports = (env, options) => {
       new CopyWebpackPlugin({
         patterns: [{ from: 'static/', to: '../' }],
       }),
+      new RemoveSourceMapUrlWebpackPlugin({
+        test: /bootstrap\.esm\.js$/
+      })
     ],
     resolve: {
       extensions: [".ts", ".js"]
