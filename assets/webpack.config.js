@@ -21,7 +21,7 @@ module.exports = (env, options) => {
       path: path.resolve(__dirname, '../priv/static/js'),
       publicPath: '/js/'
     },
-    devtool: devMode ? 'source-map' : undefined,
+    devtool: undefined,//devMode ? 'source-map' : undefined,
     module: {
       rules: [
         {

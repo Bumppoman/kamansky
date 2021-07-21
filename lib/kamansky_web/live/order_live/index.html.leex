@@ -103,11 +103,11 @@
   %>
 <% end %>
 <%= if @live_action in [:mark_completed, :mark_processed, :mark_shipped] do %>
-  <%= live_confirmation_modal
+  <%= live_confirmation_modal(
     message: "Are you sure you want to mark this order as #{@marking_action}?",
     return_to: Routes.order_index_path(@socket, @order.status),
     success: @live_action,
     title: @page_title,
     type: :confirmation_large
-  %>
+  ) %>
 <% end %>
