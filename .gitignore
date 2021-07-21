@@ -36,3 +36,6 @@ npm-debug.log
 # Hard-coded secrets
 /config/dev.secret.exs
 /config/releases.exs
+
+# Ignore lexer
+/.elixir_ls

@@ -35,6 +35,18 @@ defmodule Kamansky.Sales.Orders.Order do
     |> validate_required([])
   end
 
+  def hipstamp_changeset(order, attrs) do
+    order
+    |> cast(
+      attrs,
+      [
+        :city, :email, :item_price, :name,
+        :ordered_at, :shipping_price, :state, :street_address,
+        :supply_cost, :zip
+      ]
+    )
+  end
+
   def net_profit(%Order{} = order) do
     Decimal.sub(total_paid(order), total_cost(order))
   end

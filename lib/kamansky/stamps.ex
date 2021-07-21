@@ -68,6 +68,14 @@ defmodule Kamansky.Stamps do
 
   def get_stamp!(id), do: Repo.get!(Stamp, id)
 
+  def get_stamp_by_inventory_key(inventory_key, with_listing: true) do
+    Stamp
+    |> where(inventory_key: ^inventory_key)
+    |> join(:left, [s], l in assoc(s, :listing))
+    |> preload([s, l], [listing: l])
+    |> Repo.one()
+  end
+
   def get_stamp_detail!(id) do
     Stamp
     |> Repo.get!(id)
@@ -78,6 +86,13 @@ defmodule Kamansky.Stamps do
     stamps = where(Stamp, status: ^status)
 
     Paginate.list(Stamps, stamps, params)
+  end
+
+  @spec mark_stamp_as_sold(Stamp.t) :: {:ok, Stamp.t} | {:error, any}
+  def mark_stamp_as_sold(%Stamp{} = stamp) do
+    stamp
+    |> Ecto.Changeset.change(status: :sold)
+    |> Repo.update()
   end
 
   def move_stamp_to_stock(%Stamp{} = stamp) do
@@ -128,7 +143,8 @@ defmodule Kamansky.Stamps do
 
     stamp_reference =
       StampReference
-      |> Repo.get(stamp.stamp_reference_id)
+      |> where(scott_number: ^scott_number)
+      |> Repo.one()
 
     numeric_length =
       if !StampReference.standard?(stamp_reference), do: numeric_length + 1, else: numeric_length

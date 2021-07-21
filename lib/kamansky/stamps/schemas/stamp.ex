@@ -65,6 +65,35 @@ defmodule Kamansky.Stamps.Stamp do
     }
   ]
 
+  @type t :: Ecto.Schema.t | %Stamp{
+    scott_number: String.t,
+    grade: integer,
+    cost: Decimal.t,
+    purchase_fees: Decimal.t,
+    inventory_key: String.t,
+    status: atom,
+    format: atom,
+    blind_perforation: boolean,
+    crease: boolean,
+    gum_disturbance: boolean,
+    gum_skip: boolean,
+    hinge_remnant: boolean,
+    hinged: boolean,
+    inclusion: boolean,
+    ink_transfer: boolean,
+    no_gum: boolean,
+    pencil: boolean,
+    short_perforation: boolean,
+    stain: boolean,
+    tear: boolean,
+    thin_spot: boolean,
+    toning: boolean,
+    inserted_at: DateTime.t,
+    moved_to_stock_at: DateTime.t,
+    front_photo_id: integer,
+    rear_photo_id: integer
+  }
+
   schema "stamps" do
     field :scott_number, :string
     field :grade, :integer

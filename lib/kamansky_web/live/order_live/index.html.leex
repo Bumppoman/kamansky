@@ -103,9 +103,9 @@
     return_to: Routes.order_index_path(@socket, :pending)
   %>
 <% end %>
-<% if @live_action in [:mark_processed] do %>
+<%= if @live_action in [:mark_processed] do %>
   <%= live_confirmation_modal @socket,
-    message: "Are you sure you want to mark this order as <%= @marking_action %>?",
+    message: "Are you sure you want to mark this order as #{@marking_action}?",
     return_to: Routes.order_index_path(@socket, @order.status),
     success: @live_action,
     title: @page_title

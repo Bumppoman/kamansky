@@ -57,6 +57,12 @@ defmodule Kamansky.Sales.Listings do
     Paginate.list(Listings, listings, params)
   end
 
+  def mark_listing_sold(%Listing{} = listing, order_id: order_id, sale_price: sale_price) do
+    listing
+    |> Ecto.Changeset.change(order_id: order_id, sale_price: sale_price)
+    |> Repo.update()
+  end
+
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
@@ -75,5 +81,11 @@ defmodule Kamansky.Sales.Listings do
     Listing
     |> where(status: ^status)
     |> Repo.aggregate(:sum, :listing_price)
+  end
+
+  def update_listing_selling_fees(%Listing{} = listing, selling_fees) do
+    listing
+    |> Ecto.Changeset.change(selling_fees: selling_fees)
+    |> Repo.update()
   end
 end
