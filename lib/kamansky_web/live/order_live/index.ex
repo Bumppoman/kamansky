@@ -20,6 +20,18 @@ defmodule KamanskyWeb.OrderLive.Index do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  def marking_action(:mark_processed), do: "processed"
+
+  defp apply_action(socket, :mark_processed, %{"id" => id}) do
+    with order <- Orders.get_order!(id) do
+      socket
+      |> assign(:page_title, "Mark Order as Processed")
+      |> assign(:order, order)
+      |> assign(:marking_action, "processed")
+      |> load_orders(order.status)
+    end
+  end
+
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "Create Order")

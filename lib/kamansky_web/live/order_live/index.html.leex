@@ -92,14 +92,22 @@
     </li>
   </ul>
 </section>
-<%= if @live_action == :new do %>
+<%= if @live_action in [:edit, :new] do %>
   <%= live_modal @socket,
     KamanskyWeb.OrderLive.FormComponent,
     action: @live_action,
     form_id: "order-form",
     id: "order-form-modal",
     order: @order,
-    title: "Create Order",
+    title: (if @live_action == :new, do: "Create Order", else: "Update Order"),
     return_to: Routes.order_index_path(@socket, :pending)
+  %>
+<% end %>
+<% if @live_action in [:mark_processed] do %>
+  <%= live_confirmation_modal @socket,
+    message: "Are you sure you want to mark this order as <%= @marking_action %>?",
+    return_to: Routes.order_index_path(@socket, @order.status),
+    success: @live_action,
+    title: @page_title
   %>
 <% end %>

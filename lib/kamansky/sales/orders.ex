@@ -59,6 +59,8 @@ defmodule Kamansky.Sales.Orders do
     end
   end
 
+  def get_order!(id), do: Repo.get!(Order, id)
+
   def get_order_detail(id) do
     listings_query =
       Listing
@@ -87,6 +89,7 @@ defmodule Kamansky.Sales.Orders do
     do
       new_orders
       |> Enum.reverse()
+      |> tl()
       |> List.first()
       |> List.wrap()
       |> Enum.each(
@@ -191,7 +194,7 @@ defmodule Kamansky.Sales.Orders do
                       Decimal.from_float(0.3 / Enum.count(listings))
                     ]
                     |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
-                    |> Decimal.round(2)
+                    |> Decimal.round(2, :floor)
 
                   # Update listing
                   listing
@@ -212,7 +215,7 @@ defmodule Kamansky.Sales.Orders do
                 selling_fees: total_selling_fees,
                 shipping_cost: Decimal.add(
                   Decimal.from_float(0.55),
-                  Decimal.from_float(0.2 * (Float.floor(Enum.count(listings) / 4) - 1))
+                  Decimal.from_float(0.2 * Float.floor(Enum.count(listings) / 4))
                 )
               ]
             )

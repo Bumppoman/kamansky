@@ -14,16 +14,16 @@
             <!--
             <%# if listing.stamp.front_photo.attached? %>
               <img
-                src="<%= rails_blob_path(listing.stamp.front_photo) %>"
+                src="<%# rails_blob_path(listing.stamp.front_photo) %>"
                 height="100"
                 class="me-4"
               />
-            <% else %>
+            <%# else %>
               <%# image_pack_tag 'media/images/blank-stamp.png',
                 height: 100,
                 class: 'me-4'
               %>
-            <% end %>
+            <%# end %>
             -->
           </td>
           <td style="width: 92%;">

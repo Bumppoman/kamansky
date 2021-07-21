@@ -61,7 +61,7 @@ defmodule Kamansky.Sales.Listings do
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
   def search_query(query, search) do
-    where(query, [s],
+    where(query, [l, s],
       ilike(s.scott_number, ^"%#{search}%")
     )
   end

@@ -126,10 +126,9 @@ defmodule Kamansky.Stamps do
       |> String.graphemes()
       |> Enum.count(&(&1 in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]))
 
-    #stamp_reference =
-    #  StampReference
-    #  |> Repo.get(stamp.stamp_reference_id)
-    stamp_reference = %StampReference{issue_type: :standard}
+    stamp_reference =
+      StampReference
+      |> Repo.get(stamp.stamp_reference_id)
 
     numeric_length =
       if !StampReference.standard?(stamp_reference), do: numeric_length + 1, else: numeric_length
