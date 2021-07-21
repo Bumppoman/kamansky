@@ -6,7 +6,9 @@ defmodule Kamansky.Sales.Orders do
 
   alias __MODULE__
   alias Kamansky.Repo
+  alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Sales.Orders.Order
+  alias Kamansky.Stamps.Stamp
   alias Kamansky.Services.Hipstamp
 
   def change_order(%Order{} = order, attrs \\ %{}) do
@@ -57,6 +59,19 @@ defmodule Kamansky.Sales.Orders do
     end
   end
 
+  def get_order_detail(id) do
+    listings_query =
+      Listing
+      |> join(:left, [l], s in assoc(l, :stamp))
+      |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
+      |> preload([l, s, sr], [stamp: {s, [stamp_reference: sr]}])
+
+    Order
+    |> where(id: ^id)
+    |> preload(listings: ^listings_query)
+    |> Repo.one()
+  end
+
   def list_orders(status, params) do
     orders =
       Order
@@ -71,11 +86,14 @@ defmodule Kamansky.Sales.Orders do
       new_orders <- Hipstamp.Order.all_pending(from_date)
     do
       new_orders
+      |> Enum.reverse()
+      |> List.first()
+      |> List.wrap()
       |> Enum.each(
         fn(hipstamp_order) ->
 
           # Create the order
-          with order <- get_or_initialize_order(hipstamp_id: hipstamp_order["id"]),
+          with order <- get_or_initialize_order(hipstamp_id: String.to_integer(hipstamp_order["id"])),
             ordered_at <-
               hipstamp_order["created_at"]
               |> NaiveDateTime.from_iso8601()
@@ -86,60 +104,119 @@ defmodule Kamansky.Sales.Orders do
               |> elem(1)
           do
             order =
-              %{order |
-                ordered_at: ordered_at,
-                item_price: Decimal.from_float(hipstamp_order["sales_listings_amount"] / 1),
-                shipping_price: Decimal.from_float(hipstamp_order["postage_amount"] / 1),
-                supply_cost: Decimal.from_float(0.1),
-                name: "#{String.capitalize(String.downcase(hipstamp_order["ShippingAddress"]["name_first"]))} #{humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["name_last"]))}",
-                street_address: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["address"])),
-                city: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["city"])),
-                state: String.upcase(hipstamp_order["ShippingAddress"]["state_abbreviation"]),
-                zip: hipstamp_order["ShippingAddress"]["postal_code"],
-                email: String.downcase(hipstamp_order["buyer_email"])
-              }
-
-            raise inspect order
+              order
+              |> Ecto.Changeset.change(
+                [
+                  ordered_at: ordered_at,
+                  item_price: Decimal.from_float(hipstamp_order["sales_listings_amount"] / 1),
+                  shipping_price: Decimal.from_float(hipstamp_order["postage_amount"] / 1),
+                  supply_cost: Decimal.from_float(0.1),
+                  name: "#{String.capitalize(String.downcase(hipstamp_order["ShippingAddress"]["name_first"]))} #{humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["name_last"]))}",
+                  street_address: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["address"])),
+                  city: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["city"])),
+                  state: String.upcase(hipstamp_order["ShippingAddress"]["state_abbreviation"]),
+                  zip: hipstamp_order["ShippingAddress"]["postal_code"],
+                  email: String.downcase(hipstamp_order["buyer_email"])
+                ]
+              )
+              |> Repo.insert_or_update()
+              |> elem(1)
 
             # Add all of the listings to the order and mark the stamps as sold
-            #hipstamp_order['SaleListings'].each do |sale_listing|
+            listings =
+              hipstamp_order["SaleListings"]
+              |> Enum.map(
+                fn sale_listing ->
 
-              # Find and update stamp
-              #stamp = Stamp.find_by_inventory_key(sale_listing['private_id'])
-              #stamp.update(status: :sold)
+                  # Find stamp
+                  stamp =
+                    Stamp
+                    |> where(inventory_key: ^sale_listing["private_id"])
+                    |> join(:left, [s], l in assoc(s, :listing))
+                    |> preload([s, l], [listing: l])
+                    |> Repo.one()
 
-              # Update the listing and add it to the order
-              #stamp.listing.update(
-              #  sale_price: sale_listing['price'],
-              #  sold_at: hipstamp_order['created_at'],
-              #  status: :sold
-              #)
-              #order.listings << stamp.listing
-            #end
+                  # Update stamp
+                  stamp
+                  |> Ecto.Changeset.change(status: :sold)
+                  |> Repo.update()
 
-            # Save the listings to the order
-            #order.save
+                  # Update the listing and add it to the order
+                  stamp.listing
+                  |> Ecto.Changeset.change(
+                    [
+                      order_id: order.id,
+                      sale_price: Decimal.new(sale_listing["price"]),
+                      status: :sold
+                    ]
+                  )
+                  |> Repo.update()
+                  |> elem(1)
+                end
+              )
 
             # Calculate the selling fees for each listing
-            #total_selling_fees = 0.0
-            #order.listings.each do |listing|
-            #  selling_fees =
-            #    (
-            #      (listing.listing_price * 0.0895).floor(2) +
-            #      ((order.shipping_price * 0.0895).floor(2) / order.listings.count) +
-            #      (listing.listing_price * 0.029) +
-            #      ((order.shipping_price * 0.029) / order.listings.count) +
-            #      (0.3 / order.listings.count)
-            #    )
-            #  listing.update(selling_fees: selling_fees)
-            #  total_selling_fees += selling_fees
-            #end
+            total_selling_fees =
+              listings
+              |> Enum.map(
+                fn listing ->
+                  selling_fees =
+                    [
+                      Decimal.mult(
+                        listing.sale_price,
+                        Decimal.from_float(0.0895)
+                      ),
+                      Decimal.div(
+                        Decimal.mult(
+                          order.shipping_price,
+                          Decimal.from_float(0.0895)
+                        ),
+                        Decimal.new(
+                          Enum.count(listings)
+                        )
+                      ),
+                      Decimal.mult(
+                        listing.sale_price,
+                        Decimal.from_float(0.029)
+                      ),
+                      Decimal.div(
+                        Decimal.mult(
+                          order.shipping_price,
+                          Decimal.from_float(0.029)
+                        ),
+                        Decimal.new(
+                          Enum.count(listings)
+                        )
+                      ),
+                      Decimal.from_float(0.3 / Enum.count(listings))
+                    ]
+                    |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
+                    |> Decimal.round(2)
 
-            # Calculate the total order selling fees
-            #order.update(
-            #  selling_fees: total_selling_fees,
-            #  shipping_cost: 0.55 + (0.2 * ((order.listings.count / 4).floor - 1))
-            #)
+                  # Update listing
+                  listing
+                  |> Ecto.Changeset.change(selling_fees: selling_fees)
+                  |> Repo.update()
+
+                  # Return the selling fees
+                  selling_fees
+                end
+              )
+              |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
+              |> Decimal.round(2)
+
+            # Calculate the total order selling fees and shipping fee
+            order
+            |> Ecto.Changeset.change(
+              [
+                selling_fees: total_selling_fees,
+                shipping_cost: Decimal.add(
+                  Decimal.from_float(0.55),
+                  Decimal.from_float(0.2 * (Float.floor(Enum.count(listings) / 4) - 1))
+                )
+              ]
+            )
+            |> Repo.update()
           end
         end
       )

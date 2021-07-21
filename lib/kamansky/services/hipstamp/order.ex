@@ -10,13 +10,19 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
-  def all_pending(from_time) do
-    with {:ok, response} <-
-      Hipstamp.get(
-        "/stores/#{hipstamp_username()}/sales/paid",
-        query: [created_time_from: from_time]
-      )
-    do
+  def all_pending(%DateTime{} = from_time) do
+    with(
+      from_time <-
+        from_time
+        |> DateTime.shift_zone("America/New_York")
+        |> elem(1)
+        |> Calendar.strftime("%c"),
+      {:ok, response} <-
+        Hipstamp.get(
+          "/stores/#{hipstamp_username()}/sales/paid",
+          query: [created_time_from: from_time]
+        )
+    ) do
       response.body["results"]
     end
   end

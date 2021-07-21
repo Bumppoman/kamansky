@@ -1,0 +1,102 @@
+<div class="mt-4">
+  <h2>Order #<%= Order.order_number(@order) %></h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th colspan="2">Stamp</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for listing <- @order.listings do %>
+        <tr>
+          <td>
+            <!--
+            <%# if listing.stamp.front_photo.attached? %>
+              <img
+                src="<%= rails_blob_path(listing.stamp.front_photo) %>"
+                height="100"
+                class="me-4"
+              />
+            <% else %>
+              <%# image_pack_tag 'media/images/blank-stamp.png',
+                height: 100,
+                class: 'me-4'
+              %>
+            <% end %>
+            -->
+          </td>
+          <td style="width: 92%;">
+            <%= StampReference.description(listing.stamp.stamp_reference) %><br />
+            <small>Item #<%= listing.stamp.inventory_key %></small>
+          </td>
+          <td style="width: 8%;"><%= format_decimal_as_currency(listing.sale_price) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" class="text-end pe-5">Subtotal</td>
+        <td><%= format_decimal_as_currency(@order.item_price) %></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="text-end pe-5 border-bottom border-dark">Shipping</td>
+        <td class="border-bottom border-dark"><%= format_decimal_as_currency(@order.shipping_price) %></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="text-end pe-5">Total</td>
+        <td><%= format_decimal_as_currency(Order.total_paid(@order)) %></td>
+      </tr>
+    </tfoot>
+  </table>
+  <section>
+    <div class="row">
+      <div class="col">
+        Ordered by:<br />
+        <%= @order.name %><br />
+        <%= @order.street_address %><br />
+        <%= @order.city %>, <%= @order.state %> <%= @order.zip %><br />
+        <%= @order.email %>
+      </div>
+      <div class="col">
+        <table class="table">
+          <thead>
+            <tr>
+              <th colspan="2">Metrics</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Price paid</td>
+              <td><%= format_decimal_as_currency(Order.total_paid(@order)) %></td>
+            </tr>
+            <tr>
+              <td>Stamp cost</td>
+              <td><%= format_decimal_as_currency(Order.total_stamp_cost(@order)) %></td>
+            </tr>
+            <tr>
+              <td>Selling fees</td>
+              <td><%= format_decimal_as_currency(@order.selling_fees) %></td>
+            </tr>
+            <tr>
+              <td>Shipping cost</td>
+              <td><%= format_decimal_as_currency(@order.shipping_cost) %></td>
+            </tr>
+            <tr>
+              <td>Supply cost</td>
+              <td><%= format_decimal_as_currency(Order.total_supply_cost(@order)) %></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="fw-bold">
+              <td>Net profit/loss</td>
+              <td class="<%= if Decimal.gt?(Order.net_profit(@order), Decimal.new(0)), do: "text-success", else: "text-danger" %>">
+                <%= format_decimal_as_currency(Order.net_profit(@order)) %>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>

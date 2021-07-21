@@ -14,7 +14,7 @@ defmodule Kamansky.Sales.Orders.Order do
     field :selling_fees, :decimal
     field :shipping_cost, :decimal
     field :supply_cost, :decimal
-    field :status, Ecto.Enum, values: [pending: 1, finalized: 2, processed: 3, shipped: 4, completed: 5]
+    field :status, Ecto.Enum, values: [pending: 1, finalized: 2, processed: 3, shipped: 4, completed: 5], default: :pending
     field :hipstamp_id, :integer
     field :name, :string
     field :street_address, :string
