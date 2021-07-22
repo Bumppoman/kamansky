@@ -27,7 +27,7 @@
     data_source: @data_source,
     empty_message: "There are no stamp references to display.",
     options: [
-      go_to_record: @go_to_record,
+      go_to_record: Map.get(assigns, :go_to_record),
       sort: 0
     ]
   do %>

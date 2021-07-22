@@ -24,13 +24,13 @@
     data_source: @data_source,
     empty_message: "There are no customers to display.",
     options: [
-      go_to_record: @go_to_record,
+      go_to_record: Map.get(assigns, :go_to_record),
       sort: 0
     ]
   do %>
   <td><%= @item.name %></td>
   <td><%= Customer.full_address(@item) %></td>
-  <td><%= @item.email %></td>
+  <td><%= @item.email || "---" %></td>
   <td>Amount Spent YTD</td>
   <td>Most Recent Purchase</td>
   <td>
