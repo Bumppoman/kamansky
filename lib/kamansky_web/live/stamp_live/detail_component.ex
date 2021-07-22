@@ -10,29 +10,26 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
   @impl true
   def update(assigns, socket) do
     with socket <- assign(socket, assigns) do
-      {:ok, assign(socket, :current_photo, current_photo(socket))}
+      {:ok, assign(socket, :current_photo, current_photo("front", socket))}
     end
   end
 
   @impl true
   def handle_event("change_photo", %{"display" => display}, socket) do
-    {
-      :noreply,
-      socket
-        |> assign(:current_photo, current_photo(socket))
-        |> assign(:display, display)
-    }
+    {:noreply, assign(socket, :current_photo, current_photo(display, socket))}
   end
 
-  def current_photo(%{assigns: %{stamp: %Stamp{front_photo: nil, rear_photo: nil}}} = socket) do
+  def current_photo(_display, %{assigns: %{stamp: %Stamp{front_photo: nil, rear_photo: nil}}} = socket) do
     {:blank, Routes.static_path(socket, "/images/blank-stamp.png")}
   end
 
-  def current_photo(%{assigns: %{display: "rear", stamp: %Stamp{rear_photo: rear_photo}}}) do
+  def current_photo("rear", %{assigns: %{stamp: %Stamp{rear_photo: rear_photo}}}) do
     {:rear, Attachment.path(rear_photo)}
   end
 
-  def current_photo(%{assigns: %{stamp: %Stamp{front_photo: front_photo}}}), do: {:front, Attachment.path(front_photo)}
+  def current_photo("front", %{assigns: %{stamp: %Stamp{front_photo: front_photo}}}) do
+    {:front, Attachment.path(front_photo)}
+  end
 
   def display_photo_nav(%Stamp{front_photo: nil}), do: false
   def display_photo_nav(%Stamp{rear_photo: nil}), do: false
