@@ -23,6 +23,12 @@ defmodule KamanskyWeb.CustomerLive.Index do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    socket
+    |> assign(:page_title, "Edit Customer")
+    |> assign(:customer, Customers.get_customer!(id))
+  end
+
   defp apply_action(socket, :index, params) do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))

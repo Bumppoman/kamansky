@@ -66,13 +66,9 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   def handle_event("per_page_changed", %{"per_page" => per_page}, socket) do
-    per_page = String.to_integer(per_page)
-
-    socket =
-      socket
-      |> assign(current_page: 1)
-      |> assign(
-        data: load_data_for_page(
+    with per_page <- String.to_integer(per_page),
+      {_count, data} <-
+        load_data_for_page(
           %{
             data_source: socket.assigns.data_source,
             current_page: 1,
@@ -80,12 +76,16 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
             search: socket.assigns.search,
             sort: socket.assigns.sort
           }
-        )
-      )
-      |> assign(per_page: per_page)
-      |> assign(total_pages: total_pages(socket.assigns.total_items, per_page))
-
-    {:noreply, socket}
+        ),
+      socket <-
+        socket
+        |> assign(current_page: 1)
+        |> assign(data: data)
+        |> assign(per_page: per_page)
+        |> assign(total_pages: total_pages(socket.assigns.total_items, per_page))
+    do
+      {:noreply, socket}
+    end
   end
 
   def handle_event("search", %{"search" => search}, socket) do

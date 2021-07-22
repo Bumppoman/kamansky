@@ -40,14 +40,13 @@
   </td>
   <% end %>
 </section>
-<%# if @live_action == do %>
-  <%# live_modal @socket,
-    KamanskyWeb.StampReferenceLive.FormComponent,
-    action: @live_action,
-    form_id: "stamp-reference-form",
-    id: "stamp-reference-form-modal",
-    stamp_reference: @stamp_reference,
-    title: (if @live_action == :new, do: "Add New Stamp Reference", else: "Edit Stamp Reference"),
-    return_to: Routes.stamp_reference_index_path(@socket, :index)
+<%= if @live_action == :edit do %>
+  <% live_modal KamanskyWeb.StampReferenceLive.FormComponent,
+    action: :edit,
+    form_id: "customer-form",
+    id: "customer-form-modal",
+    customer: @customer,
+    title: "Edit Customer"
+    return_to: Routes.customer_index_path(@socket, :index)
   %>
-<%# end %>
+<%= end %>

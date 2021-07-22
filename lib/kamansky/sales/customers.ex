@@ -7,6 +7,8 @@ defmodule Kamansky.Sales.Customers do
   alias Kamansky.Repo
   alias Kamansky.Sales.Customers.Customer
 
+  def change_customer(%Customer{} = customer, attrs \\ %{}), do: Customer.changeset(customer, attrs)
+
   def count_customers, do: Repo.aggregate(Customer, :count, :id)
 
   def find_row_number_for_customer(options) do
@@ -37,4 +39,10 @@ defmodule Kamansky.Sales.Customers do
   @impl true
   @spec sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :id})
+
+  def update_customer(%Customer{} = customer, attrs) do
+    customer
+    |> Customer.changeset(attrs)
+    |> Repo.update()
+  end
 end

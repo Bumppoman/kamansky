@@ -25,6 +25,6 @@ defmodule Kamansky.Sales.Customers.Customer do
       customer.city,
       "#{customer.state} #{customer.zip}"
     ]
-    |> Enum.join(",")
+    |> Enum.join(", ")
   end
 end
