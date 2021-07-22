@@ -8,22 +8,31 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
-  def handle_event("display_front_photo", _params, socket), do: {:noreply, assign(socket, :display_photo, :front)}
-  def handle_event("display_rear_photo", _params, socket), do: {:noreply, assign(socket, :display_photo, :rear)}
+  def mount(socket), do: {:ok, assign(socket, :current_photo, current_photo(socket))}
 
-  def current_photo(socket, %Stamp{front_photo: nil, rear_photo: nil}) do
-    Routes.static_path(socket, "/images/blank-stamp.png")
+  @impl true
+  def handle_event("change_photo", %{"display" => display}, socket) do
+    {
+      :noreply,
+      socket
+        |> assign(:current_photo, current_photo(socket))
+        |> assign(:display, display)
+    }
   end
 
-  def current_photo(%{assigns: %{display_photo: rear_photo}}, %Stamp{rear_photo: rear_photo}) do
-    Attachment.path(rear_photo)
+  def current_photo(%{assigns: %{stamp: %Stamp{front_photo: nil, rear_photo: nil}}}) do
+    {:blank, Routes.static_path(socket, "/images/blank-stamp.png")}
   end
 
-  def current_photo(_socket, %Stamp{front_photo: front_photo}), do: Attachment.path(front_photo)
+  def current_photo(%{assigns: %{display: "rear", stamp: %Stamp{rear_photo: rear_photo}}}) do
+    {:rear, Attachment.path(rear_photo)}
+  end
 
-  def display_photo_nav(%Stamp{front_photo: front_photo, rear_photo: rear_photo})
-    when not is_nil(front_photo) and not is_nil(rear_photo), do: true
-  def display_photo_nav(_), do: false
+  def current_photo(%{assigns: %{stamp: %Stamp{front_photo: front_photo}}}), do: {:front, Attachment.path(front_photo)}
+
+  def display_photo_nav(%Stamp{front_photo: nil}), do: false
+  def display_photo_nav(%Stamp{rear_photo: nil}), do: false
+  def display_photo_nav(_), do: true
 
   def formatted_history(%Stamp{} = stamp) do
     stamp
