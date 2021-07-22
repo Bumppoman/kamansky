@@ -16,16 +16,11 @@ defmodule Kamansky.Sales.Orders.Order do
     field :supply_cost, :decimal
     field :status, Ecto.Enum, values: [pending: 1, finalized: 2, processed: 3, shipped: 4, completed: 5], default: :pending
     field :hipstamp_id, :integer
-    field :name, :string
-    field :street_address, :string
-    field :city, :string
-    field :state, :string
-    field :zip, :string
-    field :email, :string
     field :processed_at, :utc_datetime
     field :shipped_at, :utc_datetime
     field :completed_at, :utc_datetime
 
+    belongs_to :customer, Kamansky.Sales.Customers.Customer
     has_many :listings, Kamansky.Sales.Listings.Listing
   end
 
@@ -37,14 +32,7 @@ defmodule Kamansky.Sales.Orders.Order do
 
   def hipstamp_changeset(order, attrs) do
     order
-    |> cast(
-      attrs,
-      [
-        :city, :email, :item_price, :name,
-        :ordered_at, :shipping_price, :state, :street_address,
-        :supply_cost, :zip
-      ]
-    )
+    |> cast(attrs, [:item_price, :ordered_at, :shipping_price, :supply_cost])
   end
 
   def net_profit(%Order{} = order) do

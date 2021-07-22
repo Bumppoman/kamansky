@@ -18,13 +18,14 @@
                 height="100"
                 class="me-4"
               />
-            <%# else %>
-              <%# image_pack_tag 'media/images/blank-stamp.png',
-                height: 100,
-                class: 'me-4'
-              %>
-            <%# end %>
             -->
+            <%# else %>
+              <img
+                src="<%= Routes.static_path(@socket, "/images/blank-stamp.png") %>"
+                height="100"
+                class="me-4"
+              />
+            <%# end %>
           </td>
           <td style="width: 92%;">
             <%= StampReference.description(listing.stamp.stamp_reference) %><br />
@@ -53,10 +54,10 @@
     <div class="row">
       <div class="col">
         Ordered by:<br />
-        <%= @order.name %><br />
-        <%= @order.street_address %><br />
-        <%= @order.city %>, <%= @order.state %> <%= @order.zip %><br />
-        <%= @order.email %>
+        <%= @order.customer.name %><br />
+        <%= @order.customer.street_address %><br />
+        <%= @order.customer.city %>, <%= @order.customer.state %> <%= @order.customer.zip %><br />
+        <%= @order.customer.email %>
       </div>
       <div class="col">
         <table class="table">
