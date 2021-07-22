@@ -11,15 +11,13 @@
       <%= for listing <- @order.listings do %>
         <tr>
           <td>
-            <!--
-            <%# if listing.stamp.front_photo.attached? %>
+            <%= if listing.stamp.front_photo do %>
               <img
-                src="<%# rails_blob_path(listing.stamp.front_photo) %>"
+                src="<%= Attachment.path(listing.stamp.front_photo) %>"
                 height="100"
                 class="me-4"
               />
-            -->
-            <%# else %>
+            <% else %>
               <img
                 src="<%= Routes.static_path(@socket, "/images/blank-stamp.png") %>"
                 height="100"

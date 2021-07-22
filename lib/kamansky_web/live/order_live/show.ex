@@ -3,6 +3,7 @@ defmodule KamanskyWeb.OrderLive.Show do
 
   import Kamansky.Helpers
 
+  alias Kamansky.Attachments.Attachment
   alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Stamps.StampReferences.StampReference
