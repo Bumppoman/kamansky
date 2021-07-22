@@ -49,7 +49,7 @@ module.exports = (env, options) => {
         patterns: [{ from: 'static/', to: '../' }],
       }),
       new RemoveSourceMapUrlWebpackPlugin({
-        test: /bootstrap\.esm\.js$/
+        test: /\.js/
       })
     ],
     resolve: {
