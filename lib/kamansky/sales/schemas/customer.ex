@@ -19,6 +19,9 @@ defmodule Kamansky.Sales.Customers.Customer do
     |> cast(attrs, [:city, :email, :name, :state, :street_address, :zip])
   end
 
+  def formatted_email(%Customer{email: email}) when email in [nil, ""], do: "---"
+  def formatted_email(%Customer{email: email}), do: email
+
   def full_address(%Customer{} = customer) do
     [
       customer.street_address,

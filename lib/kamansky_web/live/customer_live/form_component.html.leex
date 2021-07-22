@@ -43,7 +43,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-7 form-group required">
+    <div class="col-md-6 form-group required">
       <%= label f,
         :city,
         class: "form-control-label"
@@ -54,7 +54,7 @@
         required: true
       %>
     </div>
-    <div class="col-md-2 form-group required" phx-ignore="true">
+    <div class="col-md-2 form-group required" phx-update="ignore">
       <%= label f,
         :state,
         class: "form-control-label"
@@ -65,7 +65,7 @@
         class: "choices-select"
       %>
     </div>
-    <div class="col-md-3 form-group required">
+    <div class="col-md-4 form-group required">
       <%= label f,
         :zip,
         "ZIP Code",

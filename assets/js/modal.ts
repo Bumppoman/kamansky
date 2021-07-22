@@ -22,7 +22,12 @@ export const modalHook = {
   },
   
   destroyed () {
+    const modal = Modal.getInstance(this.el);
     this.el.removeEventListener('hidden.bs.modal', this._pushClose.bind(this));
+    if (modal) {
+      modal?.hide();
+      modal?.dispose();
+    }
     document.body.classList.remove('modal-open');
   },
   

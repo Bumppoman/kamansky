@@ -30,7 +30,7 @@
   do %>
   <td><%= @item.name %></td>
   <td><%= Customer.full_address(@item) %></td>
-  <td><%= @item.email || "---" %></td>
+  <td><%= Customer.formatted_email(@item) %></td>
   <td>Amount Spent YTD</td>
   <td>Most Recent Purchase</td>
   <td>
