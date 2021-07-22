@@ -8,7 +8,11 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
-  def mount(socket), do: {:ok, assign(socket, :current_photo, current_photo(socket))}
+  def update(assigns, socket) do
+    with socket <- assign(socket, assigns) do
+      {:ok, assign(socket, :current_photo, current_photo(socket))}
+    end
+  end
 
   @impl true
   def handle_event("change_photo", %{"display" => display}, socket) do
@@ -20,7 +24,7 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
     }
   end
 
-  def current_photo(%{assigns: %{stamp: %Stamp{front_photo: nil, rear_photo: nil}}}) do
+  def current_photo(%{assigns: %{stamp: %Stamp{front_photo: nil, rear_photo: nil}}} = socket) do
     {:blank, Routes.static_path(socket, "/images/blank-stamp.png")}
   end
 

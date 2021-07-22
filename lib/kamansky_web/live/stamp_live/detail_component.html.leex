@@ -3,22 +3,24 @@
     <div>
       <img
         height="200"
-        src="<%= @current_photo %>"
+        src="<%= elem(@current_photo, 1) %>"
       />
       <%= if display_photo_nav(@stamp) do %>
         <div class="text-center mt-2">
           <a
             href="#"
             class="<%= ["photo-display-link"] ++ (if Map.get(@socket.assigns, :current_photo) != :rear, do: [" fw-bold"], else: []) %>"
-            phx-click="display_front_photo"
+            phx-click="change_photo"
             phx-target="<%= @myself %>"
+            phx-value-display="front"
           >Front</a>
           |
           <a
             href="#"
             class="<%= ["photo-display-link"] ++ (if Map.get(@socket.assigns, :current_photo) == :rear, do: [" fw-bold"], else: []) %>"
-            phx-click="display_rear_photo"
+            phx-click="change_photo"
             phx-target="<%= @myself %>"
+            phx-value-display="rear"
           >Rear</a>
         </div>
       <% end %>
