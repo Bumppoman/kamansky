@@ -15,12 +15,6 @@ defmodule KamanskyWeb.Router do
     plug :accepts, ["json"]
   end
 
-  pipeline :files do
-    plug Plug.Static,
-      at: "/files",
-      from: {:kamansky, Application.get_env(:kamansky, :uploads_directory)}
-  end
-
   scope "/", KamanskyWeb do
     pipe_through :browser
 
@@ -59,11 +53,6 @@ defmodule KamanskyWeb.Router do
     live "/stamps/:id/edit", StampLive.Index, :edit
     live "/stamps/:id/move-to-stock", StampLive.Index, :move_to_stock
     live "/stamps/:id/sell", StampLive.Index, :sell
-  end
-
-  scope "/files" do
-    pipe_through :files
-    #get "/*path", ErrorController, :not_found
   end
 
   # Other scopes may use custom stacks.

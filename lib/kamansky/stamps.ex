@@ -221,28 +221,4 @@ defmodule Kamansky.Stamps do
     |> where([s], fragment("DATE_PART('month', ?)", s.inserted_at) == ^month)
     |> Repo.aggregate(:count, :id)
   end
-
-  def load_stamp_photos do
-    File.ls!("/data/kamansky/CONVERSION")
-    |> Enum.each(fn file ->
-      [stamp_id, rest] = String.split(file, "-")
-      [type, _ext] = String.split(rest, ".")
-
-      stamp = get_stamp!(stamp_id)
-
-      path = Path.join(["/data/kamansky/CONVERSION", file])
-
-      stat = File.stat!(path)
-
-      {:ok, {:ok, attachment}} =
-        Kamansky.Attachments.create_attachment(
-          %{path: path},
-          %{client_size: stat.size, client_name: "#{type}.jpg", client_type: "image/jpeg"}
-        )
-
-      stamp
-      |> Ecto.Changeset.change([{String.to_existing_atom("#{type}_photo_id"), attachment.id}])
-      |> Repo.update()
-    end)
-  end
 end
