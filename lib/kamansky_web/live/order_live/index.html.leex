@@ -70,25 +70,25 @@
     <li class="nav-item">
       <%= live_patch "Pending",
         to: Routes.order_index_path(@socket, :pending),
-        class: ["nav-link"] ++ (unless @live_action in [:completed, :finalized, :processed, :shipped], do: [" active"], else: [])
+        class: ["nav-link"] ++ (if @live_action in [:new, :pending], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
       <%= live_patch "Finalized",
         to: Routes.order_index_path(@socket, :finalized),
-        class: ["nav-link"] ++ (if @live_action == :finalized, do: [" active"], else: [])
+        class: ["nav-link"] ++ (if @live_action in [:finalized, :mark_processed], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
       <%= live_patch "Processed",
         to: Routes.order_index_path(@socket, :processed),
-        class: ["nav-link"] ++ (if @live_action == :processed, do: [" active"], else: [])
+        class: ["nav-link"] ++ (if @live_action in [:processed, :mark_shipped], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
       <%= live_patch "Shipped",
         to: Routes.order_index_path(@socket, :shipped),
-        class: ["nav-link"] ++ (if @live_action == :shipped, do: [" active"], else: [])
+        class: ["nav-link"] ++ (if @live_action in [:shipped, :mark_completed], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">

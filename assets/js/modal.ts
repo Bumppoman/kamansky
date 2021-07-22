@@ -5,7 +5,8 @@ import { createDefaultChoices } from './utils';
 
 export const modalHook = {
   mounted () {
-    Modal.getOrCreateInstance(this.el).show();
+    // Workaround type declaration until @types/bootstrap updated (2021-07-22)
+    (Modal as unknown as Modal & { getOrCreateInstance (el: HTMLElement): Modal }).getOrCreateInstance(this.el).show();
     
     for (const select of this.el.querySelectorAll('.choices-select')) {
       createDefaultChoices(select as HTMLSelectElement);
@@ -23,7 +24,6 @@ export const modalHook = {
   
   destroyed () {
     this.el.removeEventListener('hidden.bs.modal', this._pushClose.bind(this));
-    //this.modalInstance.hide();
     Modal.getInstance(this.el)?.hide();
   },
   

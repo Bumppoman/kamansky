@@ -50,6 +50,7 @@ defmodule KamanskyWeb.OrderLive.Index do
         o when not is_nil(o.hipstamp_id) ->
           Hipstamp.Order.mark_shipped(order)
         _ ->
+          Orders.mark_order_as_shipped(order)
       end
 
       {
