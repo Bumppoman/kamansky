@@ -7,14 +7,12 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
   alias Kamansky.Sales.Orders.Order
 
   @impl true
-  def update(%{customer: customer, order: order} = assigns, socket) do
-    with order_changeset <- Orders.change_order(order),
-      customer_changeset <- Customers.change_customer(customer),
+  def update(%{order: order} = assigns, socket) do
+    with changeset <- Orders.change_new_order(order),
       socket <-
         socket
         |> assign(assigns)
-        |> assign(:customer_changeset, customer_changeset)
-        |> assign(:order_changeset, order_changeset)
+        |> assign(:changeset, changeset)
     do
       {:ok, socket}
     end
@@ -24,13 +22,13 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
   def handle_event("validate", %{"order" => order_params}, socket) do
     changeset =
       socket.assigns.order
-      |> Orders.change_order(order_params)
+      |> Orders.change_new_order(order_params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
 
-  def handle_event("submit", %{"order" => order_params}, socket) do
+  def handle_event("submit", %{"order" => order_params} = params, socket) do
     save_order(socket, socket.assigns.action, order_params)
   end
 

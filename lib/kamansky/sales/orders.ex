@@ -9,9 +9,9 @@ defmodule Kamansky.Sales.Orders do
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.Hipstamp
 
-  def change_order(%Order{} = order, attrs \\ %{}) do
-    Order.changeset(order, attrs)
-  end
+  def change_new_order(%Order{} = order, attrs \\ %{}), do: Order.new_changeset(order, attrs)
+
+  def change_order(%Order{} = order, attrs \\ %{}), do: Order.changeset(order, attrs)
 
   def count_orders(:all) do
     Repo.aggregate(Order, :count, :id)
@@ -31,7 +31,8 @@ defmodule Kamansky.Sales.Orders do
 
   def create_order(attrs) do
     %Order{}
-    |> Order.changeset(attrs)
+    |> Order.new_changeset(attrs)
+    |> Ecto.Changeset.put_change(:ordered_at, DateTime.truncate(DateTime.utc_now(), :second))
     |> Repo.insert()
   end
 
@@ -107,14 +108,12 @@ defmodule Kamansky.Sales.Orders do
   end
 
   def mark_order_as_shipped(%Order{} = order) do
-    with :ok <- Hipstamp.Order.mark_shipped(order) do
-      order
-      |> Ecto.Changeset.change(
-        status: :shipped,
-        shipped_at: DateTime.truncate(DateTime.utc_now(), :second)
-      )
-      |> Repo.update()
-    end
+    order
+    |> Ecto.Changeset.change(
+      status: :shipped,
+      shipped_at: DateTime.truncate(DateTime.utc_now(), :second)
+    )
+    |> Repo.update()
   end
 
   def most_recent_order do

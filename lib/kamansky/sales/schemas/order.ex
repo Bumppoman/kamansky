@@ -30,6 +30,9 @@ defmodule Kamansky.Sales.Orders.Order do
     |> validate_required([])
   end
 
+  def completed?(%Order{status: :completed}), do: true
+  def completed?(%Order{}), do: false
+
   def hipstamp_changeset(order, attrs) do
     order
     |> cast(attrs, [:item_price, :ordered_at, :shipping_price, :supply_cost])
@@ -37,6 +40,12 @@ defmodule Kamansky.Sales.Orders.Order do
 
   def net_profit(%Order{} = order) do
     Decimal.sub(total_paid(order), total_cost(order))
+  end
+
+  def new_changeset(order, attrs) do
+    order
+    |> cast(attrs, [:item_price, :selling_fees, :shipping_cost, :shipping_price, :supply_cost])
+    |> cast_assoc(:customer, with: &Kamansky.Sales.Customers.Customer.changeset/2)
   end
 
   def order_number(%Order{id: id}), do: :io_lib.format("~9..0B", [id])

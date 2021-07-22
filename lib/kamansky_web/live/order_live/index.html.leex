@@ -8,12 +8,14 @@
       <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
     </div>
   <% end %>
-  <div class="text-end mb-2">
-    <%= live_patch "Create Order",
-      to: Routes.order_index_path(@socket, :new),
-      class: "btn btn-primary"
-    %>
-  </div>
+  <%= unless @live_action in [:completed, :finalized, :processed, :shipped] do %>
+    <div class="text-end mb-2">
+      <%= live_patch "Create Order",
+        to: Routes.order_index_path(@socket, :new),
+        class: "btn btn-primary"
+      %>
+    </div>
+  <% end %>
   <%= live_component KamanskyWeb.ComponentLive.TableComponent,
     id: "orders-kamansky-data-table",
     headers:
@@ -68,7 +70,7 @@
     <li class="nav-item">
       <%= live_patch "Pending",
         to: Routes.order_index_path(@socket, :pending),
-        class: ["nav-link"] ++ (if @live_action == :pending, do: [" active"], else: [])
+        class: ["nav-link"] ++ (unless @live_action in [:completed, :finalized, :processed, :shipped], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
@@ -102,7 +104,6 @@
     action: @live_action,
     form_id: "order-form",
     id: "order-form-modal",
-    customer: @customer,
     order: @order,
     title: (if @live_action == :new, do: "Create Order", else: "Update Order"),
     return_to: Routes.order_index_path(@socket, :pending)

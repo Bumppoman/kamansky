@@ -1,4 +1,4 @@
-<%= f = form_for @order_changeset,
+<%= f = form_for @changeset,
   "#",
   id: @form_id,
   phx_target: @myself,
@@ -11,7 +11,7 @@
         <%= label cf, :name, class: "form-control-label" %>
         <%= text_input cf, :name, class: "form-control" %>
       </div>
-      <div class="col-md-6 form-group required">
+      <div class="col-md-6 form-group">
         <%= label cf, :email, class: "form-control-label" %>
         <%= text_input cf, :email, class: "form-control" %>
       </div>
@@ -27,7 +27,7 @@
         <%= label cf, :city, class: "form-control-label" %>
         <%= text_input cf, :city, class: "form-control" %>
       </div>
-      <div class="col-md-2 form-group required">
+      <div class="col-md-2 form-group required" phx-update="ignore">
         <%= label cf, :state, class: "form-control-label" %>
         <%= select cf,
           :state,

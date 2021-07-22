@@ -142,13 +142,13 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
-  def mark_shipped(%Order{hipstamp_id: id}) do
+  def mark_shipped(%Order{hipstamp_id: id} = order) do
     Hipstamp.put(
       "/stores/#{hipstamp_username()}/sales/#{id}",
       %{ flag_shipping: 1 }
     )
 
-    :ok
+    Orders.mark_order_as_shipped(order)
   end
 
   defp hipstamp_username, do: Application.get_env(:kamansky, :hipstamp_username)

@@ -6,6 +6,7 @@ defmodule KamanskyWeb.OrderLive.Index do
   alias Kamansky.Sales.Customers.Customer
   alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
+  alias Kamansky.Services.Hipstamp
 
   @impl true
   def mount(_params, session, socket), do: {:ok, assign_defaults(socket, session)}
@@ -43,6 +44,23 @@ defmodule KamanskyWeb.OrderLive.Index do
     end
   end
 
+  def handle_event("mark_shipped", _value, socket) do
+    with order <- socket.assigns.order do
+      case order do
+        o when not is_nil(o.hipstamp_id) ->
+          Hipstamp.Order.mark_shipped(order)
+        _ ->
+      end
+
+      {
+        :noreply,
+        socket
+          |> put_flash(:info, "You have successfully marked this order as shipped.")
+          |> push_redirect(to: Routes.order_index_path(socket, order.status))
+      }
+    end
+  end
+
   @impl true
   def handle_params(params, _uri, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
@@ -68,11 +86,20 @@ defmodule KamanskyWeb.OrderLive.Index do
     end
   end
 
+  defp apply_action(socket, :mark_shipped, %{"id" => id}) do
+    with order <- Orders.get_order!(id) do
+      socket
+      |> assign(:page_title, "Mark Order as Shipped")
+      |> assign(:order, order)
+      |> assign(:marking_action, "shipped")
+      |> load_orders(order.status)
+    end
+  end
+
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:customer, %Customer{})
     |> assign(:page_title, "Create Order")
-    |> assign(:order, %Order{})
+    |> assign(:order, %Order{customer: %Customer{}})
     |> load_orders(:pending)
   end
 
