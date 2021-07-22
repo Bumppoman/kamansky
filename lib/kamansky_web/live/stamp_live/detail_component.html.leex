@@ -9,7 +9,7 @@
         <div class="text-center mt-2">
           <a
             href="#"
-            class="<%= ["photo-display-link"] ++ (if {:rear, _photo} != @current_photo, do: [" fw-bold"], else: []) %>"
+            class="<%= ["photo-display-link"] ++ (if elem(@current_photo, 0) != :rear, do: [" fw-bold"], else: []) %>"
             phx-click="change_photo"
             phx-target="<%= @myself %>"
             phx-value-display="front"
@@ -17,7 +17,7 @@
           |
           <a
             href="#"
-            class="<%= ["photo-display-link"] ++ (if {:rear, _photo} == @current_photo, do: [" fw-bold"], else: []) %>"
+            class="<%= ["photo-display-link"] ++ (if elem(@current_photo, 0) == :rear, do: [" fw-bold"], else: []) %>"
             phx-click="change_photo"
             phx-target="<%= @myself %>"
             phx-value-display="rear"
