@@ -8,8 +8,8 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
-  def handle_event("display_front_photo", _params, socket), do: {:noreply, assign(socket, :current_photo, :front)}
-  def handle_event("display_rear_photo", _params, socket), do: {:noreply, assign(socket, :current_photo, :rear)}
+  def handle_event("display_front_photo", _params, socket), do: {:noreply, assign(socket, :display_photo, :front)}
+  def handle_event("display_rear_photo", _params, socket), do: {:noreply, assign(socket, :display_photo, :rear)}
 
   def current_photo(socket, %Stamp{front_photo: nil, rear_photo: nil}) do
     Routes.static_path(socket, "/images/blank-stamp.png")

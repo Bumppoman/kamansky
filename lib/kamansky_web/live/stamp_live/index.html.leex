@@ -61,8 +61,7 @@
   <% end %>
 </section>
 <%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket,
-    KamanskyWeb.StampLive.FormComponent,
+  <%= live_modal KamanskyWeb.StampLive.FormComponent,
     action: @live_action,
     form_id: "stamp-form",
     id: "stamp-form-modal",
@@ -73,8 +72,7 @@
   %>
 <% end %>
 <%= if @live_action == :show do %>
-  <%= live_modal @socket,
-    KamanskyWeb.StampLive.DetailComponent,
+  <%= live_modal KamanskyWeb.StampLive.DetailComponent,
     footer: false,
     id: "stamp-detail-modal",
     stamp: @stamp,
@@ -83,16 +81,15 @@
   %>
 <% end %>
 <%= if @live_action == :move_to_stock do %>
-  <%= live_confirmation_modal @socket,
+  <%= live_confirmation_modal(
     message: "Are you sure you want to move this stamp to stock?",
     return_to: Routes.stamp_index_path(@socket, @status),
     success: :move_to_stock,
     title: "Move Stamp To Stock"
-  %>
+  ) %>
 <% end %>
 <%= if @live_action == :sell do %>
-  <%= live_modal @socket,
-    KamanskyWeb.StampLive.ListingFormComponent,
+  <%= live_modal KamanskyWeb.StampLive.ListingFormComponent,
     action: @live_action,
     form_id: "list-stamp-form",
     id: "list-stamp-form-modal",
