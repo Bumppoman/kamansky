@@ -51,7 +51,7 @@ defmodule Kamansky.Attachments do
         [
           Application.get_env(:kamansky, :uploads_directory),
           Attachment.hash_path(hash),
-          String.slice(hash, 0, 16) <> file_type
+          String.slice(hash, 0, 24) <> file_type
         ]
       )
     )

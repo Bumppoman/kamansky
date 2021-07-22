@@ -1,5 +1,6 @@
 defmodule Kamansky.Attachments.Attachment do
   use Ecto.Schema
+  @timestamps_opts [type: :utc_datetime]
 
   import Ecto.Changeset
 
@@ -10,8 +11,7 @@ defmodule Kamansky.Attachments.Attachment do
     size: integer,
     content_type: String.t,
     hash: String.t,
-    inserted_at: DateTime.t,
-    updated_at: DateTime.t
+    inserted_at: DateTime.t
   }
 
   schema "attachments" do
@@ -20,7 +20,7 @@ defmodule Kamansky.Attachments.Attachment do
     field :content_type, :string
     field :hash, :string
 
-    timestamps()
+    timestamps(updated_at: false)
   end
 
   @doc "Return an empty `Ecto.Changeset` for an attachment."
@@ -36,7 +36,7 @@ defmodule Kamansky.Attachments.Attachment do
 
   def path(nil), do: nil
   def path(%Attachment{} = attachment) do
-    filename = String.slice(attachment.hash, 0, 16) <> Path.extname(attachment.filename)
+    filename = String.slice(attachment.hash, 0, 24) <> Path.extname(attachment.filename)
 
     Path.join(["/files", hash_path(attachment.hash), filename])
   end
