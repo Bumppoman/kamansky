@@ -41,12 +41,12 @@
   <% end %>
 </section>
 <%= if @live_action == :edit do %>
-  <% live_modal KamanskyWeb.StampReferenceLive.FormComponent,
+  <%= live_modal KamanskyWeb.StampReferenceLive.FormComponent,
     action: :edit,
     form_id: "customer-form",
     id: "customer-form-modal",
     customer: @customer,
-    title: "Edit Customer"
+    title: "Edit Customer",
     return_to: Routes.customer_index_path(@socket, :index)
   %>
-<%= end %>
+<% end %>

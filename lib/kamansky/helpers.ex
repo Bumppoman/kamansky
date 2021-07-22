@@ -59,7 +59,7 @@ defmodule Kamansky.Helpers do
     |> String.downcase()
   end
 
-  def states
+  def states do
     [
       "AL", "AK", "AZ", "AR",
       "CA", "CO", "CT", "DC",

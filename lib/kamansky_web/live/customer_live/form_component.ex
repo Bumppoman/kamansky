@@ -29,10 +29,10 @@ defmodule KamanskyWeb.CustomerLive.FormComponent do
   end
 
   def handle_event("submit", %{"customer" => customer_params}, socket) do
-    save_customer(socket, customer)
+    save_customer(socket, customer_params)
   end
 
-  defp save_stamp_reference(socket, customer_params) do
+  defp save_customer(socket, customer_params) do
     case Customers.update_customer(socket.assigns.customer, customer_params) do
       {:ok, %Customer{id: id}} ->
         {:noreply,
