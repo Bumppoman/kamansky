@@ -80,13 +80,27 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.insert_or_update()
   end
 
-  def list_orders(status, params) do
+  def list_orders(params \\ []) do
+    Order
+    |> where(^params)
+    |> Repo.all()
+  end
+
+  def list_orders(:display, status, params) do
     orders =
       Order
       |> where(status: ^status)
       |> preload([o], [listings: :stamp])
 
     Paginate.list(Orders, orders, params)
+  end
+
+  def list_pending_orders_to_add_listing do
+    Order
+    |> where(status: :pending)
+    |> join(:left, [o], c in assoc(o, :customer))
+    |> preload([o, c], [customer: c])
+    |> Repo.all()
   end
 
   def mark_order_as_completed(%Order{} = order) do

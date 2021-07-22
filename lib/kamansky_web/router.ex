@@ -31,6 +31,7 @@ defmodule KamanskyWeb.Router do
 
     live "/listings", ListingLive.Active, :index
     live "/listings/sold", ListingLive.Sold, :index
+    live "/listings/:id/add-to-order", ListingLive.Active, :add_to_order
 
     post "/login", SessionController, :create
     delete "/logout", SessionController, :delete

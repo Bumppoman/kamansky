@@ -66,7 +66,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-4 form-group">
+    <div class="col-md-6 form-group">
       <%= label f, :selling_fees, class: "form-control-label" %>
       <div class="input-group">
         <div class="input-group-prepend">
@@ -77,7 +77,7 @@
         <%= text_input f, :selling_fees, class: "form-control" %>
       </div>
     </div>
-    <div class="col-md-4 form-group">
+    <div class="col-md-6 form-group">
       <%= label f, :shipping_cost, class: "form-control-label" %>
       <div class="input-group">
         <div class="input-group-prepend">
@@ -86,17 +86,6 @@
           </span>
         </div>
         <%= text_input f, :shipping_cost, class: "form-control" %>
-      </div>
-    </div>
-    <div class="col-md-4 form-group">
-      <%= label f, :supply_cost, "Order supply cost", class: "form-control-label" %>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">
-            <i class="material-icons">attach_money</i>
-          </span>
-        </div>
-        <%= text_input f, :supply_cost, class: "form-control", value: "0.10" %>
       </div>
     </div>
   </div>

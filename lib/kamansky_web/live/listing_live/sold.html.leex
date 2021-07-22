@@ -15,12 +15,7 @@
         "Scott Number",
         "Date of Sale",
         "Sale Price",
-        "Shipping Price",
         "Stamp Cost",
-        "Selling Fees",
-        "Shipping Cost",
-        "Supply Cost",
-        "Gross Profit",
         "Net Profit/Loss"
       ],
     data_count: @data_count,
@@ -35,13 +30,8 @@
     <td><%= @item.stamp.scott_number %></td>
     <td><%= formatted_date(@item.order.ordered_at) %></td>
     <td class="text-success"><%= format_decimal_as_currency(@item.sale_price) %></td>
-    <td class="text-success"><%= format_decimal_as_currency(Listing.shipping_price(@item)) %></td>
-    <td class="text-danger"><%= format_decimal_as_currency(Stamp.total_cost(@item.stamp)) %></td>
-    <td class="text-danger"><%= format_decimal_as_currency(@item.selling_fees) %></td>
-    <td class="text-danger"><%= format_decimal_as_currency(Listing.shipping_cost(@item)) %></td>
-    <td class="text-danger"><%= format_decimal_as_currency(Listing.supply_cost(@item)) %></td>
-    <td class="<%= if Decimal.gt?(Listing.gross_profit(@item), 0), do: "text-success", else: "text-danger" %>">
-      <%= format_decimal_as_currency(Listing.gross_profit(@item)) %>
+    <td class="<%= if Decimal.eq?(Stamp.total_cost(@item.stamp), 0), do: "", else: "text-danger" %>">
+      <%= format_decimal_as_currency(Stamp.total_cost(@item.stamp)) %>
     </td>
     <td class="<%= if Decimal.gt?(Listing.net_profit(@item), 0), do: "text-success", else: "text-danger" %>">
       <%= format_decimal_as_currency(Listing.net_profit(@item)) %>

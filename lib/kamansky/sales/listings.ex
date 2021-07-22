@@ -7,6 +7,13 @@ defmodule Kamansky.Sales.Listings do
   alias Kamansky.Repo
   alias Kamansky.Sales.Listings.Listing
 
+  def add_listing_to_order(%Listing{} = listing, attrs) do
+    listing
+    |> Listing.changeset(attrs)
+    |> Ecto.Changeset.put_change(:status, :sold)
+    |> Repo.update()
+  end
+
   def change_listing(%Listing{} = listing, attrs \\ %{}) do
     Listing.changeset(listing, attrs)
   end
@@ -33,6 +40,8 @@ defmodule Kamansky.Sales.Listings do
     |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
     |> elem(1)
   end
+
+  def get_listing!(id), do: Repo.get!(Listing, id)
 
   def list_listings(status, params) do
     listings =

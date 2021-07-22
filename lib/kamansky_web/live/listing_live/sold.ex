@@ -17,6 +17,7 @@ defmodule KamanskyWeb.ListingLive.Sold do
         data_locator: fn options -> Listings.find_row_number_for_listing(:sold, options) end,
         data_source: fn options -> Listings.list_sold_listings(options) end
       ])
+      |> assign(:page_title, "Sold Listings")
 
     {:ok, socket}
   end

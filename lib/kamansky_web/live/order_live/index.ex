@@ -121,7 +121,7 @@ defmodule KamanskyWeb.OrderLive.Index do
       [
         data_count: Orders.count_orders(status),
         data_locator: fn options -> Orders.find_row_number_for_order(status, options) end,
-        data_source: fn options -> Orders.list_orders(status, options) end
+        data_source: fn options -> Orders.list_orders(:display, status, options) end
       ]
     )
   end

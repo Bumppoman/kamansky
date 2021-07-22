@@ -47,9 +47,9 @@
     <td><%= format_decimal_as_currency(@item.listing_price) %></td>
     <td><%= formatted_date(@item.inserted_at) %></td>
     <td>
-      <a class="action-icon">
+      <%= live_patch to: Routes.listing_active_path(@socket, :add_to_order, @item), class: "action-icon" do %>
         <i class="material-icons">add_shopping_cart</i>
-      </a>
+      <% end %>
     </td>
   <% end %>
   <ul class="nav nav-pills justify-content-center">
@@ -61,3 +61,14 @@
     </li>
   </ul>
 </section>
+<%= if @live_action == :add_to_order do %>
+  <%= live_modal KamanskyWeb.ListingLive.AddToOrderFormComponent,
+    action: @live_action,
+    form_id: "listing-add_to_order-modal-form",
+    id: "listing-add_to_order-modal",
+    listing: @listing,
+    pending_orders: @pending_orders,
+    title: "Add Listing to Order",
+    return_to: Routes.listing_active_path(@socket, :index)
+  %>
+<% end %>
