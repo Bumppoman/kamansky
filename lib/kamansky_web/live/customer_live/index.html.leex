@@ -1,0 +1,53 @@
+<section class="section-wrapper">
+  <%= if live_flash(@flash, :info) do %>
+  <div
+    id="customers-success-message"
+    class="disappearing-success-message"
+    phx-hook="disappearingSuccessMessage"
+  >
+    <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
+  </div>
+  <% end %>
+  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
+    id: "customers-kamansky-data-table",
+    headers:
+      [
+        "Name",
+        "Address",
+        "Email",
+        "Amount Spent YTD",
+        "Most Recent Purchase",
+        "Actions",
+      ],
+    data_count: @data_count,
+    data_locator: @data_locator,
+    data_source: @data_source,
+    empty_message: "There are no customers to display.",
+    options: [
+      go_to_record: @go_to_record,
+      sort: 0
+    ]
+  do %>
+  <td><%= @item.name %></td>
+  <td><%= Customer.full_address(@item) %></td>
+  <td><%= @item.email %></td>
+  <td>Amount Spent YTD</td>
+  <td>Most Recent Purchase</td>
+  <td>
+    <%= live_patch to: Routes.customer_index_path(@socket, :edit, @item), class: "action-icon" do %>
+      <i class="material-icons">edit</i>
+    <% end %>
+  </td>
+  <% end %>
+</section>
+<%# if @live_action == do %>
+  <%# live_modal @socket,
+    KamanskyWeb.StampReferenceLive.FormComponent,
+    action: @live_action,
+    form_id: "stamp-reference-form",
+    id: "stamp-reference-form-modal",
+    stamp_reference: @stamp_reference,
+    title: (if @live_action == :new, do: "Add New Stamp Reference", else: "Edit Stamp Reference"),
+    return_to: Routes.stamp_reference_index_path(@socket, :index)
+  %>
+<%# end %>

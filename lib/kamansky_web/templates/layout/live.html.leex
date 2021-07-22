@@ -39,6 +39,12 @@
           >Admin</a>
           <ul class="dropdown-menu">
             <li>
+              <%= live_redirect "Customers",
+                to: Routes.customer_index_path(@socket, :index),
+                class: "dropdown-item"
+              %>
+            </li>
+            <li>
               <%= live_redirect "Stamp References",
                 to: Routes.stamp_reference_index_path(@socket, :index),
                 class: "dropdown-item"

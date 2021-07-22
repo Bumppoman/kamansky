@@ -14,8 +14,17 @@ defmodule Kamansky.Sales.Customers.Customer do
     field :zip, :string
   end
 
-  def changeset(customer, attrs) do
+  def changeset(%Customer{} = customer, attrs) do
     customer
     |> cast(attrs, [:city, :email, :name, :state, :street_address, :zip])
+  end
+
+  def full_address(%Customer{} = customer) do
+    [
+      customer.street_address,
+      customer.city,
+      "#{customer.state} #{customer.zip}"
+    ]
+    |> Enum.join(",")
   end
 end

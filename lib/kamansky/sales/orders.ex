@@ -62,14 +62,14 @@ defmodule Kamansky.Sales.Orders do
   def get_order_detail(id) do
     listings_query =
       Listing
-      |> join(:left, [l], c in assoc(l, :customer))
       |> join(:left, [l], s in assoc(l, :stamp))
-      |> join(:left, [l, ..., s], sr in assoc(s, :stamp_reference))
-      |> preload([l, c, s, sr], [customer: c, stamp: {s, [stamp_reference: sr]}])
+      |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
+      |> preload([l, s, sr], [stamp: {s, [stamp_reference: sr]}])
 
     Order
     |> where(id: ^id)
-    |> preload(listings: ^listings_query)
+    |> join(:left, [o], c in assoc(o, :customer))
+    |> preload([o, c], customer: c, listings: ^listings_query)
     |> Repo.one()
   end
 

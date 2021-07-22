@@ -7,13 +7,7 @@ defmodule KamanskyWeb.OrderLive.Index do
   alias Kamansky.Sales.Orders.Order
 
   @impl true
-  def mount(params, session, socket) do
-    socket =
-      socket
-      |> assign_defaults(session)
-
-    {:ok, socket}
-  end
+  def mount(_params, session, socket), do: {:ok, assign_defaults(socket, session)}
 
   @impl true
   def handle_event("mark_completed", _value, socket) do
