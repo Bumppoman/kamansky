@@ -1,17 +1,23 @@
 defmodule KamanskyWeb.OrderLive.FormComponent do
   use KamanskyWeb, :live_component
 
-  alias Kamansky.Sales.Orders
+  import Kamansky.Helpers
+
+  alias Kamansky.Sales.{Customers, Orders}
   alias Kamansky.Sales.Orders.Order
 
   @impl true
-  def update(%{order: order} = assigns, socket) do
-    changeset = Orders.change_order(order)
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+  def update(%{customer: customer, order: order} = assigns, socket) do
+    with order_changeset <- Orders.change_order(order),
+      customer_changeset <- Customers.change_customer(customer),
+      socket <-
+        socket
+        |> assign(assigns)
+        |> assign(:customer_changeset, customer_changeset)
+        |> assign(:order_changeset, order_changeset)
+    do
+      {:ok, socket}
+    end
   end
 
   @impl true

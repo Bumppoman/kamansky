@@ -41,7 +41,8 @@ defmodule KamanskyWeb.Router do
     live "/orders/shipped", OrderLive.Index, :shipped
     live "/orders/completed", OrderLive.Index, :completed
     live "/orders/new", OrderLive.Index, :new
-    live "/orders/:id/show", OrderLive.Show, :show
+    live "/orders/:id", OrderLive.Show, :show
+    live "/orders/:id/edit", OrderLive.Index, :edit
     live "/orders/:id/mark-completed", OrderLive.Index, :mark_completed
     live "/orders/:id/mark-processed", OrderLive.Index, :mark_processed
     live "/orders/:id/mark-shipped", OrderLive.Index, :mark_shipped

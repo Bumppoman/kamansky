@@ -3,6 +3,7 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   import Kamansky.Helpers
 
+  alias Kamansky.Sales.Customers.Customer
   alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
 
@@ -69,6 +70,7 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
+    |> assign(:customer, %Customer{})
     |> assign(:page_title, "Create Order")
     |> assign(:order, %Order{})
     |> load_orders(:pending)
@@ -84,7 +86,6 @@ defmodule KamanskyWeb.OrderLive.Index do
     |> load_orders(action)
   end
 
-  defp load_orders(%{assigns: %{live_action: live_action}} = socket, _params) when live_action == :new, do: load_orders(socket, :pending)
   defp load_orders(socket, %{"status" => status}), do: load_orders(socket, String.to_existing_atom(status))
   defp load_orders(socket, %{}), do: load_orders(socket, socket.assigns.live_action)
   defp load_orders(socket, status) when status in [:pending, :finalized, :processed, :shipped, :completed] do
