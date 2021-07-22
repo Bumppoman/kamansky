@@ -38,7 +38,7 @@ defmodule KamanskyWeb.CustomerLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "You have successfully updated this customer.")
-         |> push_redirect(to: socket.assigns.return_to, go_to_record: id)}
+         |> push_redirect(to: Routes.customer_index_path(@socket, :index, go_to_record: id))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
