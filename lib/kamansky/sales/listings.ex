@@ -31,6 +31,9 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.insert()
   end
 
+  @impl true
+  def exclude_from_count(query), do: query
+
   def find_row_number_for_listing(status, options) do
     Listing
     |> where(status: ^status)

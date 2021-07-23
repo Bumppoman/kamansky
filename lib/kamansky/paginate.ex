@@ -4,11 +4,12 @@ defmodule Kamansky.Paginate do
   alias Kamansky.Repo
 
   @callback as_list_query(Ecto.Query.t) :: Ecto.Query.t
+  @callback exclude_from_count(Ecto.Query.t) :: Ecto.Query.t
   @callback primary_key :: atom
   @callback search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
   @callback sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
 
-  @optional_callbacks as_list_query: 1, primary_key: 0
+  @optional_callbacks as_list_query: 1, exclude_from_count: 1, primary_key: 0
 
   @type params :: %{
     required(:limit) => integer,
@@ -26,7 +27,17 @@ defmodule Kamansky.Paginate do
 
       @doc false
       @impl true
+      def exclude_from_count(query) do
+        query
+        |> Ecto.Query.exclude(:join)
+        |> Ecto.Query.exclude(:group_by)
+      end
+
+      @doc false
+      @impl true
       def primary_key, do: unquote(Keyword.get(opts, :primary_key, :id))
+
+      defoverridable exclude_from_count: 1
     end
   end
 
@@ -45,8 +56,7 @@ defmodule Kamansky.Paginate do
     with query <- implementation.search_query(query, search),
       count <-
         query
-        |> exclude(:join)
-        |> exclude(:group_by)
+        |> implementation.exclude_from_count()
         |> Repo.aggregate(:count, implementation.primary_key()),
       records <- records(implementation, query, params)
     do
