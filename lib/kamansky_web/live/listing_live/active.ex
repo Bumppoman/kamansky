@@ -28,6 +28,7 @@ defmodule KamanskyWeb.ListingLive.Active do
   defp apply_action(socket, :index, _params), do: assign(socket, :page_title, "Listings")
   defp apply_action(socket, :add_to_order, %{"id" => id}) do
     socket
+    |> assign(:go_to_record, id)
     |> assign(:listing, Listings.get_listing!(id))
     |> assign(:page_title, "Add Listing to Order")
     |> assign(:pending_orders, Orders.list_pending_orders_to_add_listing())

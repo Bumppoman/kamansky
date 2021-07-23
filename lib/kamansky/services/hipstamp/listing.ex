@@ -35,8 +35,9 @@ defmodule Kamansky.Services.Hipstamp.Listing do
       item_specifics_07_year_of_issue: stamp.stamp_reference.year_of_issue
     }
 
-    #"/listings"
-    #|> Hipstamp.post(body)["results"]
-    #|> hd()
+    "/listings"
+    |> Hipstamp.post(body)
+    |> Map.get("results")
+    |> hd()
   end
 end

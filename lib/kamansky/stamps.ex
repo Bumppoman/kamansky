@@ -76,16 +76,22 @@ defmodule Kamansky.Stamps do
     |> Repo.one()
   end
 
+  @spec get_stamp_detail!(integer) :: Stamp.t
   def get_stamp_detail!(id) do
     Stamp
-    |> Repo.get!(id)
-    |> Repo.preload([:front_photo, :rear_photo, :stamp_reference])
+    |> where(id: ^id)
+    |> join(:left, [s], sr in assoc(s, :stamp_reference))
+    |> join(:left, [s], fp in assoc(s, :front_photo))
+    |> join(:left, [s], rp in assoc(s, :rear_photo))
+    |> preload([s, sr, fp, rp], [stamp_reference: sr, front_photo: fp, rear_photo: rp])
+    |> Repo.one!()
   end
 
+  @spec list_stamps(atom, %{}) :: [Stamp.t]
   def list_stamps(status, params) do
-    stamps = where(Stamp, status: ^status)
-
-    Paginate.list(Stamps, stamps, params)
+    Stamp
+    |> where(status: ^status)
+    |> then(&Paginate.list(Stamps, &1, params))
   end
 
   @spec mark_stamp_as_sold(Stamp.t) :: {:ok, Stamp.t} | {:error, any}

@@ -46,6 +46,17 @@ defmodule Kamansky.Sales.Listings do
 
   def get_listing!(id), do: Repo.get!(Listing, id)
 
+  def get_listing_to_list(id) do
+    Listing
+    |> where(id: ^id)
+    |> join(:inner, [l], s in assoc(l, :stamp))
+    |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
+    |> join(:left, [l, s], fp in assoc(s, :front_photo))
+    |> join(:left, [l, s], rp in assoc(s, :rear_photo))
+    |> preload([l, s, sr, fp, rp], [stamp: {s, [front_photo: fp, rear_photo: rp, stamp_reference: sr]}])
+    |> Repo.one()
+  end
+
   def list_listings(status, params) do
     listings_query =
       Listing
