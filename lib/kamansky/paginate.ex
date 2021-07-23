@@ -43,7 +43,11 @@ defmodule Kamansky.Paginate do
 
   def list(implementation, query, %{search: search} = params) do
     with query <- implementation.search_query(query, search),
-      count <- Repo.aggregate(query, :count, implementation.primary_key()),
+      count <-
+        query
+        |> exclude(:join)
+        |> exclude(:group_by)
+        |> Repo.aggregate(:count, implementation.primary_key()),
       records <- records(implementation, query, params)
     do
       {count, records}
