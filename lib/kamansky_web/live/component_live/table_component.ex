@@ -7,6 +7,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     per_page: 10
   }
 
+  @spec end_value(integer, integer, integer) :: integer
   def end_value(current_page, per_page, total_items) do
     start_value = start_value(current_page, per_page)
 
@@ -18,107 +19,49 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   @impl true
-  def handle_event("go_to_page", %{"page" => page}, %{assigns: %{search: search}} = socket) when is_binary(search) do
-    page = String.to_integer(page)
-
-    {count, data} =
-      load_data_for_page(
-        %{
-          data_source: socket.assigns.data_source,
-          current_page: page,
-          per_page: socket.assigns.per_page,
-          search: search,
-          sort: socket.assigns.sort
-        }
-      )
-
-    socket =
-      socket
-      |> assign(current_page: page)
-      |> assign(data: data)
-      |> assign(search: search)
-      |> assign(total_items: count)
-      |> assign(total_pages: total_pages(count, socket.assigns.per_page))
-
-    {:noreply, socket}
-  end
-
+  @spec handle_event(String.t, %{}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("go_to_page", %{"page" => page}, socket) do
-    page = String.to_integer(page)
-
-    socket =
-      socket
-      |> assign(current_page: page)
-      |> assign(
-        data: load_data_for_page(
-          %{
-            data_source: socket.assigns.data_source,
-            current_page: page,
-            per_page: socket.assigns.per_page,
-            sort: socket.assigns.sort
-          }
-        )
-      )
-
-    {:noreply, socket}
+    with page <- String.to_integer(page),
+      socket <- assign(socket, current_page: page)
+    do
+      {:noreply, assign_data(socket)}
+    end
   end
 
   def handle_event("per_page_changed", %{"per_page" => per_page}, socket) do
     with per_page <- String.to_integer(per_page),
-      data <-
-        load_data_for_page(
-          %{
-            data_source: socket.assigns.data_source,
-            current_page: 1,
-            per_page: per_page,
-            sort: socket.assigns.sort
-          }
-        ),
       socket <-
         socket
-        |> assign(current_page: 1)
-        |> assign(data: data)
-        |> assign(per_page: per_page)
-        |> assign(total_pages: total_pages(socket.assigns.total_items, per_page))
+        |> assign(:current_page, 1)
+        |> assign(:per_page, per_page)
+        |> assign(:total_pages, total_pages(socket.assigns.total_items, per_page))
     do
-      {:noreply, socket}
+      {:noreply, assign_data(socket)}
     end
   end
 
   def handle_event("search", %{"search" => search}, socket) do
-    {count, data} =
-      load_data_for_page(
-        %{
-          data_source: socket.assigns.data_source,
-          current_page: 1,
-          per_page: socket.assigns.per_page,
-          search: search,
-          sort: socket.assigns.sort
-        }
-      )
-
-    socket =
-      socket
-      |> assign(current_page: 1)
-      |> assign(data: data)
-      |> assign(search: search)
-      |> assign(total_items: count)
-      |> assign(total_pages: total_pages(count, socket.assigns.per_page))
-
-    {:noreply, socket}
+    with(
+      socket <-
+        socket
+        |> assign(:current_page, 1)
+        |> assign(:search, search)
+    ) do
+      {:noreply, assign_data(socket)}
+    end
   end
 
   def handle_event("sort", %{"sort" => sort, "sort_direction" => sort_direction}, socket) do
-    sort = %{column: String.to_integer(sort), direction: invert_sort_direction(sort_direction)}
-
-    socket =
-      socket
-      |> assign(data: load_data_for_page(%{socket.assigns | sort: sort}))
-      |> assign(sort: sort)
-
-      {:noreply, socket}
+    with sort <- %{column: String.to_integer(sort), direction: invert_sort_direction(sort_direction)},
+      socket <- assign(socket, sort: sort)
+    do
+      {:noreply, assign_data(socket)}
+    end
   end
 
+  @spec load_data_for_page(
+    %{current_page: integer, per_page: integer, search: String.t, sort: %{column: integer, direction: :asc | :desc}}
+  ) :: [Ecto.Schema.t]
   def load_data_for_page(parameters) do
     parameters[:data_source].(
       %{
@@ -131,16 +74,21 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   @impl true
+  @spec mount(Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(socket) do
-    socket =
-      socket
-      |> assign(current_page: @default_table_data.current_page)
-      |> assign(page: @default_table_data.page)
-      |> assign(per_page: @default_table_data.per_page)
-
-    {:ok, socket}
+    with(
+      socket <-
+        socket
+        |> assign(current_page: @default_table_data.current_page)
+        |> assign(page: @default_table_data.page)
+        |> assign(per_page: @default_table_data.per_page)
+        |> assign(search: nil)
+    ) do
+      {:ok, socket}
+    end
   end
 
+  @spec page_links(integer, integer, String.t) :: [String.t]
   def page_links(current_page, total_pages, target) do
     cond do
       total_pages < 8 ->
@@ -173,28 +121,33 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     end
   end
 
+  @spec start_value(integer, integer) :: integer
   def start_value(current_page, per_page), do: ((current_page * per_page) - per_page) + 1
 
+  @spec sort_direction(integer, %{column: integer, direction: :asc | :desc}) :: String.t
   def sort_direction(column, %{column: column, direction: :asc}), do: "asc"
   def sort_direction(column, %{column: column, direction: :desc}), do: "desc"
   def sort_direction(_column, _sort), do: nil
 
+  @spec total_items(%{data_count: integer} | %{data: Enum.t}) :: integer
   def total_items(%{data_count: data_count}), do: data_count
   def total_items(%{data: data}), do: Enum.count(data)
 
+  @spec total_pages(integer, integer) :: integer
   def total_pages(total_items, per_page) do
     total_items / per_page
     |> Float.ceil()
     |> round()
   end
 
+  @doc false
   @impl true
+  @spec update(%{}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def update(assigns, socket) do
     socket =
       if assigns[:headers] do
         socket
         |> assign(assigns)
-        |> assign(search: nil)
         |> assign(sort: build_sort(assigns.options[:sort]))
       else
         socket
@@ -204,18 +157,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
       socket
       |> assign(:current_page, record_location(socket, assigns.options[:go_to_record]))
 
-    socket =
-      assign(
-        socket,
-        data: load_data_for_page(
-          %{
-            data_source: socket.assigns.data_source,
-            current_page: socket.assigns.current_page,
-            per_page: socket.assigns.per_page,
-            sort: socket.assigns.sort
-          }
-        )
-      )
+    socket = assign_data(socket)
 
     socket =
       socket
@@ -225,10 +167,50 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     {:ok, socket}
   end
 
+  @spec assign_data(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
+  defp assign_data(%{assigns: %{search: nil}} = socket) do
+    assign(
+      socket,
+      :data,
+      load_data_for_page(
+        %{
+          data_source: socket.assigns.data_source,
+          current_page: socket.assigns.current_page,
+          per_page: socket.assigns.per_page,
+          search: socket.assigns.search,
+          sort: socket.assigns.sort
+        }
+      )
+    )
+  end
+
+  defp assign_data(socket) do
+    with(
+      {count, data} <-
+        load_data_for_page(
+          %{
+            data_source: socket.assigns.data_source,
+            current_page: socket.assigns.current_page,
+            per_page: socket.assigns.per_page,
+            search: socket.assigns.search,
+            sort: socket.assigns.sort
+          }
+        )
+    ) do
+      socket
+      |> assign(data: data)
+      |> assign(search: socket.assigns.search)
+      |> assign(total_items: count)
+      |> assign(total_pages: total_pages(count, socket.assigns.per_page))
+    end
+  end
+
+  @spec build_sort(%{} | integer | nil) :: %{column: integer, direction: :asc | :desc}
   defp build_sort(sort_parameters) when is_map(sort_parameters), do: sort_parameters
   defp build_sort(sort_column) when is_integer(sort_column), do: %{column: sort_column, direction: :asc}
   defp build_sort(nil), do: %{column: 0, direction: :asc}
 
+  @spec dummy_page_link :: String.t
   defp dummy_page_link do
     ~E"""
       <li>
@@ -237,9 +219,11 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     """
   end
 
-  defp invert_sort_direction("asc"), do: :desc
+  @spec invert_sort_direction(String.t) :: :asc | :desc
   defp invert_sort_direction("desc"), do: :asc
+  defp invert_sort_direction(_), do: :desc
 
+  @spec link_to_page(integer, integer, String.t) :: String.t
   defp link_to_page(page, current_page, target) do
     ~E"""
       <li>
@@ -254,6 +238,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     """
   end
 
+  @spec record_location(Phoenix.LiveView.Socket.t, integer | nil) :: integer
   defp record_location(socket, nil), do: socket.assigns.current_page
   defp record_location(socket, record_id) do
     %{

@@ -8,6 +8,12 @@ defmodule KamanskyWeb.LiveHelpers do
     |> assign(:timezone, get_connect_params(socket)["timezone"] || "America/New_York")
   end
 
+  #def assign_datatable_attributes(socket, attrs) do
+    #socket
+    #|> assign(:go_to_record, )
+    #|> assign(:search, )
+  #end
+
   def live_confirmation_modal(_socket, opts), do: live_confirmation_modal(opts)
   def live_confirmation_modal(opts) do
     live_modal(
