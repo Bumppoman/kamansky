@@ -6,6 +6,17 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
 
   alias __MODULE__
 
+  @type t :: Ecto.Schema.t | %StampReference{
+    scott_number: String.t,
+    denomination: Decimal.t,
+    year_of_issue: integer,
+    color: String.t,
+    issue_type: atom,
+    commemorative: boolean,
+    title: String.t,
+    synopsis: String.t
+  }
+
   schema "stamp_references" do
     field :scott_number, :string
     field :denomination, :decimal
@@ -18,6 +29,7 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
   end
 
   @doc false
+  @spec changeset(StampReference.t, %{}) :: Ecto.Changeset.t
   def changeset(stamp_reference, attrs) do
 
     # Workaround for Ecto.Enum (7/2021)
@@ -28,16 +40,19 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
     |> validate_required([])
   end
 
-  def description(stamp_reference) do
+  @spec description(StampReference.t) :: String.t
+  def description(%StampReference{} = stamp_reference) do
     "Scott ##{stamp_reference.scott_number} #{stamp_reference.year_of_issue} #{formatted_denomination(stamp_reference)} #{stamp_reference.title}"
   end
 
+  @spec display_column_for_sorting(integer) :: atom
   def display_column_for_sorting(column) do
     [:scott_number]
     |> Enum.at(column)
   end
 
-  def formatted_denomination(stamp_reference) do
+  @spec formatted_denomination(StampReference.t) :: String.t
+  def formatted_denomination(%StampReference{} = stamp_reference) do
     if Decimal.lt?(stamp_reference.denomination, 1) do
       stamp_reference.denomination
       |> Decimal.rem(Decimal.from_float(0.01))
@@ -58,6 +73,7 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
     end
   end
 
+  @spec issue_types :: [tuple]
   def issue_types do
     [
       {"Standard", :standard},
@@ -71,6 +87,7 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
     ]
   end
 
+  @spec standard?(StampReference.t) :: boolean
   def standard?(%StampReference{issue_type: :standard}), do: true
   def standard?(%StampReference{}), do: false
 end

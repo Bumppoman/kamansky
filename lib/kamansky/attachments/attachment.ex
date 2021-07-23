@@ -29,17 +29,20 @@ defmodule Kamansky.Attachments.Attachment do
     cast(attachment, attrs, [:content_type, :filename, :hash, :size])
   end
 
+  @spec full_path(Attachment.t) :: String.t
   def full_path(%Attachment{} = attachment) do
     attachment
     |> path()
     |> then(&Path.join(KamanskyWeb.Endpoint.url(), &1))
   end
 
+  @spec hash_path(String.t) :: String.t
   def hash_path(hash) do
     [String.slice(hash, 0, 2), String.slice(hash, 2, 2), String.slice(hash, 4, 2)]
     |> Path.join()
   end
 
+  @spec path(Attachment.t | nil) :: String.t | nil
   def path(nil), do: nil
   def path(%Attachment{} = attachment) do
     attachment.hash

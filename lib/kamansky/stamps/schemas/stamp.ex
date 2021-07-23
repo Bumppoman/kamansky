@@ -138,14 +138,14 @@ defmodule Kamansky.Stamps.Stamp do
   def changeset(stamp, attrs) do
 
     # Workaround for Ecto.Enum (7/2021)
-    attrs = cast_enum_fields(attrs, ["format"])
+    attrs = cast_enum_fields(attrs, ["format", "status"])
 
     stamp
     |> cast(attrs, [:scott_number, :grade, :cost, :purchase_fees,
       :format, :blind_perforation, :crease, :gum_disturbance,
       :gum_skip, :hinge_remnant, :hinged, :inclusion,
       :ink_transfer, :no_gum, :pencil, :short_perforation,
-      :stain, :tear, :thin_spot, :toning, :add_to])
+      :stain, :tear, :thin_spot, :toning, :status, :add_to])
     |> validate_required([:scott_number])
   end
 

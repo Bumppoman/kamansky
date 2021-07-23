@@ -78,12 +78,14 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     with {:ok, front_photo} <- manage_photo(socket, :front_photo),
       {:ok, rear_photo} <- manage_photo(socket, :rear_photo)
     do
-      case Stamps.create_stamp(stamp_params, front_photo, rear_photo, socket.assigns.status) do
-        {:ok, %{id: id}} ->
-          {:noreply,
-          socket
-          |> put_flash(:info, "You have successfully added this stamp.")
-          |> push_redirect(to: Routes.stamp_index_path(socket, socket.assigns.status, go_to_record: id))}
+      case Stamps.create_stamp(stamp_params, front_photo, rear_photo) do
+        {:ok, %Stamp{id: id, status: status}} ->
+          {
+            :noreply,
+            socket
+              |> put_flash(:info, "You have successfully added this stamp.")
+              |> push_redirect(to: Routes.stamp_index_path(socket, status, go_to_record: id))
+          }
 
         {:error, %Ecto.Changeset{} = changeset} ->
           {:noreply, assign(socket, changeset: changeset)}
