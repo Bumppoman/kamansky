@@ -6,17 +6,21 @@
   phx_submit: "submit"
 %>
   <div class="row">
-    <div class="col-md-4 form-group">
+    <div class="col-md-3 form-group">
       <label class="form-control-label">Scott Number</label>
       <p><%= @stamp.scott_number %></p>
     </div>
-    <div class="col-md-4 form-group">
+    <div class="col-md-3 form-group">
       <label class="form-control-label">Grade</label>
       <p><%= Stamp.formatted_grade(@stamp) %></p>
     </div>
-    <div class="col-md-4 form-group">
+    <div class="col-md-3 form-group">
       <label class="form-control-label">Price Paid</label>
       <p><%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %></p>
+    </div>
+    <div class="col-md-3 form-group">
+      <label class="form-control-label">Median Listing Price</label>
+      <p><%= format_decimal_as_currency(Listings.get_median_listing_price_for_scott_number(@stamp.scott_number)) %></p>
     </div>
   </div>
   <div class="row">

@@ -63,6 +63,15 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.one()
   end
 
+  @spec get_median_listing_price_for_scott_number(integer) :: Decimal.t | nil
+  def get_median_listing_price_for_scott_number(scott_number) do
+    Listing
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> where([l, s], s.scott_number == ^scott_number)
+    |> select([l, s], fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.listing_price))
+    |> Repo.one()
+  end
+
   @spec list_listings(atom, %{}) :: [Listing.t]
   def list_listings(status, params) do
     Listing
