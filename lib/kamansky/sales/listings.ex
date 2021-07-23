@@ -44,13 +44,13 @@ defmodule Kamansky.Sales.Listings do
   def get_listing!(id), do: Repo.get!(Listing, id)
 
   def list_listings(status, params) do
-    listings =
+    listings_query =
       Listing
       |> where(status: ^status)
       |> join(:left, [l], s in assoc(l, :stamp))
       |> preload([l, s], [stamp: s])
 
-    Paginate.list(Listings, listings, params)
+    Paginate.list(Listings, listings_query, params)
   end
 
   def list_sold_listings(params) do

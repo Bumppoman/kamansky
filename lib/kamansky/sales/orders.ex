@@ -7,7 +7,6 @@ defmodule Kamansky.Sales.Orders do
   alias Kamansky.Repo
   alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Sales.Orders.Order
-  alias Kamansky.Services.Hipstamp
 
   def change_new_order(%Order{} = order, attrs \\ %{}), do: Order.new_changeset(order, attrs)
 

@@ -12,6 +12,11 @@ defmodule Kamansky.Sales.Customers.Customer do
     field :city, :string
     field :state, :string
     field :zip, :string
+
+    field :amount_spent_ytd, :decimal, virtual: true
+    field :most_recent_order_date, :utc_datetime, virtual: true
+
+    has_many :orders, Kamansky.Sales.Orders.Order
   end
 
   def changeset(%Customer{} = customer, attrs) do
