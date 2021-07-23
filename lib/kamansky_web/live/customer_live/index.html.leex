@@ -32,7 +32,7 @@
   <td><%= Customer.full_address(@item) %></td>
   <td><%= Customer.formatted_email(@item) %></td>
   <td><%= @item.amount_spent_ytd %></td>
-  <td><%= formatted_date(@item.most_recent_purchase_date) %></td>
+  <td><%= formatted_date(@item.most_recent_order_date) %></td>
   <td>
     <%= live_patch to: Routes.customer_index_path(@socket, :edit, @item), class: "action-icon" do %>
       <i class="material-icons">edit</i>
