@@ -69,7 +69,11 @@ defmodule Kamansky.Stamps do
     |> select([s], {s.id, row_number() |> over(order_by: [{:asc, s.scott_number}])})
     |> Repo.all
     |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
-    |> elem(1)
+    |> case do
+      nil -> 1
+      {_id, nil} -> 1
+      {_id, row_number} -> row_number
+    end
   end
 
   @spec get_stamp!(integer) :: Stamp.t
