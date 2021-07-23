@@ -134,6 +134,7 @@ defmodule Kamansky.Stamps.Stamp do
   end
 
   @doc false
+  @spec changeset(Stamp.t, %{}) :: Ecto.Changeset.t
   def changeset(stamp, attrs) do
 
     # Workaround for Ecto.Enum (7/2021)
@@ -148,6 +149,7 @@ defmodule Kamansky.Stamps.Stamp do
     |> validate_required([:scott_number])
   end
 
+  @spec flaws :: [atom]
   def flaws do
     [
       :blind_perforation,
@@ -168,8 +170,10 @@ defmodule Kamansky.Stamps.Stamp do
     ]
   end
 
-  def flaws?(stamp), do: Enum.any?(flaws(), &(Map.get(stamp, &1)))
+  @spec flaws?(Stamp.t) :: boolean
+  def flaws?(%Stamp{} = stamp), do: Enum.any?(flaws(), &(Map.get(stamp, &1)))
 
+  @spec format_code(%Stamp{format: atom}) :: String.t
   def format_code(%Stamp{format: :single}), do: ""
   def format_code(%Stamp{format: :pair}), do: "P"
   def format_code(%Stamp{format: :se_tenant}), do: "ST"
@@ -179,6 +183,7 @@ defmodule Kamansky.Stamps.Stamp do
   def format_code(%Stamp{format: :zip_block}), do: "ZB"
   def format_code(%Stamp{format: :mail_early_block}), do: "MB"
 
+  @spec formats :: [tuple()]
   def formats do
     [
       {"Single", :single},
@@ -192,26 +197,29 @@ defmodule Kamansky.Stamps.Stamp do
     ]
   end
 
+  @spec formatted_flaws(Stamp.t) :: String.t
   def formatted_flaws(%Stamp{} = stamp) do
-    flaws = Enum.filter(Stamp.flaws, fn flaw -> Map.get(stamp, flaw) end)
-
-    if Enum.count(flaws) == 0 do
-      "None"
-    else
-      flaws
-      |> Enum.map(fn flaw ->
-        flaw
-        |> Atom.to_string()
-        |> String.replace("_", " ")
-      end)
-      |> Enum.join("; ")
-      |> String.capitalize()
+    with flaws <- Enum.filter(Stamp.flaws, &(Map.get(stamp, &1))) do
+      if Enum.count(flaws) == 0 do
+        "None"
+      else
+        flaws
+        |> Enum.map(fn flaw ->
+          flaw
+          |> Atom.to_string()
+          |> String.replace("_", " ")
+        end)
+        |> Enum.join("; ")
+        |> String.capitalize()
+      end
     end
   end
 
+  @spec formatted_grade(%Stamp{grade: nil | integer}) :: String.t
   def formatted_grade(%Stamp{grade: nil}), do: "---"
   def formatted_grade(%Stamp{grade: grade} = stamp), do: "#{letter_grade(stamp)} (#{grade})"
 
+  @spec history(Stamp.t) :: [String.t]
   def history(%Stamp{} = stamp) do
     h =
       if stamp.moved_to_stock_at != stamp.inserted_at do
@@ -233,23 +241,27 @@ defmodule Kamansky.Stamps.Stamp do
     h
   end
 
+  @spec letter_grade(%Stamp{grade: nil | integer}) :: String.t
   def letter_grade(%Stamp{grade: grade}) do
     @grade_classes
     |> Enum.find(fn %{start: start, finish: finish} -> grade >= start && grade <= finish end)
     |> Map.get(:name)
   end
 
+  @spec quality(Stamp.t) :: String.t
   def quality(%Stamp{no_gum: true}), do: "unused no gum"
   def quality(%Stamp{hinge_remnant: true}), do: "unused HR"
   def quality(%Stamp{hinged: true}), do: "unused hinged"
   def quality(%Stamp{gum_disturbance: true}), do: "unused disturbed gum"
   def quality(%Stamp{}), do: "MNH OG"
 
+  @spec sale_description(Stamp.t) :: String.t
   def sale_description(%Stamp{} = stamp) do
     [StampReference.description(stamp.stamp_reference), quality(stamp)]
     |> Kernel.++(if !is_nil(stamp.grade) and stamp.grade >= 70, do: [Stamp.letter_grade(stamp)], else: [])
     |> Enum.join(" ")
   end
 
+  @spec total_cost(%Stamp{cost: Decimal.t, purchase_fees: Decimal.t}) :: Decimal.t
   def total_cost(%Stamp{cost: cost, purchase_fees: purchase_fees}), do: Decimal.add(cost, purchase_fees)
 end

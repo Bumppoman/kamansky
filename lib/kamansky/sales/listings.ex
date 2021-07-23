@@ -7,23 +7,25 @@ defmodule Kamansky.Sales.Listings do
   alias Kamansky.Repo
   alias Kamansky.Sales.Listings.Listing
 
-  def add_listing_to_order(%Listing{} = listing, attrs) do
+  @spec add_listing_to_order(Listing.t, %{}) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  def add_listing_to_order(%Listing{} = listing, attrs \\ %{}) do
     listing
-    |> Listing.changeset(attrs)
+    |> change_listing(attrs)
     |> Ecto.Changeset.put_change(:status, :sold)
     |> Repo.update()
   end
 
-  def change_listing(%Listing{} = listing, attrs \\ %{}) do
-    Listing.changeset(listing, attrs)
-  end
+  @spec change_listing(Listing.t, %{}) :: Ecto.Changeset.t
+  def change_listing(%Listing{} = listing, attrs \\ %{}), do: Listing.changeset(listing, attrs)
 
+  @spec count_listings(atom) :: integer | nil
   def count_listings(status) do
     Listing
     |> where(status: ^status)
     |> Repo.aggregate(:count, :id)
   end
 
+  @spec create_listing(Kamansky.Stamps.Stamp.t, %{}) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def create_listing(stamp, attrs) do
     stamp
     |> Ecto.build_assoc(:listing)
@@ -32,8 +34,10 @@ defmodule Kamansky.Sales.Listings do
   end
 
   @impl true
+  @spec exclude_from_count(Ecto.Query.t) :: Ecto.Query.t
   def exclude_from_count(query), do: query
 
+  @spec find_row_number_for_listing(atom, %{}) :: integer
   def find_row_number_for_listing(status, options) do
     Listing
     |> where(status: ^status)
@@ -44,8 +48,10 @@ defmodule Kamansky.Sales.Listings do
     |> elem(1)
   end
 
+  @spec get_listing!(integer) :: Listing.t
   def get_listing!(id), do: Repo.get!(Listing, id)
 
+  @spec get_listing_to_list(integer) :: Listing.t | nil
   def get_listing_to_list(id) do
     Listing
     |> where(id: ^id)
@@ -57,16 +63,16 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.one()
   end
 
+  @spec list_listings(atom, %{}) :: [Listing.t]
   def list_listings(status, params) do
-    listings_query =
-      Listing
-      |> where(status: ^status)
-      |> join(:left, [l], s in assoc(l, :stamp))
-      |> preload([l, s], [stamp: s])
-
-    Paginate.list(Listings, listings_query, params)
+    Listing
+    |> where(status: ^status)
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> preload([l, s], [stamp: s])
+    |> then(&Paginate.list(Listings, &1, params))
   end
 
+  @spec list_sold_listings(%{}) :: [%Listing{status: :sold}]
   def list_sold_listings(params) do
     Listing
     |> where(status: :sold)
@@ -76,6 +82,8 @@ defmodule Kamansky.Sales.Listings do
     |> then(&Paginate.list(Listings, &1, params))
   end
 
+  @spec mark_listing_sold(Listing.t, [order_id: integer, sale_price: Decimal.t])
+    :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def mark_listing_sold(%Listing{} = listing, order_id: order_id, sale_price: sale_price) do
     listing
     |> Ecto.Changeset.change(order_id: order_id, sale_price: sale_price)
@@ -96,18 +104,21 @@ defmodule Kamansky.Sales.Listings do
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, [l, s], {^direction, s.scott_number})
   def sort(query, %{column: 1, direction: direction}), do: order_by(query, [l, s, o], {^direction, o.ordered_at})
 
+  @spec total_listings_price(atom) :: float | nil
   def total_listings_price(status) do
     Listing
     |> where(status: ^status)
     |> Repo.aggregate(:sum, :listing_price)
   end
 
+  @spec update_hipstamp_listing(Listing.t, %{}) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def update_hipstamp_listing(%Listing{} = listing, params) do
     listing
     |> Listing.hipstamp_changeset(params)
     |> Repo.update()
   end
 
+  @spec update_listing_selling_fees(Listing.t, Decimal.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def update_listing_selling_fees(%Listing{} = listing, selling_fees) do
     listing
     |> Ecto.Changeset.change(selling_fees: selling_fees)

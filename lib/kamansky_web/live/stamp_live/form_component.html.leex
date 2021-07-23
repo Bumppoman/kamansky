@@ -36,7 +36,8 @@
           <div>
             <p>
               <%= StampReference.description(@copy_in_collection.stamp_reference) %><br />
-              <%= Stamp.formatted_grade(@copy_in_collection) %>
+              <%= Stamp.formatted_grade(@copy_in_collection) %><br />
+              <%= Stamp.formatted_flaws(@copy_in_collection) %>
             </p>
           </div>
         </div>

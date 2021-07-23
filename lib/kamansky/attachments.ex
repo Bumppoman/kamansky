@@ -1,6 +1,4 @@
 defmodule Kamansky.Attachments do
-  import Ecto.Changeset
-  import Ecto.Query
   import Kamansky.Helpers
 
   alias Kamansky.Attachments.Attachment
@@ -30,7 +28,7 @@ defmodule Kamansky.Attachments do
     end
   end
 
-  @doc "Create the directories necessary to store the attachment."
+  @spec create_necessary_directories(String.t) :: :ok | {:error, any}
   defp create_necessary_directories(hash) do
     Application.get_env(:kamansky, :uploads_directory)
     |> Path.join(Attachment.hash_path(hash))
