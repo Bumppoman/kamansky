@@ -1,6 +1,8 @@
 defmodule KamanskyWeb.CustomerLive.Index do
   use KamanskyWeb, :live_view
 
+  import Kamansky.Helpers
+
   alias Kamansky.Sales.Customers
   alias Kamansky.Sales.Customers.Customer
 
