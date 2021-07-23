@@ -2,8 +2,10 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   use KamanskyWeb, :live_component
 
   alias Kamansky.Attachments
+  alias Kamansky.Attachments.Attachment
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
+  alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
   def mount(socket) do
@@ -16,16 +18,23 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   end
 
   @impl true
-  def update(%{stamp: stamp} = assigns, socket) do
-    changeset = Stamps.change_stamp(stamp)
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+  def update(%{stamp: stamp, status: status} = assigns, socket) do
+    {
+      :ok,
+      socket
+        |> assign(assigns)
+        |> assign(:changeset, Stamps.change_stamp(stamp, %{add_to: status}))
+        |> assign(:copy_in_collection, nil)
+    }
   end
 
   @impl true
+  def handle_event("find_in_collection", %{"value" => scott_number}, socket) do
+    with copy_in_collection <- Stamps.get_stamp_in_collection_by_scott_number(scott_number) do
+      {:noreply, assign(socket, :copy_in_collection, copy_in_collection)}
+    end
+  end
+
   def handle_event("validate", %{"stamp" => stamp_params}, socket) do
     changeset =
       socket.assigns.stamp

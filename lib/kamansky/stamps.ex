@@ -76,6 +76,16 @@ defmodule Kamansky.Stamps do
     |> Repo.one()
   end
 
+  @spec get_stamp_in_collection_by_scott_number(String.t) :: Stamp.t | nil
+  def get_stamp_in_collection_by_scott_number(scott_number) do
+    Stamp
+    |> where(status: :collection, scott_number: ^scott_number)
+    |> join(:left, [s], sr in assoc(s, :stamp_reference))
+    |> join(:left, [s], fp in assoc(s, :front_photo))
+    |> preload([s, sr, fp], [stamp_reference: sr, front_photo: fp])
+    |> Repo.one()
+  end
+
   @spec get_stamp_detail!(integer) :: Stamp.t
   def get_stamp_detail!(id) do
     Stamp

@@ -21,10 +21,14 @@ defmodule Kamansky.Sales.Listings.Listing do
     belongs_to :order, Kamansky.Sales.Orders.Order
   end
 
-  def changeset(listing, attrs) do
+  def changeset(%Listing{} = listing, attrs) do
     listing
     |> cast(attrs, [:listing_price, :order_id, :sale_price])
     |> validate_required([])
+  end
+
+  def hipstamp_changeset(%Listing{} = listing, attrs) do
+    cast(listing, attrs, [:inserted_at, :hipstamp_id])
   end
 
   def net_profit(%Listing{} = listing) do

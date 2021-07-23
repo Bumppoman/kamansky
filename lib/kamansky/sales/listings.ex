@@ -68,16 +68,12 @@ defmodule Kamansky.Sales.Listings do
   end
 
   def list_sold_listings(params) do
-
-    # Can't join listings twice for some reason so it's separately loaded
-    listings =
-      Listing
-      |> where(status: :sold)
-      |> join(:left, [l], s in assoc(l, :stamp))
-      |> join(:left, [l], o in assoc(l, :order))
-      |> preload([l, s, o], [stamp: s, order: {o, :listings}])
-
-    Paginate.list(Listings, listings, params)
+    Listing
+    |> where(status: :sold)
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> join(:left, [l], o in assoc(l, :order))
+    |> preload([l, s, o], [stamp: s, order: {o, :listings}])  # Can't join listings twice for some reason so it's separately loaded
+    |> then(&Paginate.list(Listings, &1, params))
   end
 
   def mark_listing_sold(%Listing{} = listing, order_id: order_id, sale_price: sale_price) do
@@ -104,6 +100,12 @@ defmodule Kamansky.Sales.Listings do
     Listing
     |> where(status: ^status)
     |> Repo.aggregate(:sum, :listing_price)
+  end
+
+  def update_hipstamp_listing(%Listing{} = listing, params) do
+    listing
+    |> Listing.hipstamp_changeset(params)
+    |> Repo.update()
   end
 
   def update_listing_selling_fees(%Listing{} = listing, selling_fees) do

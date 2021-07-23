@@ -29,6 +29,12 @@ defmodule Kamansky.Attachments.Attachment do
     cast(attachment, attrs, [:content_type, :filename, :hash, :size])
   end
 
+  def full_path(%Attachment{} = attachment) do
+    attachment
+    |> path()
+    |> then(&Path.join(KamanskyWeb.Endpoint.url(), &1))
+  end
+
   def hash_path(hash) do
     [String.slice(hash, 0, 2), String.slice(hash, 2, 2), String.slice(hash, 4, 2)]
     |> Path.join()
@@ -36,8 +42,9 @@ defmodule Kamansky.Attachments.Attachment do
 
   def path(nil), do: nil
   def path(%Attachment{} = attachment) do
-    filename = String.slice(attachment.hash, 0, 24) <> Path.extname(attachment.filename)
-
-    Path.join(["/files", hash_path(attachment.hash), filename])
+    attachment.hash
+    |> String.slice(0, 24)
+    |> Kernel.<>(Path.extname(attachment.filename))
+    |> then(&Path.join(["/files", hash_path(attachment.hash), &1]))
   end
 end

@@ -120,6 +120,8 @@ defmodule Kamansky.Stamps.Stamp do
     timestamps(updated_at: false)
     field :moved_to_stock_at, :utc_datetime
 
+    field :add_to, Ecto.Enum, values: [:collection, :stock], virtual: true
+
     belongs_to :front_photo, Kamansky.Attachments.Attachment
     belongs_to :rear_photo, Kamansky.Attachments.Attachment
     belongs_to :stamp_reference,
@@ -142,7 +144,7 @@ defmodule Kamansky.Stamps.Stamp do
       :format, :blind_perforation, :crease, :gum_disturbance,
       :gum_skip, :hinge_remnant, :hinged, :inclusion,
       :ink_transfer, :no_gum, :pencil, :short_perforation,
-      :stain, :tear, :thin_spot, :toning])
+      :stain, :tear, :thin_spot, :toning, :add_to])
     |> validate_required([:scott_number])
   end
 

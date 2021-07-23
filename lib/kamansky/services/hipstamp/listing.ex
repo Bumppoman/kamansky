@@ -1,5 +1,6 @@
 defmodule Kamansky.Services.Hipstamp.Listing do
   alias Kamansky.Attachments.Attachment
+  alias Kamansky.Sales.Listings
   alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Services.Hipstamp
   alias Kamansky.Stamps.Stamp
@@ -21,8 +22,8 @@ defmodule Kamansky.Services.Hipstamp.Listing do
       buyout_price: listing.listing_price,
       images: Enum.join(
         [
-          Attachment.path(stamp.front_photo),
-          Attachment.path(stamp.rear_photo)
+          Attachment.full_path(stamp.front_photo),
+          Attachment.full_path(stamp.rear_photo)
         ],
         "||"
       ),
@@ -36,8 +37,14 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     }
 
     "/listings"
-    |> Hipstamp.post(body)
+    |> Hipstamp.post!(body)
     |> Map.get("results")
     |> hd()
+    |> then(
+      &Listings.update_hipstamp_listing(
+        listing,
+        [inserted_at: &1["created_at"], hipstamp_id: &1["id"]]
+      )
+    )
   end
 end
