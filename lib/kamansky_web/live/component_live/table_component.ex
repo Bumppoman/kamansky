@@ -10,11 +10,10 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   def end_value(current_page, per_page, total_items) do
     start_value = start_value(current_page, per_page)
 
-    cond do
-      total_items < (per_page + start_value) ->
-        total_items
-      true ->
-        (start_value + per_page) - 1
+    if total_items < (per_page + start_value) do
+      total_items
+    else
+      (start_value + per_page) - 1
     end
   end
 
@@ -56,7 +55,6 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
             data_source: socket.assigns.data_source,
             current_page: page,
             per_page: socket.assigns.per_page,
-            search: socket.assigns.search,
             sort: socket.assigns.sort
           }
         )
@@ -67,13 +65,12 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
 
   def handle_event("per_page_changed", %{"per_page" => per_page}, socket) do
     with per_page <- String.to_integer(per_page),
-      {_count, data} <-
+      data <-
         load_data_for_page(
           %{
             data_source: socket.assigns.data_source,
             current_page: 1,
             per_page: per_page,
-            search: socket.assigns.search,
             sort: socket.assigns.sort
           }
         ),
@@ -176,25 +173,14 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     end
   end
 
-  def start_value(current_page, per_page) do
-    ((current_page * per_page) - per_page) + 1
-  end
+  def start_value(current_page, per_page), do: ((current_page * per_page) - per_page) + 1
 
-  def sort_direction(column, sort) do
-    cond do
-      column == sort.column && sort.direction == :asc -> "asc"
-      column == sort.column && sort.direction == :desc -> "desc"
-      true -> nil
-    end
-  end
+  def sort_direction(column, %{column: column, direction: :asc}), do: "asc"
+  def sort_direction(column, %{column: column, direction: :desc}), do: "desc"
+  def sort_direction(_column, _sort), do: nil
 
-  def total_items(%{data_count: data_count}) do
-    data_count
-  end
-
-  def total_items(%{data: data}) do
-    Enum.count(data)
-  end
+  def total_items(%{data_count: data_count}), do: data_count
+  def total_items(%{data: data}), do: Enum.count(data)
 
   def total_pages(total_items, per_page) do
     total_items / per_page
@@ -208,7 +194,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
       if assigns[:headers] do
         socket
         |> assign(assigns)
-        |> assign(search: "")
+        |> assign(search: nil)
         |> assign(sort: build_sort(assigns.options[:sort]))
       else
         socket
@@ -239,17 +225,9 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     {:ok, socket}
   end
 
-  defp build_sort(sort_parameters) when is_map(sort_parameters) do
-    sort_parameters
-  end
-
-  defp build_sort(sort_column) when is_integer(sort_column) do
-    %{column: sort_column, direction: :asc}
-  end
-
-  defp build_sort(nil) do
-    %{column: 0, direction: :asc}
-  end
+  defp build_sort(sort_parameters) when is_map(sort_parameters), do: sort_parameters
+  defp build_sort(sort_column) when is_integer(sort_column), do: %{column: sort_column, direction: :asc}
+  defp build_sort(nil), do: %{column: 0, direction: :asc}
 
   defp dummy_page_link do
     ~E"""
@@ -259,9 +237,8 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     """
   end
 
-  defp invert_sort_direction(sort_direction) do
-    if sort_direction == "asc", do: :desc, else: :asc
-  end
+  defp invert_sort_direction("asc"), do: :desc
+  defp invert_sort_direction("desc"), do: :asc
 
   defp link_to_page(page, current_page, target) do
     ~E"""
