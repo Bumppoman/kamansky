@@ -93,8 +93,8 @@ defmodule Kamansky.Sales.Orders do
         Listing
         |> join(:left, [l], s in assoc(l, :stamp))
         |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
-        |> join(:inner, [l, s, sr], fp in assoc(s, :front_photo))
-        |> join(:inner, [l, s, ..., fp], rp in assoc(s, :rear_photo))
+        |> join(:left, [l, s, sr], fp in assoc(s, :front_photo))
+        |> join(:left, [l, s, ..., fp], rp in assoc(s, :rear_photo))
         |> preload([l, s, sr, fp, rp], [stamp: {s, [stamp_reference: sr, front_photo: fp, rear_photo: rp]}])
     ) do
       Order

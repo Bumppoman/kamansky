@@ -20,7 +20,6 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"order" => order_params}, socket) do
-    IO.inspect(order_params)
     changeset =
       socket.assigns.order
       |> Orders.change_new_order(order_params)

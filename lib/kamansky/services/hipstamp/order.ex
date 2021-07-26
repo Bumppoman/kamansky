@@ -88,6 +88,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
+  @spec mark_shipped(Kamansky.Sales.Orders.Order.t) :: {:ok, Kamansky.Sales.Orders.Order.t} | {:error, Ecto.Changeset.t}
   def mark_shipped(%Order{hipstamp_id: id} = order) do
     Hipstamp.put(
       "/stores/#{hipstamp_username()}/sales/#{id}",
@@ -97,26 +98,29 @@ defmodule Kamansky.Services.Hipstamp.Order do
     Orders.mark_order_as_shipped(order)
   end
 
+  @spec calculate_selling_fees(Decimal.t, Decimal.t) :: Decimal.t
   defp calculate_selling_fees(item_price, shipping_price) do
     with hipstamp_coefficient <- Decimal.from_float(0.0895),
       paypal_coefficient <- Decimal.from_float(0.029),
       paypal_flat_fee <- Decimal.from_float(0.3),
-      item_fees <-
+      hipstamp_fees <-
         item_price
+        |> Decimal.add(shipping_price)
         |> Decimal.mult(hipstamp_coefficient)
-        |> Decimal.add(Decimal.mult(item_price, paypal_coefficient))
-        |> Decimal.add(paypal_flat_fee),
-      shipping_fees <-
-        shipping_price
-        |> Decimal.mult(hipstamp_coefficient)
-        |> Decimal.add(Decimal.mult(shipping_price, paypal_coefficient))
+        |> Decimal.round(2, :floor),
+      paypal_fees <-
+        item_price
+        |> Decimal.add(shipping_price)
+        |> Decimal.mult(paypal_coefficient)
+        |> Decimal.add(paypal_flat_fee)
     do
-      item_fees
-      |> Decimal.add(shipping_fees)
+      hipstamp_fees
+      |> Decimal.add(paypal_fees)
       |> Decimal.round(2)
     end
   end
 
+  @spec hipstamp_username :: String.t
   defp hipstamp_username, do: Application.get_env(:kamansky, :hipstamp_username)
 
   @spec normalize_name(String.t, String.t) :: String.t
@@ -135,6 +139,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
+  @spec parse_ordered_at(String.t) :: DateTime.t
   defp parse_ordered_at(ordered_at) do
     ordered_at
     |> NaiveDateTime.from_iso8601!()
@@ -142,6 +147,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
     |> DateTime.shift_zone!("Etc/UTC")
   end
 
+  @spec update_order_listings([map], integer) :: [Kamansky.Sales.Listings.Listing.t]
   defp update_order_listings(sale_listings, order_id) do
     Enum.map(
       sale_listings,

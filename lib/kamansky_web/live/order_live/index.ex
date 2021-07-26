@@ -34,10 +34,11 @@ defmodule KamanskyWeb.OrderLive.Index do
     with order <- socket.assigns.order do
       case Orders.mark_order_as_processed(order) do
         {:ok, _order} ->
-          {:noreply,
-          socket
-          |> put_flash(:info, "You have successfully marked this order as processed.")
-          |> push_redirect(to: Routes.order_index_path(socket, order.status))
+          {
+            :noreply,
+            socket
+            |> put_flash(:info, "You have successfully marked this order as processed.")
+            |> push_redirect(to: Routes.order_index_path(socket, order.status))
         }
 
         {:error, %Ecto.Changeset{} = changeset} ->
