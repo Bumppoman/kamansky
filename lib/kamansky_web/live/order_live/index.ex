@@ -72,7 +72,7 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :edit, %{"id" => id}) do
-    with order <- Orders.get_order!(id) do
+    with order <- Orders.get_order_with_customer!(id) do
       socket
       |> assign(:page_title, "Update Order")
       |> assign(:order, order)
