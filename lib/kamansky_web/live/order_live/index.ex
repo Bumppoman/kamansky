@@ -56,8 +56,8 @@ defmodule KamanskyWeb.OrderLive.Index do
       {
         :noreply,
         socket
-          |> put_flash(:info, "You have successfully marked this order as shipped.")
-          |> push_redirect(to: Routes.order_index_path(socket, order.status))
+        |> put_flash(:info, "You have successfully marked this order as shipped.")
+        |> push_redirect(to: Routes.order_index_path(socket, order.status))
       }
     end
   end
@@ -65,6 +65,15 @@ defmodule KamanskyWeb.OrderLive.Index do
   @impl true
   def handle_params(params, _uri, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    with order <- Orders.get_order!(id) do
+      socket
+      |> assign(:page_title, "Update Order")
+      |> assign(:order, order)
+      |> load_orders(order.status)
+    end
   end
 
   defp apply_action(socket, :mark_completed, %{"id" => id}) do

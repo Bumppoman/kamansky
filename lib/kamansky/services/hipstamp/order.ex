@@ -1,4 +1,6 @@
 defmodule Kamansky.Services.Hipstamp.Order do
+  import Kamansky.Helpers, only: [humanize_and_capitalize: 1]
+
   alias Kamansky.Sales.{Customers, Listings, Orders}
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.Hipstamp
@@ -36,21 +38,26 @@ defmodule Kamansky.Services.Hipstamp.Order do
     do
       new_orders
       |> Enum.reverse()
-      |> tl()
       |> Enum.each(
         fn(hipstamp_order) ->
           with order <- Orders.get_or_initialize_order(hipstamp_id: String.to_integer(hipstamp_order["id"])),
             ordered_at <- parse_ordered_at(hipstamp_order["created_at"]),
+            customer_name <-
+              normalize_name(
+                hipstamp_order["ShippingAddress"]["name_first"],
+                hipstamp_order["ShippingAddress"]["name_last"]
+              ),
             {:ok, %{id: customer_id}} <-
               Customers.insert_or_update_hipstamp_customer(
-                hipstamp_id: hipstamp_order["buyer_id"],
-                first_name: hipstamp_order["ShippingAddress"]["name_first"],
-                last_name: hipstamp_order["ShippingAddress"]["name_last"],
-                street_address: hipstamp_order["ShippingAddress"]["address"],
-                city: hipstamp_order["ShippingAddress"]["city"],
-                state: hipstamp_order["ShippingAddress"]["state_abbreviation"],
-                zip: hipstamp_order["ShippingAddress"]["postal_code"],
-                email: hipstamp_order["buyer_email"]
+                %{
+                  hipstamp_id: hipstamp_order["buyer_id"],
+                  name: customer_name,
+                  street_address: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["address"])),
+                  city: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["city"])),
+                  state: String.upcase(hipstamp_order["ShippingAddress"]["state_abbreviation"]),
+                  zip: hipstamp_order["ShippingAddress"]["postal_code"],
+                  email: String.downcase(hipstamp_order["buyer_email"])
+                }
               ),
             item_price <- Decimal.from_float(hipstamp_order["sales_listings_amount"] / 1),
             shipping_price <- Decimal.from_float(hipstamp_order["postage_amount"] / 1),
@@ -111,6 +118,22 @@ defmodule Kamansky.Services.Hipstamp.Order do
   end
 
   defp hipstamp_username, do: Application.get_env(:kamansky, :hipstamp_username)
+
+  @spec normalize_name(String.t, String.t) :: String.t
+  defp normalize_name(first_name, last_name) do
+    with(
+      first_name <-
+        first_name
+        |> String.downcase()
+        |> humanize_and_capitalize(),
+      last_name <-
+        last_name
+        |> String.downcase()
+        |> humanize_and_capitalize()
+    ) do
+      "#{first_name} #{last_name}"
+    end
+  end
 
   defp parse_ordered_at(ordered_at) do
     ordered_at
