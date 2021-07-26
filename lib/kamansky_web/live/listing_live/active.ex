@@ -32,7 +32,7 @@ defmodule KamanskyWeb.ListingLive.Active do
   @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :index, params) do
     socket
-    |> assign(:go_to_record, Map.get(params, :go_to_record))
+    |> assign(:go_to_record, Map.get(params, "go_to_record"))
     |> assign(:page_title, "Listings")
   end
 
