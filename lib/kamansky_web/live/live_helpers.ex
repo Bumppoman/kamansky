@@ -2,19 +2,21 @@ defmodule KamanskyWeb.LiveHelpers do
   import Phoenix.LiveView
   import Phoenix.LiveView.Helpers
 
+  @spec assign_defaults(Phoenix.LiveView.Socket.t, map)
+    :: %Phoenix.LiveView.Socket{
+      assigns: %{
+        required(:logged_in) => boolean,
+        required(:timezone) => Calendar.time_zone,
+        optional(any) => any
+      }
+    }
   def assign_defaults(socket, session) do
     socket
     |> assign(:logged_in, Map.get(session, "logged_in", false))
     |> assign(:timezone, get_connect_params(socket)["timezone"] || "America/New_York")
   end
 
-  #def assign_datatable_attributes(socket, attrs) do
-    #socket
-    #|> assign(:go_to_record, )
-    #|> assign(:search, )
-  #end
-
-  def live_confirmation_modal(_socket, opts), do: live_confirmation_modal(opts)
+  @spec live_confirmation_modal(keyword) :: Phoenix.LiveView.Component.t
   def live_confirmation_modal(opts) do
     live_modal(
       KamanskyWeb.ComponentLive.ConfirmationModalComponent,
@@ -42,7 +44,7 @@ defmodule KamanskyWeb.LiveHelpers do
         stamp: @stamp,
         return_to: Routes.stamp_index_path(@socket, :index) %>
   """
-  def live_modal(_socket, component, opts), do: live_modal(component, opts)
+  @spec live_modal(module, keyword) :: Phoenix.LiveView.Component.t
   def live_modal(component, opts) do
     path = Keyword.fetch!(opts, :return_to)
     modal_opts = [id: :modal, return_to: path, component: component, opts: opts]

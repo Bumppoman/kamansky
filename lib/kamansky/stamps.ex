@@ -9,7 +9,7 @@ defmodule Kamansky.Stamps do
   alias Kamansky.Stamps.Stamp
   alias Kamansky.Stamps.StampReferences.StampReference
 
-  @spec change_stamp(Stamp.t, %{}) :: Ecto.Changeset.t
+  @spec change_stamp(Stamp.t, map) :: Ecto.Changeset.t
   def change_stamp(%Stamp{} = stamp, attrs \\ %{}), do: Stamp.changeset(stamp, attrs)
 
   @spec cost_of_stamps(atom) :: float
@@ -20,13 +20,14 @@ defmodule Kamansky.Stamps do
     |> Repo.one()
   end
 
-  @spec cost_of_stamps([atom] | atom, integer) :: float
+  @spec cost_of_stamps([atom], integer) :: float
   def cost_of_stamps(status, month) when is_list(status) do
     Stamp
     |> where([s], s.status in ^status)
     |> cost_of_stamps_for_month(month)
   end
 
+  @spec cost_of_stamps(atom, integer) :: float
   def cost_of_stamps(status, month) do
     Stamp
     |> where(status: ^status)
@@ -40,13 +41,14 @@ defmodule Kamansky.Stamps do
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec count_stamps_purchased([atom] | atom, integer) :: integer
+  @spec count_stamps_purchased([atom], integer) :: integer
   def count_stamps_purchased(status, month) when is_list(status) do
     Stamp
     |> where([s], s.status in ^status)
     |> count_stamps_purchased_in_month(month)
   end
 
+  @spec count_stamps_purchased(atom, integer) :: integer
   def count_stamps_purchased(status, month) do
     Stamp
     |> where(status: ^status)
@@ -62,7 +64,7 @@ defmodule Kamansky.Stamps do
     |> Repo.insert()
   end
 
-  @spec find_row_number_for_stamp(atom, %{}) :: integer
+  @spec find_row_number_for_stamp(atom, map) :: integer
   def find_row_number_for_stamp(status, options) do
     Stamp
     |> where(status: ^status)
@@ -109,14 +111,14 @@ defmodule Kamansky.Stamps do
     |> Repo.one!()
   end
 
-  @spec list_stamps(atom, %{}) :: [Stamp.t]
+  @spec list_stamps(atom, map) :: [Stamp.t]
   def list_stamps(status, params) do
     Stamp
     |> where(status: ^status)
     |> then(&Paginate.list(Stamps, &1, params))
   end
 
-  @spec mark_stamp_as_sold(Stamp.t) :: {:ok, Stamp.t} | {:error, any}
+  @spec mark_stamp_as_sold(Stamp.t) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
   def mark_stamp_as_sold(%Stamp{} = stamp) do
     stamp
     |> Ecto.Changeset.change(status: :sold)
@@ -141,7 +143,7 @@ defmodule Kamansky.Stamps do
     )
   end
 
-  @spec sell_stamp(Stamp.t, %{}) :: {:ok, %Stamp{status: :listed}, integer} | {:error, Ecto.Changeset.t}
+  @spec sell_stamp(Stamp.t, map) :: {:ok, %Stamp{status: :listed}, integer} | {:error, Ecto.Changeset.t}
   def sell_stamp(%Stamp{} = stamp, attrs) do
     with {:ok, stamp} <- set_stamp_inventory_key(stamp),
       {:ok, %{id: id}} <- Listings.create_listing(stamp, attrs)
@@ -218,26 +220,28 @@ defmodule Kamansky.Stamps do
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
   def sort(query, %{column: 1, direction: direction}), do: order_by(query, {^direction, :grade})
 
-  @spec update_stamp(Stamp.t, %{}, integer | nil, integer | nil)
-    :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
+  @spec update_stamp(Stamp.t, map, nil, nil) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
   def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) when is_nil(front_photo) and is_nil(rear_photo) do
     stamp
     |> Stamp.changeset(attrs)
     |> Repo.update()
   end
 
+  @spec update_stamp(Stamp.t, map, integer, nil) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
   def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) when is_nil(rear_photo) do
     stamp
     |> Stamp.changeset(attrs)
     |> Ecto.Changeset.put_change(:front_photo_id, front_photo.id)
   end
 
+  @spec update_stamp(Stamp.t, map, nil, integer) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
   def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) when is_nil(front_photo) do
     stamp
     |> Stamp.changeset(attrs)
     |> Ecto.Changeset.put_change(:rear_photo_id, rear_photo.id)
   end
 
+  @spec update_stamp(Stamp.t, map, integer, integer) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
   def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) do
     stamp
     |> Stamp.changeset(attrs)

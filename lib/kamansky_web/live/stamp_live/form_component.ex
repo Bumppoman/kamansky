@@ -22,9 +22,9 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     {
       :ok,
       socket
-        |> assign(assigns)
-        |> assign(:changeset, Stamps.change_stamp(stamp, %{add_to: status}))
-        |> assign(:copy_in_collection, nil)
+      |> assign(assigns)
+      |> assign(:changeset, Stamps.change_stamp(stamp, %{add_to: status}))
+      |> assign(:copy_in_collection, nil)
     }
   end
 
@@ -63,10 +63,12 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     do
       case Stamps.update_stamp(socket.assigns.stamp, stamp_params, front_photo, rear_photo) do
         {:ok, %{id: id}} ->
-          {:noreply,
-          socket
-          |> put_flash(:info, "You have successfully updated this stamp.")
-          |> push_redirect(to: Routes.stamp_index_path(socket, socket.assigns.status, go_to_record: id))}
+          {
+            :noreply,
+            socket
+            |> put_flash(:info, "You have successfully updated this stamp.")
+            |> push_redirect(to: Routes.stamp_index_path(socket, socket.assigns.status, go_to_record: id))
+          }
 
         {:error, %Ecto.Changeset{} = changeset} ->
           {:noreply, assign(socket, :changeset, changeset)}

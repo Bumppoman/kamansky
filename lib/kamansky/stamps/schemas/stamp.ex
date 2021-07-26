@@ -134,7 +134,7 @@ defmodule Kamansky.Stamps.Stamp do
   end
 
   @doc false
-  @spec changeset(Stamp.t, %{}) :: Ecto.Changeset.t
+  @spec changeset(Stamp.t, map) :: Ecto.Changeset.t
   def changeset(stamp, attrs) do
 
     # Workaround for Ecto.Enum (7/2021)
@@ -183,7 +183,7 @@ defmodule Kamansky.Stamps.Stamp do
   def format_code(%Stamp{format: :zip_block}), do: "ZB"
   def format_code(%Stamp{format: :mail_early_block}), do: "MB"
 
-  @spec formats :: [tuple()]
+  @spec formats :: [{String.t, atom}]
   def formats do
     [
       {"Single", :single},

@@ -44,10 +44,12 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
   defp save_stamp_reference(socket, :new, stamp_reference_params) do
     case StampReferences.create_stamp_reference(stamp_reference_params) do
       {:ok, %{id: id}} ->
-        {:noreply,
-        socket
-        |> put_flash(:info, "You have successfully added this stamp reference.")
-        |> push_redirect(to: Routes.stamp_reference_index_path(socket, :index, go_to_record: id))}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "You have successfully added this stamp reference.")
+          |> push_redirect(to: Routes.stamp_reference_index_path(socket, :index, go_to_record: id))
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

@@ -120,7 +120,7 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.aggregate(:sum, :listing_price)
   end
 
-  @spec update_hipstamp_listing(Listing.t, %{}) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  @spec update_hipstamp_listing(Listing.t, map) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def update_hipstamp_listing(%Listing{} = listing, params) do
     listing
     |> Listing.hipstamp_changeset(params)

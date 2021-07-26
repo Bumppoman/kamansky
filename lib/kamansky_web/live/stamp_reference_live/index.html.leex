@@ -41,8 +41,7 @@
   <% end %>
 </section>
 <%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket,
-    KamanskyWeb.StampReferenceLive.FormComponent,
+  <%= live_modal KamanskyWeb.StampReferenceLive.FormComponent,
     action: @live_action,
     form_id: "stamp-reference-form",
     id: "stamp-reference-form-modal",

@@ -7,16 +7,15 @@ defmodule KamanskyWeb.DashboardLive.Index do
   alias Kamansky.Stamps
 
   @impl true
+  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, session, socket) do
-
     with socket <- assign_defaults(socket, session),
-      {:ok, date} <- DateTime.now(socket.assigns.timezone),
+      date <- DateTime.now!(socket.assigns.timezone),
       day <- date.day,
       days <- max(day, (Date.add(date, -day)).day),
       previous_month <- Date.add(date, -days).month,
-      this_month <- date.month
-    do
-      socket =
+      this_month <- date.month,
+      socket <-
         socket
         |> assign(
           [
@@ -50,7 +49,7 @@ defmodule KamanskyWeb.DashboardLive.Index do
             total_stamps_in_all_orders: Orders.total_stamps_in_orders(:all)
           ]
         )
-
+    do
       {:ok, socket}
     end
   end

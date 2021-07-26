@@ -19,7 +19,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   @impl true
-  @spec handle_event(String.t, %{}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("go_to_page", %{"page" => page}, socket) do
     with page <- String.to_integer(page),
       socket <- assign(socket, current_page: page)
@@ -60,8 +60,14 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   @spec load_data_for_page(
-    %{current_page: integer, per_page: integer, search: String.t, sort: %{column: integer, direction: :asc | :desc}}
-  ) :: [Ecto.Schema.t]
+    %{
+      current_page: integer,
+      data_source: (map -> [Ecto.Schema.t] | {integer, [Ecto.Schema.t]}),
+      per_page: integer,
+      search: String.t | nil,
+      sort: %{column: integer, direction: :asc | :desc}
+    }
+  ) :: [Ecto.Schema.t] | {integer, [Ecto.Schema.t]}
   def load_data_for_page(parameters) do
     parameters[:data_source].(
       %{
@@ -142,7 +148,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
 
   @doc false
   @impl true
-  @spec update(%{}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec update(%{optional(atom) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(assigns, socket) do
     with(
       socket <-
@@ -203,7 +209,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   defp build_sort(sort_column) when is_integer(sort_column), do: %{column: sort_column, direction: :asc}
   defp build_sort(nil), do: %{column: 0, direction: :asc}
 
-  @spec dummy_page_link :: String.t
+  @spec dummy_page_link :: Phoenix.HTML.safe
   defp dummy_page_link do
     ~E"""
       <li>
@@ -216,7 +222,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   defp invert_sort_direction("desc"), do: :asc
   defp invert_sort_direction(_), do: :desc
 
-  @spec link_to_page(integer, integer, String.t) :: String.t
+  @spec link_to_page(integer, integer, String.t) :: Phoenix.HTML.safe
   defp link_to_page(page, current_page, target) do
     ~E"""
       <li>

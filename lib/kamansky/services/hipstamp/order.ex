@@ -65,12 +65,12 @@ defmodule Kamansky.Services.Hipstamp.Order do
             {:ok, order} <-
               Orders.insert_or_update_hipstamp_order(
                 order,
-                [
+                %{
                   customer_id: customer_id,
                   ordered_at: ordered_at,
                   item_price: item_price,
                   shipping_price: shipping_price,
-                ]
+                }
               ),
             listings <- update_order_listings(hipstamp_order["SaleListings"], order.id)
           do

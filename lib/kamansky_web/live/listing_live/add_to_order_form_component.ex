@@ -28,7 +28,7 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
     {:noreply, assign(socket, :changeset, changeset)}
   end
 
-  def handle_event("submit", %{"listing" => listing_params} = params, socket) do
+  def handle_event("submit", %{"listing" => listing_params}, socket) do
     case Listings.add_listing_to_order(socket.assigns.listing, listing_params) do
       {:ok, _order} ->
         {:noreply,

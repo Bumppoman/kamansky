@@ -8,13 +8,13 @@ defmodule Kamansky.Sales.Customers do
   alias Kamansky.Sales.Customers.Customer
   alias Kamansky.Sales.Orders.Order
 
-  @spec change_customer(Customer.t, %{}) :: Ecto.Changeset.t
+  @spec change_customer(Customer.t, map) :: Ecto.Changeset.t
   def change_customer(%Customer{} = customer, attrs \\ %{}), do: Customer.changeset(customer, attrs)
 
   @spec count_customers :: integer
   def count_customers, do: Repo.aggregate(Customer, :count, :id)
 
-  @spec find_row_number_for_customer(%{}) :: integer | nil
+  @spec find_row_number_for_customer(map) :: integer | nil
   def find_row_number_for_customer(options) do
     Customer
     |> select([c], {c.id, row_number() |> over(order_by: [{:asc, c.id}])})
@@ -26,7 +26,7 @@ defmodule Kamansky.Sales.Customers do
   @spec get_customer!(integer) :: Customer.t
   def get_customer!(id), do: Repo.get(Customer, id)
 
-  @spec insert_or_update_hipstamp_customer(%{}) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
+  @spec insert_or_update_hipstamp_customer(map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
   def insert_or_update_hipstamp_customer(attrs) do
     Customer
     |> where(hipstamp_id: ^attrs[:hipstamp_id])
@@ -39,7 +39,7 @@ defmodule Kamansky.Sales.Customers do
     |> Repo.insert_or_update()
   end
 
-  @spec list_customers(%{}) :: [Customer.t]
+  @spec list_customers(map) :: [Customer.t] | {integer, Customer.t}
   def list_customers(params) do
     with(
       most_recent_order <-
@@ -77,7 +77,7 @@ defmodule Kamansky.Sales.Customers do
   @spec sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :id})
 
-  @spec update_customer(Customer.t, %{}) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
+  @spec update_customer(Customer.t, map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
   def update_customer(%Customer{} = customer, attrs) do
     customer
     |> Customer.changeset(attrs)

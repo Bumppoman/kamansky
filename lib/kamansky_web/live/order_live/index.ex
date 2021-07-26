@@ -9,9 +9,11 @@ defmodule KamanskyWeb.OrderLive.Index do
   alias Kamansky.Services.Hipstamp
 
   @impl true
+  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, session, socket), do: {:ok, assign_defaults(socket, session)}
 
   @impl true
+  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("mark_completed", _value, socket) do
     with order <- socket.assigns.order do
       case Orders.mark_order_as_completed(order) do
@@ -63,10 +65,12 @@ defmodule KamanskyWeb.OrderLive.Index do
   end
 
   @impl true
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(params, _uri, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :edit, %{"id" => id}) do
     with order <- Orders.get_order!(id) do
       socket
@@ -123,13 +127,14 @@ defmodule KamanskyWeb.OrderLive.Index do
     |> load_orders(action)
   end
 
+  @spec load_orders(Phoenix.LiveView.Socket.t, map | atom) :: Phoenix.LiveView.Socket.t
   defp load_orders(socket, %{"status" => status}), do: load_orders(socket, String.to_existing_atom(status))
   defp load_orders(socket, %{}), do: load_orders(socket, socket.assigns.live_action)
   defp load_orders(socket, status) when status in [:pending, :finalized, :processed, :shipped, :completed] do
     socket
     |> assign(
       [
-        data_count: Orders.count_orders(status),
+        data_count: Orders.count_orders(status: status),
         data_locator: fn options -> Orders.find_row_number_for_order(status, options) end,
         data_source: fn options -> Orders.list_orders(:display, status, options) end
       ]

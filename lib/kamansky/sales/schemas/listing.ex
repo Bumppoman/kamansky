@@ -28,14 +28,14 @@ defmodule Kamansky.Sales.Listings.Listing do
     belongs_to :order, Kamansky.Sales.Orders.Order
   end
 
-  @spec changeset(Listing.t, %{}) :: Ecto.Changeset.t
+  @spec changeset(Listing.t, map) :: Ecto.Changeset.t
   def changeset(%Listing{} = listing, attrs) do
     listing
     |> cast(attrs, [:listing_price, :order_id, :sale_price])
     |> validate_required([])
   end
 
-  @spec hipstamp_changeset(Listing.t, %{}) :: Ecto.Changeset.t
+  @spec hipstamp_changeset(Listing.t, map) :: Ecto.Changeset.t
   def hipstamp_changeset(%Listing{} = listing, attrs) do
     cast(listing, attrs, [:inserted_at, :hipstamp_id])
   end
