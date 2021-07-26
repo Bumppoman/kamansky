@@ -9,7 +9,7 @@ defmodule Kamansky.Sales.Orders do
   alias Kamansky.Sales.Orders.Order
 
   @spec change_new_order(Order.t, map) :: Ecto.Changeset.t
-  def change_new_order(%Order{} = order, attrs \\ %{}), do: Order.new_changeset(order, attrs)
+  def change_new_order(%Order{} = order, attrs \\ %{}), do: Order.full_changeset(order, attrs)
 
   @spec change_order(Order.t, map) :: Ecto.Changeset.t
   def change_order(%Order{} = order, attrs \\ %{}), do: Order.changeset(order, attrs)
@@ -32,7 +32,7 @@ defmodule Kamansky.Sales.Orders do
   @spec create_order(map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
   def create_order(attrs) do
     %Order{}
-    |> Order.new_changeset(attrs)
+    |> Order.full_changeset(attrs)
     |> Ecto.Changeset.put_change(:ordered_at, DateTime.truncate(DateTime.utc_now(), :second))
     |> Repo.insert()
   end
@@ -181,7 +181,7 @@ defmodule Kamansky.Sales.Orders do
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
   def search_query(query, search) do
-    where(query, [o], ilike(fragment("CAST(id AS text)"), ^"%#{search}%"))
+    where(query, [o], ilike(fragment("CAST(? AS text)", field(o, :id)), ^"%#{search}%"))
   end
 
   @impl true
@@ -218,7 +218,7 @@ defmodule Kamansky.Sales.Orders do
   @spec update_order(Order.t, map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
   def update_order(%Order{} = order, attrs) do
     order
-    |> Order.changeset(attrs)
+    |> Order.full_changeset(attrs)
     |> Repo.update()
   end
 

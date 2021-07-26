@@ -39,7 +39,7 @@ defmodule Kamansky.Sales.Orders.Order do
     field(:shipped_at, :utc_datetime)
     field(:completed_at, :utc_datetime)
 
-    belongs_to(:customer, Kamansky.Sales.Customers.Customer)
+    belongs_to(:customer, Kamansky.Sales.Customers.Customer, on_replace: :update)
     has_many(:listings, Kamansky.Sales.Listings.Listing)
   end
 
@@ -54,16 +54,16 @@ defmodule Kamansky.Sales.Orders.Order do
   def completed?(%Order{status: :completed}), do: true
   def completed?(%Order{}), do: false
 
-  @spec net_profit(Order.t) :: Decimal.t
-  def net_profit(%Order{} = order) do
-    Decimal.sub(total_paid(order), total_cost(order))
-  end
-
-  @spec new_changeset(Order.t, map) :: Ecto.Changeset.t
-  def new_changeset(order, attrs) do
+  @spec full_changeset(Order.t, map) :: Ecto.Changeset.t
+  def full_changeset(order, attrs) do
     order
     |> cast(attrs, [:item_price, :selling_fees, :shipping_cost, :shipping_price])
     |> cast_assoc(:customer, with: &Kamansky.Sales.Customers.Customer.changeset/2)
+  end
+
+  @spec net_profit(Order.t) :: Decimal.t
+  def net_profit(%Order{} = order) do
+    Decimal.sub(total_paid(order), total_cost(order))
   end
 
   @spec order_number(Order.t) :: charlist

@@ -20,6 +20,7 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"order" => order_params}, socket) do
+    IO.inspect(order_params)
     changeset =
       socket.assigns.order
       |> Orders.change_new_order(order_params)
@@ -33,7 +34,7 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
   end
 
   @spec save_order(Phoenix.LiveView.Socket.t, atom, map) :: {:noreply, Phoenix.LiveView.Socket.t}
-  defp save_order(socket, :edit, %{"order" => order_params}) do
+  defp save_order(socket, :edit, order_params) do
     case Orders.update_order(socket.assigns.order, order_params) do
       {:ok, order} ->
         {
