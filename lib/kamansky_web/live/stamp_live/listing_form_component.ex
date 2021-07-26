@@ -10,6 +10,7 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
   alias Kamansky.Stamps.Stamp
 
   @impl true
+  @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(assigns, socket) do
     with listing <- %Listing{},
       changeset <- Listings.change_listing(listing)
@@ -17,14 +18,15 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
       {
         :ok,
         socket
-          |> assign(assigns)
-          |> assign(:changeset, changeset)
-          |> assign(:listing, listing)
+        |> assign(assigns)
+        |> assign(:changeset, changeset)
+        |> assign(:listing, listing)
       }
     end
   end
 
   @impl true
+  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"listing" => listing_params}, socket) do
     with(
       changeset <-
@@ -38,12 +40,12 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
 
   def handle_event("submit", %{"listing" => listing_params}, socket) do
     case Stamps.sell_stamp(socket.assigns.stamp, listing_params) do
-      {:ok, _stamp, listing_id} ->
+      {:ok, %Stamp{inventory_key: inventory_key}, listing_id} ->
         with :ok <- Services.Stamp.list_stamp_for_sale(listing_id, listing_params) do
           {
             :noreply,
             socket
-              |> put_flash(:info, "You have successfully listed this stamp for sale.")
+              |> put_flash(:info, "You have successfully listed this stamp for sale (inventory key: ##{inventory_key}).")
               |> push_redirect(to: Routes.listing_active_path(socket, :index, go_to_record: listing_id))
           }
         end

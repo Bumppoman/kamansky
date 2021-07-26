@@ -110,7 +110,13 @@ defmodule Kamansky.Sales.Listings do
 
   @impl true
   @spec sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
-  def sort(query, %{column: 0, direction: direction}), do: order_by(query, [l, s], {^direction, s.scott_number})
+  def sort(query, %{column: 0, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [{^direction, s.scott_number}, {:asc, l.id}]
+    )
+  end
   def sort(query, %{column: 1, direction: direction}), do: order_by(query, [l, s, o], {^direction, o.ordered_at})
 
   @spec total_listings_price(atom) :: float | nil
