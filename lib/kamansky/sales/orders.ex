@@ -95,6 +95,7 @@ defmodule Kamansky.Sales.Orders do
         |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
         |> join(:left, [l, s, sr], fp in assoc(s, :front_photo))
         |> join(:left, [l, s, ..., fp], rp in assoc(s, :rear_photo))
+        |> order_by([l, s], s.scott_number)
         |> preload([l, s, sr, fp, rp], [stamp: {s, [stamp_reference: sr, front_photo: fp, rear_photo: rp]}])
     ) do
       Order
@@ -121,13 +122,18 @@ defmodule Kamansky.Sales.Orders do
 
   @spec list_orders(:display, atom, map) :: [Order.t]
   def list_orders(:display, status, params) do
-    Order
-    |> where(status: ^status)
-    |> join(:left, [o], c in  assoc(o, :customer))
-    |> join(:left, [o], l in assoc(o, :listings))
-    |> join(:left, [o, ..., l], s in assoc(l, :stamp))
-    |> preload([o, c, l, s], [customer: c, listings: {l, [stamp: s]}])
-    |> then(&Paginate.list(Orders, &1, params))
+    with(
+      listings_query <-
+        Listing
+        |> join(:left, [l], s in assoc(l, :stamp))
+        |> preload([l, s], [stamp: s])
+    ) do
+      Order
+      |> where(status: ^status)
+      |> join(:left, [o], c in assoc(o, :customer))
+      |> preload([o, c, l, s], [customer: c, listings: ^listings_query])
+      |> then(&Paginate.list(Orders, &1, params))
+    end
   end
 
   @spec list_pending_orders_to_add_listing :: [Order.t]

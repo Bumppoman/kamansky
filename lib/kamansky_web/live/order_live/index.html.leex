@@ -68,31 +68,31 @@
   <% end %>
   <ul class="nav nav-pills justify-content-center">
     <li class="nav-item">
-      <%= live_patch "Pending",
+      <%= live_redirect "Pending",
         to: Routes.order_index_path(@socket, :pending),
         class: ["nav-link"] ++ (if @live_action in [:new, :pending], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
-      <%= live_patch "Finalized",
+      <%= live_redirect "Finalized",
         to: Routes.order_index_path(@socket, :finalized),
         class: ["nav-link"] ++ (if @live_action in [:finalized, :mark_processed], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
-      <%= live_patch "Processed",
+      <%= live_redirect "Processed",
         to: Routes.order_index_path(@socket, :processed),
         class: ["nav-link"] ++ (if @live_action in [:processed, :mark_shipped], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
-      <%= live_patch "Shipped",
+      <%= live_redirect "Shipped",
         to: Routes.order_index_path(@socket, :shipped),
         class: ["nav-link"] ++ (if @live_action in [:shipped, :mark_completed], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
-      <%= live_patch "Completed",
+      <%= live_redirect "Completed",
         to: Routes.order_index_path(@socket, :completed),
         class: ["nav-link"] ++ (if @live_action == :completed, do: [" active"], else: [])
       %>

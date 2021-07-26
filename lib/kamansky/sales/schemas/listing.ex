@@ -22,6 +22,8 @@ defmodule Kamansky.Sales.Listings.Listing do
     field :ebay_id, :integer
     field :status, Ecto.Enum, values: [pending: 1, active: 2, removed: 3, sold: 4], default: :active
 
+    field :hipstamp, :boolean, virtual: true
+
     timestamps(updated_at: false)
 
     belongs_to :stamp, Kamansky.Stamps.Stamp
@@ -31,7 +33,7 @@ defmodule Kamansky.Sales.Listings.Listing do
   @spec changeset(Listing.t, map) :: Ecto.Changeset.t
   def changeset(%Listing{} = listing, attrs) do
     listing
-    |> cast(attrs, [:listing_price, :order_id, :sale_price])
+    |> cast(attrs, [:hipstamp, :listing_price, :order_id, :sale_price])
     |> validate_required([])
   end
 
