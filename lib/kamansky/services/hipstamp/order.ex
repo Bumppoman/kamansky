@@ -1,8 +1,5 @@
 defmodule Kamansky.Services.Hipstamp.Order do
-  import Kamansky.Helpers
-
-  alias Kamansky.Sales.Listings
-  alias Kamansky.Sales.Orders
+  alias Kamansky.Sales.{Customers, Listings, Orders}
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.Hipstamp
   alias Kamansky.Stamps
@@ -43,94 +40,36 @@ defmodule Kamansky.Services.Hipstamp.Order do
       |> Enum.each(
         fn(hipstamp_order) ->
           with order <- Orders.get_or_initialize_order(hipstamp_id: String.to_integer(hipstamp_order["id"])),
-            ordered_at <-
-              hipstamp_order["created_at"]
-              |> NaiveDateTime.from_iso8601!()
-              |> DateTime.from_naive!("America/New_York")
-              |> DateTime.shift_zone!("Etc/UTC"),
+            ordered_at <- parse_ordered_at(hipstamp_order["created_at"]),
+            {:ok, %{id: customer_id}} <-
+              Customers.insert_or_update_hipstamp_customer(
+                hipstamp_id: hipstamp_order["buyer_id"],
+                first_name: hipstamp_order["ShippingAddress"]["name_first"],
+                last_name: hipstamp_order["ShippingAddress"]["name_last"],
+                street_address: hipstamp_order["ShippingAddress"]["address"],
+                city: hipstamp_order["ShippingAddress"]["city"],
+                state: hipstamp_order["ShippingAddress"]["state_abbreviation"],
+                zip: hipstamp_order["ShippingAddress"]["postal_code"],
+                email: hipstamp_order["buyer_email"]
+              ),
+            item_price <- Decimal.from_float(hipstamp_order["sales_listings_amount"] / 1),
+            shipping_price <- Decimal.from_float(hipstamp_order["postage_amount"] / 1),
+            selling_fees <- calculate_selling_fees(item_price, shipping_price),
             {:ok, order} <-
-              Orders.insert_or_update_hipstamp_order(order,
+              Orders.insert_or_update_hipstamp_order(
+                order,
                 [
+                  customer_id: customer_id,
                   ordered_at: ordered_at,
-                  item_price: Decimal.from_float(hipstamp_order["sales_listings_amount"] / 1),
-                  shipping_price: Decimal.from_float(hipstamp_order["postage_amount"] / 1),
-                  supply_cost: Decimal.from_float(0.1),
-                  name: "#{String.capitalize(String.downcase(hipstamp_order["ShippingAddress"]["name_first"]))} #{humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["name_last"]))}",
-                  street_address: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["address"])),
-                  city: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["city"])),
-                  state: String.upcase(hipstamp_order["ShippingAddress"]["state_abbreviation"]),
-                  zip: hipstamp_order["ShippingAddress"]["postal_code"],
-                  email: String.downcase(hipstamp_order["buyer_email"])
+                  item_price: item_price,
+                  shipping_price: shipping_price,
                 ]
               ),
-            listings <-
-              hipstamp_order["SaleListings"]
-              |> Enum.map(
-                fn sale_listing ->
-                  with(
-                    %Stamp{listing: listing} = stamp <-
-                      Stamps.get_stamp_by_inventory_key(sale_listing["private_id"], with_listing: true),
-                    {:ok, _stamp} <- Stamps.mark_stamp_as_sold(stamp),
-                    {:ok, listing} <-
-                      Listings.mark_listing_sold(
-                        listing,
-                        order_id: order.id,
-                        sale_price: Decimal.new(sale_listing["price"]), # comes in as a string instead of float
-                      )
-                  ) do
-                    listing
-                  end
-                end
-              ),
-            total_selling_fees <-
-              listings
-              |> Enum.map(
-                fn listing ->
-                  with(
-                    selling_fees <-
-                      [
-                        Decimal.mult(
-                          listing.sale_price,
-                          Decimal.from_float(0.0895)
-                        ),
-                        Decimal.div(
-                          Decimal.mult(
-                            order.shipping_price,
-                            Decimal.from_float(0.0895)
-                          ),
-                          Decimal.new(
-                            Enum.count(listings)
-                          )
-                        ),
-                        Decimal.mult(
-                          listing.sale_price,
-                          Decimal.from_float(0.029)
-                        ),
-                        Decimal.div(
-                          Decimal.mult(
-                            order.shipping_price,
-                            Decimal.from_float(0.029)
-                          ),
-                          Decimal.new(
-                            Enum.count(listings)
-                          )
-                        ),
-                        Decimal.from_float(0.3 / Enum.count(listings))
-                      ]
-                      |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
-                      |> Decimal.round(2, :floor),
-                    {:ok, _listing} <- Listings.update_listing_selling_fees(listing, selling_fees)
-                  ) do
-                    selling_fees
-                  end
-                end
-              )
-              |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
-              |> Decimal.round(2)
+            listings <- update_order_listings(hipstamp_order["SaleListings"], order.id)
           do
             Orders.update_order_fees(
               order,
-              selling_fees: total_selling_fees,
+              selling_fees: selling_fees,
               shipping_cost: Decimal.add(
                 Decimal.from_float(0.55),
                 Decimal.from_float(0.2 * Float.floor(Enum.count(listings) / 4))
@@ -151,5 +90,53 @@ defmodule Kamansky.Services.Hipstamp.Order do
     Orders.mark_order_as_shipped(order)
   end
 
+  defp calculate_selling_fees(item_price, shipping_price) do
+    with hipstamp_coefficient <- Decimal.from_float(0.0895),
+      paypal_coefficient <- Decimal.from_float(0.029),
+      paypal_flat_fee <- Decimal.from_float(0.3),
+      item_fees <-
+        item_price
+        |> Decimal.mult(hipstamp_coefficient)
+        |> Decimal.add(Decimal.mult(item_price, paypal_coefficient))
+        |> Decimal.add(paypal_flat_fee),
+      shipping_fees <-
+        shipping_price
+        |> Decimal.mult(hipstamp_coefficient)
+        |> Decimal.add(Decimal.mult(shipping_price, paypal_coefficient))
+    do
+      item_fees
+      |> Decimal.add(shipping_fees)
+      |> Decimal.round(2)
+    end
+  end
+
   defp hipstamp_username, do: Application.get_env(:kamansky, :hipstamp_username)
+
+  defp parse_ordered_at(ordered_at) do
+    ordered_at
+    |> NaiveDateTime.from_iso8601!()
+    |> DateTime.from_naive!("America/New_York")
+    |> DateTime.shift_zone!("Etc/UTC")
+  end
+
+  defp update_order_listings(sale_listings, order_id) do
+    Enum.map(
+      sale_listings,
+      fn sale_listing ->
+        with(
+          %Stamp{listing: listing} = stamp <-
+            Stamps.get_stamp_by_inventory_key(sale_listing["private_id"], with_listing: true),
+          {:ok, _stamp} <- Stamps.mark_stamp_as_sold(stamp),
+          {:ok, listing} <-
+            Listings.mark_listing_sold(
+              listing,
+              order_id: order_id,
+              sale_price: Decimal.new(sale_listing["price"]), # comes in as a string instead of float
+            )
+        ) do
+          listing
+        end
+      end
+    )
+  end
 end

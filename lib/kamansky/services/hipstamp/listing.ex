@@ -38,12 +38,20 @@ defmodule Kamansky.Services.Hipstamp.Listing do
 
     "/listings"
     |> Hipstamp.post!(body)
+    |> Map.get(:body)
     |> Map.get("results")
     |> hd()
     |> then(
       &Listings.update_hipstamp_listing(
         listing,
-        [inserted_at: &1["created_at"], hipstamp_id: &1["id"]]
+        %{
+          inserted_at:
+            &1["created_at"]
+            |> NaiveDateTime.from_iso8601!()
+            |> DateTime.from_naive!("America/New_York")
+            |> DateTime.shift_zone!("Etc/UTC"),
+          hipstamp_id: &1["id"]
+        }
       )
     )
   end

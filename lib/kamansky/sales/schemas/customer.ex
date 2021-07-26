@@ -12,6 +12,8 @@ defmodule Kamansky.Sales.Customers.Customer do
     field :city, :string
     field :state, :string
     field :zip, :string
+    field :hipstamp_id, :integer
+    field :ebay_id, :integer
 
     field :amount_spent_ytd, :decimal, virtual: true
     field :most_recent_order_date, :utc_datetime, virtual: true
@@ -21,7 +23,12 @@ defmodule Kamansky.Sales.Customers.Customer do
 
   def changeset(%Customer{} = customer, attrs) do
     customer
-    |> cast(attrs, [:city, :email, :name, :state, :street_address, :zip])
+    |> cast(attrs,
+      [
+        :city, :email, :hipstamp_id, :name,
+        :state, :street_address, :zip
+      ]
+    )
   end
 
   def formatted_email(%Customer{email: email}) when email in [nil, ""], do: "---"

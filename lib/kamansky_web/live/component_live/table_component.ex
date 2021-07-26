@@ -144,27 +144,20 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   @impl true
   @spec update(%{}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def update(assigns, socket) do
-    socket =
-      if assigns[:headers] do
+    with(
+      socket <-
         socket
         |> assign(assigns)
-        |> assign(sort: build_sort(assigns.options[:sort]))
-      else
+        |> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
+      socket <- assign(socket, :current_page, record_location(socket, assigns.options[:go_to_record])),
+      socket <- assign_data(socket),
+      socket <-
         socket
-      end
-
-    socket =
-      socket
-      |> assign(:current_page, record_location(socket, assigns.options[:go_to_record]))
-
-    socket = assign_data(socket)
-
-    socket =
-      socket
-      |> assign(total_items: total_items(socket.assigns))
-      |> assign(total_pages: total_pages(total_items(socket.assigns), socket.assigns.per_page))
-
-    {:ok, socket}
+        |> assign_new(:total_items, fn -> total_items(socket.assigns) end)
+        |> assign_new(:total_pages, fn -> total_pages(total_items(socket.assigns), socket.assigns.per_page) end)
+    ) do
+      {:ok, socket}
+    end
   end
 
   @spec assign_data(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t

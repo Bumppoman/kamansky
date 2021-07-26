@@ -32,11 +32,6 @@ defmodule Kamansky.Sales.Orders.Order do
   def completed?(%Order{status: :completed}), do: true
   def completed?(%Order{}), do: false
 
-  def hipstamp_changeset(order, attrs) do
-    order
-    |> cast(attrs, [:item_price, :ordered_at, :shipping_price])
-  end
-
   def net_profit(%Order{} = order) do
     Decimal.sub(total_paid(order), total_cost(order))
   end

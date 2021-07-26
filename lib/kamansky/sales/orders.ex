@@ -77,7 +77,7 @@ defmodule Kamansky.Sales.Orders do
 
   def insert_or_update_hipstamp_order(order, attrs) do
     order
-    |> Order.hipstamp_changeset(attrs)
+    |> Ecto.Changeset.change(attrs)
     |> Repo.insert_or_update()
   end
 
