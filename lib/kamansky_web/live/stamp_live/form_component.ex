@@ -80,7 +80,10 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     with {:ok, front_photo} <- manage_photo(socket, :front_photo),
       {:ok, rear_photo} <- manage_photo(socket, :rear_photo)
     do
-      case Stamps.create_stamp(%{stamp_params | "status" => add_to}, front_photo, rear_photo) do
+      stamp_params
+      |> Map.put("status", add_to)
+      |> Stamps.create_stamp(front_photo, rear_photo)
+      |> case do
         {:ok, %Stamp{id: id, status: status}} ->
           {
             :noreply,
