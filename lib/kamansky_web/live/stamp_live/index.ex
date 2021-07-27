@@ -81,12 +81,8 @@ defmodule KamanskyWeb.StampLive.Index do
       assigns: %{
         optional(:stamp) => Stamp.t
       }
-    }, %{optional(String.t) => String.t}
+    }, map
   ) :: Phoenix.LiveView.Socket.t
-  defp load_stamps(socket, %{"status" => status}) do
-    load_stamps(socket, String.to_existing_atom(status))
-  end
-
   defp load_stamps(%{assigns: %{stamp: %Stamp{status: status}}} = socket, _params) do
     load_stamps(socket, status)
   end

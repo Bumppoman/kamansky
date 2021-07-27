@@ -35,25 +35,25 @@
   do %>
     <td>
       <%= live_patch @item.scott_number,
-        to: Routes.stamp_index_path(@socket, :show, @item, status: @item.status)
+        to: Routes.stamp_index_path(@socket, :show, @item)
       %>
     </td>
     <td><%= Stamp.formatted_grade(@item) %></td>
     <td><%= format_decimal_as_currency(Stamp.total_cost(@item)) %></td>
     <td><%= Stamp.formatted_flaws(@item) %></td>
     <td>
-      <%= live_patch to: Routes.stamp_index_path(@socket, :edit, @item, status: @item.status), class: "action-icon" do %>
+      <%= live_patch to: Routes.stamp_index_path(@socket, :edit, @item), class: "action-icon" do %>
         <i class="material-icons">edit</i>
       <% end %>
       <%= if @item.status == :collection do %>
-        <%= live_patch to: Routes.stamp_index_path(@socket, :move_to_stock, @item, status: @item.status),
+        <%= live_patch to: Routes.stamp_index_path(@socket, :move_to_stock, @item),
           class: "action-icon"
         do %>
           <i class="material-icons">inventory_2</i>
         <% end %>
       <% end %>
       <%= if @item.status != :listed do %>
-        <%= live_patch to: Routes.stamp_index_path(@socket, :sell, @item, status: @item.status), class: "action-icon" do %>
+        <%= live_patch to: Routes.stamp_index_path(@socket, :sell, @item), class: "action-icon" do %>
           <i class="material-icons">attach_money</i>
         <% end %>
       <% end %>
