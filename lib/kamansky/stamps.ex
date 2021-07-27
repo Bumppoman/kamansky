@@ -204,32 +204,17 @@ defmodule Kamansky.Stamps do
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
   def sort(query, %{column: 1, direction: direction}), do: order_by(query, {^direction, :grade})
 
-  @spec update_stamp(Stamp.t, map, nil, nil) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
-  def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) when is_nil(front_photo) and is_nil(rear_photo) do
-    stamp
-    |> Stamp.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @spec update_stamp(Stamp.t, map, integer, nil) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
-  def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) when is_nil(rear_photo) do
-    stamp
-    |> Stamp.changeset(attrs)
-    |> Ecto.Changeset.put_change(:front_photo_id, front_photo.id)
-  end
-
-  @spec update_stamp(Stamp.t, map, nil, integer) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
-  def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) when is_nil(front_photo) do
-    stamp
-    |> Stamp.changeset(attrs)
-    |> Ecto.Changeset.put_change(:rear_photo_id, rear_photo.id)
-  end
-
-  @spec update_stamp(Stamp.t, map, integer, integer) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
+  @spec update_stamp(
+    Stamp.t,
+    map,
+    Kamansky.Attachments.Attachment.t | nil,
+    Kamansky.Attachments.Attachment.t | nil
+  ) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
   def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) do
     stamp
     |> Stamp.changeset(attrs)
-    |> Ecto.Changeset.change([front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
+    |> handle_photos(front_photo, rear_photo)
+    |> Repo.update()
   end
 
   @spec cost_of_stamps_for_month(Ecto.Query.t, integer) :: float
@@ -245,5 +230,23 @@ defmodule Kamansky.Stamps do
     query
     |> where([s], fragment("DATE_PART('month', ?)", s.inserted_at) == ^month)
     |> Repo.aggregate(:count, :id)
+  end
+
+  @spec handle_photos(Ecto.Changeset.t, Kamansky.Attachments.Attachment.t | nil, Kamansky.Attachments.Attachment.t)
+    :: Ecto.Changeset.t
+  defp handle_photos(changeset, nil, nil) do
+    changeset
+  end
+
+  defp handle_photos(changeset, front_photo, nil) do
+    Ecto.Changeset.put_change(changeset, :front_photo_id, front_photo.id)
+  end
+
+  defp handle_photos(changeset, nil, rear_photo) do
+    Ecto.Changeset.put_change(changeset, :rear_photo_id, rear_photo.id)
+  end
+
+  defp handle_photos(changeset, front_photo, rear_photo) do
+    Ecto.Changeset.change(changeset, [front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
   end
 end
