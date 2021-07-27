@@ -106,7 +106,7 @@
     id: "order-form-modal",
     order: @order,
     title: (if @live_action == :new, do: "Create Order", else: "Update Order"),
-    return_to: Routes.order_index_path(@socket, :pending)
+    return_to: Routes.order_index_path(@socket, @order.status)
   %>
 <% end %>
 <%= if @live_action in [:mark_completed, :mark_processed, :mark_shipped] do %>

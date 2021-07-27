@@ -42,16 +42,26 @@
     </div>
   <% end %>
   <div class="row">
-    <div class="col">
+    <div class="col-md-6 form-group required">
       <%= label f, :platform, class: "form-control-label" %>
-      <div class="form-check form-check-inline">
-        <%= radio_button f, :platform, :hipstamp, class: "form-check-input" %>
-        <label class="form-check-label">Hipstamp</label>
+      <div>
+        <div class="form-check form-check-inline">
+          <%= radio_button f, :platform, :hipstamp, class: "form-check-input" %>
+          <label class="form-check-label">Hipstamp</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <%= radio_button f, :platform, :ebay, class: "form-check-input" %>
+          <label class="form-check-label">eBay</label>
+        </div>
       </div>
-      <div class="form-check form-check-inline">
-        <%= radio_button f, :platform, :ebay, class: "form-check-input" %>
-        <label class="form-check-label">eBay</label>
-      </div>
+    </div>
+    <div class="col-md-6 form-group required">
+      <%= label f,
+        get_platform_id_field(@changeset),
+        get_platform_id_field_label(@changeset),
+        class: "form-control-label"
+      %>
+      <%= text_input f, get_platform_id_field(@changeset), class: "form-control" %>
     </div>
   </div>
   <div class="row">

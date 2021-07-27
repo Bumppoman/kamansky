@@ -62,7 +62,13 @@ defmodule Kamansky.Sales.Orders.Order do
   @spec full_changeset(Order.t, map) :: Ecto.Changeset.t
   def full_changeset(order, attrs) do
     order
-    |> cast(attrs, [:item_price, :selling_fees, :shipping_cost, :shipping_price])
+    |> cast(
+      attrs,
+      [
+        :ebay_id, :hipstamp_id, :item_price, :platform,
+        :selling_fees, :shipping_cost, :shipping_price
+      ]
+    )
     |> cast_assoc(:customer, with: &Kamansky.Sales.Customers.Customer.changeset/2)
   end
 

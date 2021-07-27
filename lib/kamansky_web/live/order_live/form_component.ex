@@ -32,6 +32,26 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
     save_order(socket, socket.assigns.action, order_params)
   end
 
+  @spec get_platform_id_field(Ecto.Changeset.t) :: :ebay_id | :hipstamp_id
+  def get_platform_id_field(changeset) do
+    changeset
+    |> Ecto.Changeset.get_field(:platform)
+    |> case do
+      :hipstamp -> :hipstamp_id
+      :ebay -> :ebay_id
+    end
+  end
+
+  @spec get_platform_id_field(Ecto.Changeset.t) :: String.t
+  def get_platform_id_field_label(changeset) do
+    changeset
+    |> Ecto.Changeset.get_field(:platform)
+    |> case do
+      :hipstamp -> "Hipstamp ID"
+      :ebay -> "eBay ID"
+    end
+  end
+
   @spec save_order(Phoenix.LiveView.Socket.t, atom, map) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp save_order(socket, :edit, order_params) do
     case Orders.update_order(socket.assigns.order, order_params) do

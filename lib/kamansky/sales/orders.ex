@@ -54,10 +54,8 @@ defmodule Kamansky.Sales.Orders do
     |> limit(1)
     |> Repo.one()
     |> case do
-      %Order{} = order ->
-        order
-      nil ->
-        struct(Order, params)
+      %Order{} = order -> order
+      nil -> struct(Order, params)
     end
   end
 
@@ -73,20 +71,7 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.one!()
   end
 
-  @spec get_order_detail(integer)
-    :: %Order{
-      customer: Kamansky.Sales.Customers.Customer.t,
-      listings:
-        [
-          %Listing{
-            stamp: %Kamansky.Stamps.Stamp{
-              front_photo: Kamansky.Attachments.Attachment.t,
-              rear_photo: Kamansky.Attachments.Attachment.t,
-              stamp_reference: Kamansky.Stamps.StampReferences.StampReference.t
-            }
-          }
-        ]
-    }
+  @spec get_order_detail(integer) :: Order.t
   def get_order_detail(id) do
     with (
       listings_query <-

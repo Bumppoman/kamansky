@@ -7,7 +7,7 @@ defmodule Kamansky.Sales.Listings do
   alias Kamansky.Repo
   alias Kamansky.Sales.Listings.Listing
 
-  @spec add_listing_to_order(Listing.t, %{}) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  @spec add_listing_to_order(Listing.t, map) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def add_listing_to_order(%Listing{} = listing, attrs \\ %{}) do
     listing
     |> change_listing(attrs)
@@ -15,7 +15,7 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.update()
   end
 
-  @spec change_listing(Listing.t, %{}) :: Ecto.Changeset.t
+  @spec change_listing(Listing.t, map) :: Ecto.Changeset.t
   def change_listing(%Listing{} = listing, attrs \\ %{}), do: Listing.changeset(listing, attrs)
 
   @spec count_listings(atom) :: integer | nil
@@ -25,7 +25,7 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec create_listing(Kamansky.Stamps.Stamp.t, %{}) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  @spec create_listing(Kamansky.Stamps.Stamp.t, map) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def create_listing(stamp, attrs) do
     stamp
     |> Ecto.build_assoc(:listing)
@@ -37,7 +37,7 @@ defmodule Kamansky.Sales.Listings do
   @spec exclude_from_count(Ecto.Query.t) :: Ecto.Query.t
   def exclude_from_count(query), do: query
 
-  @spec find_row_number_for_listing(atom, %{}) :: integer
+  @spec find_row_number_for_listing(atom, map) :: integer
   def find_row_number_for_listing(status, options) do
     Listing
     |> where(status: ^status)
@@ -72,7 +72,7 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.one()
   end
 
-  @spec list_listings(atom, %{}) :: [Listing.t]
+  @spec list_listings(atom, Kamansky.Paginate.params) :: [Listing.t]
   def list_listings(status, params) do
     Listing
     |> where(status: ^status)
@@ -81,7 +81,7 @@ defmodule Kamansky.Sales.Listings do
     |> then(&Paginate.list(Listings, &1, params))
   end
 
-  @spec list_sold_listings(%{}) :: [%Listing{status: :sold}]
+  @spec list_sold_listings(Kamansky.Paginate.params) :: [%Listing{status: :sold}]
   def list_sold_listings(params) do
     Listing
     |> where(status: :sold)
