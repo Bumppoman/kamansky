@@ -51,11 +51,17 @@
   <section>
     <div class="row">
       <div class="col">
-        Ordered by:<br />
-        <%= @order.customer.name %><br />
-        <%= @order.customer.street_address %><br />
-        <%= @order.customer.city %>, <%= @order.customer.state %> <%= @order.customer.zip %><br />
-        <%= @order.customer.email %>
+        <div>
+          Ordered by:<br />
+          <%= @order.customer.name %><br />
+          <%= @order.customer.street_address %><br />
+          <%= @order.customer.city %>, <%= @order.customer.state %> <%= @order.customer.zip %><br />
+          <%= @order.customer.email %>
+        </div>
+        <div>
+          Ordered through: <%= Order.platform(@order) %><br />
+          Order ID: <%= Order.platform_id(@order) %>
+        </div>
       </div>
       <div class="col">
         <table class="table">

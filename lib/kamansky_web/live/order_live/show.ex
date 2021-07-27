@@ -9,12 +9,13 @@ defmodule KamanskyWeb.OrderLive.Show do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
+  @spec mount(%{required(String.t) => String.t}, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(%{"id" => id}, session, socket) do
-    socket =
+    {
+      :ok,
       socket
       |> assign_defaults(session)
       |> assign(:order, Orders.get_order_detail(id))
-
-    {:ok, socket}
+    }
   end
 end

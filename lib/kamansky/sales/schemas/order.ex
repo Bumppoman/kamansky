@@ -14,6 +14,7 @@ defmodule Kamansky.Sales.Orders.Order do
     selling_fees: Decimal.t,
     shipping_cost: Decimal.t,
     status: atom,
+    ebay_id: String.t,
     hipstamp_id: integer,
     processed_at: DateTime.t,
     shipped_at: DateTime.t,
@@ -23,24 +24,22 @@ defmodule Kamansky.Sales.Orders.Order do
   }
 
   schema "orders" do
-    field(:ordered_at, :utc_datetime)
-    field(:item_price, :decimal)
-    field(:shipping_price, :decimal)
-    field(:selling_fees, :decimal)
-    field(:shipping_cost, :decimal)
-
-    field(:status, Ecto.Enum,
+    field :ordered_at, :utc_datetime
+    field :item_price, :decimal
+    field :shipping_price, :decimal
+    field :selling_fees, :decimal
+    field :shipping_cost, :decimal
+    field :status, Ecto.Enum,
       values: [pending: 1, finalized: 2, processed: 3, shipped: 4, completed: 5],
       default: :pending
-    )
+    field :ebay_id, :string
+    field :hipstamp_id, :integer
+    field :processed_at, :utc_datetime
+    field :shipped_at, :utc_datetime
+    field :completed_at, :utc_datetime
 
-    field(:hipstamp_id, :integer)
-    field(:processed_at, :utc_datetime)
-    field(:shipped_at, :utc_datetime)
-    field(:completed_at, :utc_datetime)
-
-    belongs_to(:customer, Kamansky.Sales.Customers.Customer, on_replace: :update)
-    has_many(:listings, Kamansky.Sales.Listings.Listing)
+    belongs_to :customer, Kamansky.Sales.Customers.Customer, on_replace: :update
+    has_many :listings, Kamansky.Sales.Listings.Listing
   end
 
   @spec changeset(Order.t, map) :: Ecto.Changeset.t
@@ -54,12 +53,20 @@ defmodule Kamansky.Sales.Orders.Order do
   def completed?(%Order{status: :completed}), do: true
   def completed?(%Order{}), do: false
 
+  @spec ebay?(Order.t) :: boolean
+  def ebay?(%Order{ebay_id: nil}), do: false
+  def ebay?(%Order{}), do: true
+
   @spec full_changeset(Order.t, map) :: Ecto.Changeset.t
   def full_changeset(order, attrs) do
     order
     |> cast(attrs, [:item_price, :selling_fees, :shipping_cost, :shipping_price])
     |> cast_assoc(:customer, with: &Kamansky.Sales.Customers.Customer.changeset/2)
   end
+
+  @spec hipstamp?(Order.t) :: boolean
+  def hipstamp?(%Order{hipstamp_id: nil}), do: false
+  def hipstamp?(%Order{}), do: true
 
   @spec net_profit(Order.t) :: Decimal.t
   def net_profit(%Order{} = order) do
@@ -72,6 +79,22 @@ defmodule Kamansky.Sales.Orders.Order do
   @spec pending?(Order.t) :: boolean
   def pending?(%Order{status: :pending}), do: true
   def pending?(%Order{}), do: false
+
+  @spec platform(Order.t) :: String.t
+  def platform(%Order{} = order) do
+    cond do
+      Order.hipstamp?(order) -> "Hipstamp"
+      Order.ebay?(order) -> "eBay"
+    end
+  end
+
+  @spec platform_id(Order.t) :: integer | String.t
+  def platform_id(%Order{} = order) do
+    cond do
+      Order.hipstamp?(order) -> order.hipstamp_id
+      Order.ebay?(order) -> order.ebay_id
+    end
+  end
 
   @spec processed?(Order.t) :: boolean
   def processed?(%Order{status: :processed}), do: true

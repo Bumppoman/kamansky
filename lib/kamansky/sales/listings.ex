@@ -95,7 +95,7 @@ defmodule Kamansky.Sales.Listings do
     :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def mark_listing_sold(%Listing{} = listing, order_id: order_id, sale_price: sale_price) do
     listing
-    |> Ecto.Changeset.change(order_id: order_id, sale_price: sale_price)
+    |> Ecto.Changeset.change(order_id: order_id, sale_price: sale_price, status: :sold)
     |> Repo.update()
   end
 
@@ -117,7 +117,14 @@ defmodule Kamansky.Sales.Listings do
       [{^direction, s.scott_number}, {:asc, l.id}]
     )
   end
-  def sort(query, %{column: 1, direction: direction}), do: order_by(query, [l, s, o], {^direction, o.ordered_at})
+
+  def sort(query, %{column: 1, direction: direction}) do
+    order_by(
+      query,
+      [l, s, o],
+      [{^direction, o.ordered_at}, {:asc, s.scott_number}, {:asc, l.id}]
+    )
+  end
 
   @spec total_listings_price(atom) :: float | nil
   def total_listings_price(status) do
