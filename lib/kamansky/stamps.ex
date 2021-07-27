@@ -130,7 +130,7 @@ defmodule Kamansky.Stamps do
   def move_stamp_to_stock(%Stamp{} = stamp) do
     stamp
     |> Stamp.changeset(%{})
-    |> Ecto.Changeset.change([status: :stock, moved_to_stock_at: NaiveDateTime.local_now()])
+    |> Ecto.Changeset.change([status: :stock, moved_to_stock_at: DateTime.utc_now()])
     |> Repo.update()
   end
 
@@ -159,60 +159,44 @@ defmodule Kamansky.Stamps do
   @spec set_stamp_inventory_key(%Stamp{scott_number: String.t, format: atom})
     :: {:ok, %Stamp{inventory_key: String.t}} | {:error, Ecto.Changeset.t}
   def set_stamp_inventory_key(%Stamp{scott_number: scott_number, format: format} = stamp) do
-
-    # Formatted Scott number
-    search_number =
-      if format == :se_tenant do
-        scott_number
-        |> String.split("-")
-        |> hd()
-      else
-        scott_number
-      end
-
-    # Determine the numeric length of the search number
-    numeric_length =
-      search_number
-      |> String.graphemes()
-      |> Enum.count(&(&1 in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]))
-
-    stamp_reference =
-      StampReference
-      |> where(scott_number: ^scott_number)
-      |> Repo.one()
-
-    numeric_length =
-      if !StampReference.standard?(stamp_reference), do: numeric_length + 1, else: numeric_length
-
-    formatted_scott_number =
-      search_number
-      |> String.pad_leading(String.length(search_number) + (4-numeric_length), "0")
-
-    # Suffix code
-    suffix_code =
-      case format do
-        :single ->
-          ""
-        _ ->
-          "-#{Stamp.format_code(stamp)}"
-      end
-
-    # Find how many items there are with this number
-    order =
-      Stamp
-      |> where(scott_number: ^scott_number)
-      |> where([s], not is_nil(s.inventory_key))
-      |> Repo.aggregate(:count, :id)
-      |> Kernel.+(1)
-
-    # Save key
-    stamp
-    |> Stamp.changeset(%{})
-    |> Ecto.Changeset.put_change(
-      :inventory_key,
-      "#{DateTime.utc_now().year}#{formatted_scott_number}#{:io_lib.format("~2..0B", [order])}#{suffix_code}"
-    )
-    |> Repo.update()
+    with(
+      search_number <-
+        if format == :se_tenant do
+          scott_number
+          |> String.split("-")
+          |> hd()
+        else
+          scott_number
+        end,
+      numeric_length <-
+        search_number
+        |> String.graphemes()
+        |> Enum.count(&(&1 in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])),
+      stamp <- Repo.preload(stamp, [:stamp_reference]),
+      numeric_length <-
+        if(!StampReference.standard?(stamp.stamp_reference), do: numeric_length + 1, else: numeric_length),
+      formatted_scott_number <-
+        String.pad_leading(search_number, String.length(search_number) + (4-numeric_length), "0"),
+      suffix_code <-
+        case format do
+          :single -> ""
+          _ -> "-#{Stamp.format_code(stamp)}"
+        end,
+      order <-
+        Stamp
+        |> where(scott_number: ^scott_number)
+        |> where([s], not is_nil(s.inventory_key))
+        |> Repo.aggregate(:count, :id)
+        |> Kernel.+(1)
+    ) do
+      stamp
+      |> Stamp.changeset(%{})
+      |> Ecto.Changeset.put_change(
+        :inventory_key,
+        "#{DateTime.utc_now().year}#{formatted_scott_number}#{:io_lib.format("~2..0B", [order])}#{suffix_code}"
+      )
+      |> Repo.update()
+    end
   end
 
   @impl true

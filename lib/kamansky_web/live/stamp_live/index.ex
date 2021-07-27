@@ -7,16 +7,18 @@ defmodule KamanskyWeb.StampLive.Index do
   alias Kamansky.Stamps.Stamp
 
   @impl true
+  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(params, session, socket) do
-    socket =
+    {
+      :ok,
       socket
       |> assign_defaults(session)
       |> load_stamps(params)
-
-    {:ok, socket}
+    }
   end
 
   @impl true
+  @spec handle_event(String.t, any, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("move_to_stock", _value, socket) do
     case Stamps.move_stamp_to_stock(socket.assigns.stamp) do
       {:ok, _stamp} ->
@@ -32,10 +34,12 @@ defmodule KamanskyWeb.StampLive.Index do
   end
 
   @impl true
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(params, _uri, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Stamp")
@@ -72,6 +76,9 @@ defmodule KamanskyWeb.StampLive.Index do
     |> assign(:page_title, String.capitalize(Atom.to_string(action)))
   end
 
+  @spec load_stamps(
+    Phoenix.LiveView.Socket.t, %{required(String.t) => String.t}
+  ) :: Phoenix.LiveView.Socket.t
   defp load_stamps(socket, %{"status" => status}) do
     load_stamps(socket, String.to_existing_atom(status))
   end
@@ -80,6 +87,7 @@ defmodule KamanskyWeb.StampLive.Index do
     load_stamps(socket, socket.assigns.live_action)
   end
 
+  @spec load_stamps(Phoenix.LiveView.Socket.t, atom) :: Phoenix.LiveView.Socket.t
   defp load_stamps(socket, status) do
     socket
     |> assign(

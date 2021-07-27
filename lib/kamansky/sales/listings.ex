@@ -42,7 +42,7 @@ defmodule Kamansky.Sales.Listings do
     Listing
     |> where(status: ^status)
     |> join(:left, [l], s in assoc(l, :stamp))
-    |> select([l, s], {l.id, row_number() |> over(order_by: [{:asc, s.scott_number}])})
+    |> select([l, s], {l.id, row_number() |> over(order_by: [{:asc, s.scott_number}, {:asc, l.id}])})
     |> Repo.all
     |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
     |> elem(1)
