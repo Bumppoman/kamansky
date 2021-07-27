@@ -130,7 +130,7 @@ defmodule Kamansky.Stamps do
   def move_stamp_to_stock(%Stamp{} = stamp) do
     stamp
     |> Stamp.changeset(%{})
-    |> Ecto.Changeset.change([status: :stock, moved_to_stock_at: DateTime.utc_now()])
+    |> Ecto.Changeset.change([status: :stock, moved_to_stock_at: DateTime.truncate(DateTime.utc_now(), :second)])
     |> Repo.update()
   end
 
