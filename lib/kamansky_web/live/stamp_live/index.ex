@@ -9,12 +9,7 @@ defmodule KamanskyWeb.StampLive.Index do
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, session, socket) do
-    {
-      :ok,
-      socket
-      |> assign_defaults(session)
-      |> load_stamps()
-    }
+    {:ok, assign_defaults(socket, session)}
   end
 
   @impl true
@@ -36,7 +31,9 @@ defmodule KamanskyWeb.StampLive.Index do
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(params, _uri, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+    with socket <- apply_action(socket, socket.assigns.live_action, params) do
+      {:noreply, load_stamps(socket)}
+    end
   end
 
   @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
@@ -77,13 +74,10 @@ defmodule KamanskyWeb.StampLive.Index do
   end
 
   @spec load_stamps(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
-  defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{stamp: %Stamp{status: status}}} = socket) do
+  defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{stamp: %Stamp{status: status}}} = socket) when not is_nil(status) do
     load_stamps(socket, status)
   end
-
-  defp load_stamps(socket) do
-    load_stamps(socket, socket.assigns.live_action)
-  end
+  defp load_stamps(socket), do: load_stamps(socket, socket.assigns.live_action)
 
   @spec load_stamps(Phoenix.LiveView.Socket.t, atom) :: Phoenix.LiveView.Socket.t
   defp load_stamps(socket, status) do
