@@ -49,10 +49,10 @@ defmodule KamanskyWeb.StampLive.Index do
     |> assign(:stamp, Stamps.get_stamp!(id))
   end
 
-  defp apply_action(socket, :new, _params) do
+  defp apply_action(socket, :new, %{"status" => status}) do
     socket
     |> assign(:page_title, "Add New Stamp")
-    |> assign(:stamp, %Stamp{})
+    |> assign(:stamp, %Stamp{status: String.to_existing_atom(status)})
   end
 
   defp apply_action(socket, :sell, %{"id" => id}) do
@@ -70,6 +70,7 @@ defmodule KamanskyWeb.StampLive.Index do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))
     |> assign(:page_title, String.capitalize(Atom.to_string(action)))
+    |> assign(:status, socket.assigns.live_action)
   end
 
   @spec load_stamps(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t

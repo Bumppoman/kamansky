@@ -5,6 +5,7 @@ defmodule Kamansky.Services.Hipstamp.Listing do
   alias Kamansky.Services.Hipstamp
   alias Kamansky.Stamps.Stamp
 
+  @spec get(%Listing{hipstamp_id: integer}) :: %{required(String.t) => any}
   def get(%Listing{hipstamp_id: id}) do
     with {:ok, response} <- Hipstamp.get("/listings/#{id}") do
       hd(response.body["results"])

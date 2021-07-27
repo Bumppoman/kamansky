@@ -8,16 +8,19 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
+  @spec mount(Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(socket) do
-    socket =
+    {
+      :ok,
       socket
       |> allow_upload(:front_photo, accept: :any, auto_upload: true)
       |> allow_upload(:rear_photo, accept: :any, auto_upload: true)
-
-    {:ok, socket}
+    }
   end
 
   @impl true
+  @spec update(%{required(:stamp) => Stamp.t, required(:status) => atom, optional(atom) => any}, Phoenix.LiveView.Socket.t)
+    :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{stamp: stamp, status: status} = assigns, socket) do
     {
       :ok,
@@ -29,6 +32,7 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   end
 
   @impl true
+  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("find_in_collection", %{"value" => scott_number}, socket) do
     with copy_in_collection <- Stamps.get_stamp_in_collection_by_scott_number(scott_number) do
       {:noreply, assign(socket, :copy_in_collection, copy_in_collection)}
@@ -48,6 +52,7 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     save_stamp(socket, socket.assigns.action, stamp_params)
   end
 
+  @spec manage_photo(Phoenix.LiveView.Socket.t, String.t) :: {:ok, nil | Kamansky.Attachments.Attachment.t}
   defp manage_photo(socket, photo_name) do
     socket
     |> consume_uploaded_entries(photo_name, &Attachments.create_attachment/2)
@@ -57,6 +62,7 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     end
   end
 
+  @spec save_stamp(Phoenix.LiveView.Socket.t, :edit | :new, map) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp save_stamp(socket, :edit, stamp_params) do
     with {:ok, front_photo} <- manage_photo(socket, :front_photo),
       {:ok, rear_photo} <- manage_photo(socket, :rear_photo)
@@ -88,8 +94,8 @@ defmodule KamanskyWeb.StampLive.FormComponent do
           {
             :noreply,
             socket
-              |> put_flash(:info, "You have successfully added this stamp.")
-              |> push_redirect(to: Routes.stamp_index_path(socket, status, go_to_record: id))
+            |> put_flash(:info, "You have successfully added this stamp.")
+            |> push_redirect(to: Routes.stamp_index_path(socket, status, go_to_record: id))
           }
 
         {:error, %Ecto.Changeset{} = changeset} ->
