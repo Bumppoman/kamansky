@@ -151,8 +151,6 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   @impl true
   @spec update(%{optional(atom) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(assigns, socket) do
-    IO.puts "UPDATING"
-    IO.inspect(assigns)
     with(
       socket <-
         socket
