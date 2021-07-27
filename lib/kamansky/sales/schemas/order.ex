@@ -38,6 +38,8 @@ defmodule Kamansky.Sales.Orders.Order do
     field :shipped_at, :utc_datetime
     field :completed_at, :utc_datetime
 
+    field :platform, Ecto.Enum, values: [:hipstamp, :ebay], virtual: true, default: :hipstamp
+
     belongs_to :customer, Kamansky.Sales.Customers.Customer, on_replace: :update
     has_many :listings, Kamansky.Sales.Listings.Listing
   end

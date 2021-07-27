@@ -11,11 +11,14 @@ defmodule KamanskyWeb.OrderLive.Show do
   @impl true
   @spec mount(%{required(String.t) => String.t}, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(%{"id" => id}, session, socket) do
-    {
-      :ok,
-      socket
-      |> assign_defaults(session)
-      |> assign(:order, Orders.get_order_detail(id))
-    }
+    with order <- Orders.get_order_detail(id) do
+      {
+        :ok,
+        socket
+        |> assign_defaults(session)
+        |> assign(:order, order)
+        |> assign(:page_title, "Order ##{Order.order_number(order)}")
+      }
+    end
   end
 end

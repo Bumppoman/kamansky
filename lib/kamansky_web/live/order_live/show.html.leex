@@ -58,9 +58,9 @@
           <%= @order.customer.city %>, <%= @order.customer.state %> <%= @order.customer.zip %><br />
           <%= @order.customer.email %>
         </div>
-        <div>
-          Ordered through: <%= Order.platform(@order) %><br />
-          Order ID: <%= Order.platform_id(@order) %>
+        <div class="mt-4">
+          Ordered through:<br />
+          <%= Order.platform(@order) %> (order ID: <%= Order.platform_id(@order) %>)
         </div>
       </div>
       <div class="col">

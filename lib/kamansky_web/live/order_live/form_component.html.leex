@@ -42,6 +42,19 @@
     </div>
   <% end %>
   <div class="row">
+    <div class="col">
+      <%= label f, :platform, class: "form-control-label" %>
+      <div class="form-check form-check-inline">
+        <%= radio_button f, :platform, :hipstamp, class: "form-check-input" %>
+        <label class="form-check-label">Hipstamp</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <%= radio_button f, :platform, :ebay, class: "form-check-input" %>
+        <label class="form-check-label">eBay</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-md-6 form-group">
       <%= label f, :item_price, "Subtotal", class: "form-control-label" %>
       <div class="input-group">
