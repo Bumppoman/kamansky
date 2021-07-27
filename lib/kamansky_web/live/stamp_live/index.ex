@@ -63,7 +63,6 @@ defmodule KamanskyWeb.StampLive.Index do
 
   defp apply_action(socket, :show, %{"id" => id}) do
     socket
-    |> assign(:go_to_record, id)
     |> assign(:stamp, Stamps.get_stamp_detail!(id))
   end
 
