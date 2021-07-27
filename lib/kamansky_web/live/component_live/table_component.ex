@@ -19,7 +19,8 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   @impl true
-  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t)
+    :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("go_to_page", %{"page" => page}, socket) do
     with page <- String.to_integer(page),
       socket <- assign(socket, current_page: page)
@@ -154,13 +155,16 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
       socket <-
         socket
         |> assign(assigns)
-        |> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
+        |> assign(:sort, Map.get(assigns, :sort, build_sort(assigns.options[:sort]))),
+        #|> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
       socket <- assign(socket, :current_page, record_location(socket, assigns.options[:go_to_record])),
       socket <- assign_data(socket),
       socket <-
         socket
-        |> assign_new(:total_items, fn -> total_items(socket.assigns) end)
-        |> assign_new(:total_pages, fn -> total_pages(total_items(socket.assigns), socket.assigns.per_page) end)
+        #|> assign_new(:total_items, fn -> total_items(socket.assigns) end)
+        |> assign(:total_items, total_items(socket.assigns))
+        #|> assign_new(:total_pages, fn -> total_pages(total_items(socket.assigns), socket.assigns.per_page) end)
+        |> assign(:total_pages, total_pages(total_items(socket.assigns), socket.assigns.per_page))
     ) do
       {:ok, socket}
     end
@@ -204,7 +208,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     end
   end
 
-  @spec build_sort(%{} | integer | nil) :: %{column: integer, direction: :asc | :desc}
+  @spec build_sort(map | integer | nil) :: %{column: integer, direction: :asc | :desc}
   defp build_sort(sort_parameters) when is_map(sort_parameters), do: sort_parameters
   defp build_sort(sort_column) when is_integer(sort_column), do: %{column: sort_column, direction: :asc}
   defp build_sort(nil), do: %{column: 0, direction: :asc}
