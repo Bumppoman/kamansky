@@ -34,7 +34,7 @@
     ]
   do %>
     <td>
-      <%= live_patch @item.scott_number,
+      <%= live_redirect @item.scott_number,
         to: Routes.stamp_index_path(@socket, :show, @item)
       %>
     </td>

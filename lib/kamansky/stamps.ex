@@ -111,7 +111,7 @@ defmodule Kamansky.Stamps do
     |> Repo.one!()
   end
 
-  @spec list_stamps(atom, map) :: [Stamp.t]
+  @spec list_stamps(atom, Kamansky.Paginate.params) :: [Stamp.t]
   def list_stamps(status, params) do
     Stamp
     |> where(status: ^status)
