@@ -155,7 +155,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
       socket <-
         socket
         |> assign(assigns)
-        |> assign(:sort, Map.get(assigns, :sort, build_sort(assigns.options[:sort]))),
+        |> assign(:sort, build_sort(assigns.options[:sort])),
         #|> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
       socket <- assign(socket, :current_page, record_location(socket, assigns.options[:go_to_record])),
       socket <- assign_data(socket),
