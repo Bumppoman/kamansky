@@ -8,12 +8,12 @@ defmodule KamanskyWeb.StampLive.Index do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(params, session, socket) do
+  def mount(_params, session, socket) do
     {
       :ok,
       socket
       |> assign_defaults(session)
-      |> load_stamps(params)
+      |> load_stamps()
     }
   end
 
@@ -76,18 +76,12 @@ defmodule KamanskyWeb.StampLive.Index do
     |> assign(:page_title, String.capitalize(Atom.to_string(action)))
   end
 
-  @spec load_stamps(
-    %Phoenix.LiveView.Socket{
-      assigns: %{
-        optional(:stamp) => Stamp.t
-      }
-    }, map
-  ) :: Phoenix.LiveView.Socket.t
-  defp load_stamps(%{assigns: %{stamp: %Stamp{status: status}}} = socket, _params) do
+  @spec load_stamps(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
+  defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{stamp: %Stamp{status: status}}} = socket) do
     load_stamps(socket, status)
   end
 
-  defp load_stamps(socket, %{}) do
+  defp load_stamps(socket) do
     load_stamps(socket, socket.assigns.live_action)
   end
 
