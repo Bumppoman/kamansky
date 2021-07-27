@@ -157,16 +157,13 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
       socket <-
         socket
         |> assign(assigns)
-        |> assign(:sort, build_sort(assigns.options[:sort])),
-        #|> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
+        |> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
       socket <- assign(socket, :current_page, record_location(socket, assigns.options[:go_to_record])),
       socket <- assign_data(socket),
       socket <-
         socket
-        #|> assign_new(:total_items, fn -> total_items(socket.assigns) end)
-        |> assign(:total_items, total_items(socket.assigns))
-        #|> assign_new(:total_pages, fn -> total_pages(total_items(socket.assigns), socket.assigns.per_page) end)
-        |> assign(:total_pages, total_pages(total_items(socket.assigns), socket.assigns.per_page))
+        |> assign_new(:total_items, fn -> total_items(socket.assigns) end)
+        |> assign_new(:total_pages, fn -> total_pages(total_items(socket.assigns), socket.assigns.per_page) end)
     ) do
       {:ok, socket}
     end
