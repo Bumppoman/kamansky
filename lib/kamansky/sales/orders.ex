@@ -169,6 +169,15 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.one()
   end
 
+  @spec most_recent_order(:hipstamp | :ebay) :: Order.t | nil
+  def most_recent_order(:hipstamp) do
+    Order
+    |> where([o], not is_nil(o.hipstamp_id))
+    |> order_by(desc: :ordered_at)
+    |> limit(1)
+    |> Repo.one()
+  end
+
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t

@@ -24,17 +24,13 @@ defmodule Kamansky.Helpers do
   end
 
   @doc "Return a formatted date"
-  @spec formatted_date(DateTime.t) :: String.t
+  @spec formatted_date(any) :: String.t | nil
   def formatted_date(%DateTime{} = date) do
     date
     |> DateTime.shift_zone!("America/New_York")
     |> Calendar.strftime("%B %-d, %Y")
   end
-
-  @spec formatted_date(Date.t) :: String.t
   def formatted_date(%Date{} = date), do: Calendar.strftime(date, "%B %-d, %Y")
-
-  @spec formatted_date(any) :: nil
   def formatted_date(_), do: nil
 
   @doc "Return a capitalized and humanized string"

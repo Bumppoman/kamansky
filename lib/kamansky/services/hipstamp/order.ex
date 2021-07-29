@@ -35,7 +35,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
 
   @spec load_new_orders :: :ok
   def load_new_orders do
-    with %Order{ordered_at: from_date} <- Orders.most_recent_order(),
+    with %Order{ordered_at: from_date} <- Orders.most_recent_order(:hipstamp),
       new_orders <- all_pending(from_date)
     do
       new_orders

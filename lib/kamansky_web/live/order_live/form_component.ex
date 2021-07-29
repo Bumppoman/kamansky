@@ -42,7 +42,7 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
     end
   end
 
-  @spec get_platform_id_field(Ecto.Changeset.t) :: String.t
+  @spec get_platform_id_field_label(Ecto.Changeset.t) :: String.t
   def get_platform_id_field_label(changeset) do
     changeset
     |> Ecto.Changeset.get_field(:platform)
