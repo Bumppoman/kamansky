@@ -69,6 +69,7 @@ defmodule Kamansky.Sales.Orders do
     |> join(:left, [o], c in assoc(o, :customer))
     |> preload([o, c], [customer: c])
     |> Repo.one!()
+    |> maybe_determine_platform()
   end
 
   @spec get_order_detail(integer) :: Order.t
@@ -221,6 +222,20 @@ defmodule Kamansky.Sales.Orders do
     order
     |> Ecto.Changeset.change(selling_fees: selling_fees, shipping_cost: shipping_cost)
     |> Repo.update()
+  end
+
+  @spec maybe_determine_platform(nil) :: nil
+  defp maybe_determine_platform(nil), do: nil
+
+  @spec maybe_determine_platform(Order.t) :: Order.t
+  defp maybe_determine_platform(%Order{} = order) do
+    %{
+      order | platform:
+        cond do
+          Order.hipstamp?(order) -> :hipstamp
+          Order.ebay?(order) -> :ebay
+        end
+    }
   end
 
   @spec stamps_in_orders_calculation(Ecto.Queryable.t) :: integer
