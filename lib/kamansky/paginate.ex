@@ -7,7 +7,7 @@ defmodule Kamansky.Paginate do
   @callback exclude_from_count(Ecto.Query.t) :: Ecto.Query.t
   @callback primary_key :: atom
   @callback search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  @callback sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
+  @callback sort(Ecto.Query.t, %{action: atom, column: integer, direction: :asc | :desc}) :: Ecto.Query.t
 
   @optional_callbacks as_list_query: 1, exclude_from_count: 1, primary_key: 0
 
@@ -15,8 +15,14 @@ defmodule Kamansky.Paginate do
     required(:limit) => integer,
     required(:offset) => integer,
     required(:search) => String.t | nil,
-    required(:sort) => %{column: integer, direction: :asc | :desc},
+    required(:sort) => sort,
     optional(atom) => any
+  }
+
+  @type sort :: %{
+    required(:action) => atom,
+    required(:column) => integer,
+    required(:direction) => :asc | :desc
   }
 
   defmacro __using__(opts \\ []) do

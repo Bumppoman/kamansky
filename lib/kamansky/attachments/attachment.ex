@@ -42,8 +42,10 @@ defmodule Kamansky.Attachments.Attachment do
     |> Path.join()
   end
 
-  @spec path(Attachment.t | nil) :: String.t | nil
+  @spec path(nil) :: nil
   def path(nil), do: nil
+
+  @spec path(Attachment.t) :: String.t
   def path(%Attachment{} = attachment) do
     attachment.hash
     |> String.slice(0, 24)

@@ -13,11 +13,11 @@
     headers:
       [
         "Name",
-        "Address",
-        "Email",
+        %{text: "Address", sort: :disabled},
+        %{text: "Email", sort: :disabled},
         "Amount Spent YTD",
         "Most Recent Purchase",
-        "Actions",
+        %{text: "Actions", sort: :disabled},
       ],
     data_count: @data_count,
     data_locator: @data_locator,

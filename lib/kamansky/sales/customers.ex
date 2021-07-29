@@ -56,7 +56,7 @@ defmodule Kamansky.Sales.Customers do
         |> select_merge(
           [c, o, lo],
           %{
-            amount_spent_ytd: sum(fragment("? + ?", field(o, :item_price), field(o, :shipping_price))),
+            amount_spent_ytd: fragment("SUM (? + ?) AS amount_spent_ytd", field(o, :item_price), field(o, :shipping_price)),
             most_recent_order_date: lo.ordered_at
           }
         )
@@ -74,8 +74,16 @@ defmodule Kamansky.Sales.Customers do
 
   @doc false
   @impl true
-  @spec sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
+  @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :id})
+
+  def sort(query, %{column: 3, direction: direction}) do
+    order_by(query, ^{direction, dynamic([o], fragment("amount_spent_ytd"))})
+  end
+
+  def sort(query, %{column: 4, direction: direction}) do
+    order_by(query, [o, ..., lo], {^direction, field(lo, :ordered_at)})
+  end
 
   @spec update_customer(Customer.t, map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
   def update_customer(%Customer{} = customer, attrs) do

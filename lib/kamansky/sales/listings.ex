@@ -109,7 +109,7 @@ defmodule Kamansky.Sales.Listings do
   end
 
   @impl true
-  @spec sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
+  @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}) do
     order_by(
       query,
@@ -118,11 +118,71 @@ defmodule Kamansky.Sales.Listings do
     )
   end
 
-  def sort(query, %{column: 1, direction: direction}) do
+  def sort(query, %{action: :active, column: 1, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [{^direction, s.inventory_key}, {:asc, l.id}]
+    )
+  end
+
+  def sort(query, %{action: :sold, column: 1, direction: direction}) do
     order_by(
       query,
       [l, s, o],
       [{^direction, o.ordered_at}, {:asc, s.scott_number}, {:asc, l.id}]
+    )
+  end
+
+  def sort(query, %{action: :active, column: 2, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [{^direction, s.grade}, {:asc, s.scott_number}]
+    )
+  end
+
+  def sort(query, %{action: :sold, column: 2, direction: direction}) do
+    order_by(query, {^direction, :sale_price})
+  end
+
+  def sort(query, %{action: :active, column: 3, direction: direction}) do
+    order_by(query, {^direction, :listing_price})
+  end
+
+  def sort(query, %{action: :sold, column: 3, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [
+        ^{direction, dynamic(fragment("? + ?", field([l, s], s.cost), field([l, s], s.purchase_fees)))},
+        {:asc, s.scott_number}
+      ]
+    )
+  end
+
+  def sort(query, %{action: :active, column: 4, direction: direction}) do
+    order_by(query, {^direction, :inserted_at})
+  end
+
+  def sort(query, %{action: :sold, column: 4, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [
+        ^{
+          direction,
+          dynamic(
+            fragment(
+              "? - (? + ?)",
+              field([l], l.sale_price)
+              field([l, s], s.cost),
+              field([l, s], s.purchase_fees)
+            )
+          )
+        },
+        {:asc, s.scott_number}
+      ]
     )
   end
 

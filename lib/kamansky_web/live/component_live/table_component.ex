@@ -53,9 +53,15 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   def handle_event("sort", %{"sort" => sort, "sort_direction" => sort_direction}, socket) do
-    with sort <- %{column: String.to_integer(sort), direction: invert_sort_direction(sort_direction)},
+    with(
+      sort <-
+        %{
+          action: socket.assigns.live_action,
+          column: String.to_integer(sort),
+          direction: invert_sort_direction(sort_direction),
+        },
       socket <- assign(socket, sort: sort)
-    do
+    ) do
       {:noreply, assign_data(socket)}
     end
   end
@@ -66,7 +72,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
       data_source: (map -> [Ecto.Schema.t] | {integer, [Ecto.Schema.t]}),
       per_page: integer,
       search: String.t | nil,
-      sort: %{column: integer, direction: :asc | :desc}
+      sort: Kamansky.Paginate.sort
     }
   ) :: [Ecto.Schema.t] | {integer, [Ecto.Schema.t]}
   def load_data_for_page(parameters) do

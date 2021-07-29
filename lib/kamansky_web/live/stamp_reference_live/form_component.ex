@@ -5,6 +5,8 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
+  @spec update(%{required(:stamp_reference) => StampReference.t}, Phoenix.LiveView.Socket.t)
+    :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{stamp_reference: stamp_reference} = assigns, socket) do
     changeset = StampReferences.change_stamp_reference(stamp_reference)
 
@@ -15,6 +17,8 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
   end
 
   @impl true
+  @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t)
+    :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"stamp_reference" => stamp_reference_params}, socket) do
     changeset =
       socket.assigns.stamp_reference
@@ -28,6 +32,7 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
     save_stamp_reference(socket, socket.assigns.action, stamp_reference_params)
   end
 
+  @spec save_stamp_reference(Phoenix.LiveView.Socket.t, :edit | :new, map) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp save_stamp_reference(socket, :edit, stamp_reference_params) do
     case StampReferences.update_stamp_reference(socket.assigns.stamp_reference, stamp_reference_params) do
       {:ok, _stamp_reference} ->
