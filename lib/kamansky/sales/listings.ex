@@ -175,7 +175,7 @@ defmodule Kamansky.Sales.Listings do
           dynamic(
             fragment(
               "? - (? + ?)",
-              field([l], l.sale_price)
+              field([l], l.sale_price),
               field([l, s], s.cost),
               field([l, s], s.purchase_fees)
             )
