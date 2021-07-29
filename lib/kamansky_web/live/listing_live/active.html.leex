@@ -27,7 +27,7 @@
       go_to_record: Map.get(assigns, :go_to_record),
       sort: 0
     ],
-    parent_action: @live_action
+    parent_action: :active
   do %>
     <td><%= @item.stamp.scott_number %></td>
     <td>#<%= @item.stamp.inventory_key %></td>
