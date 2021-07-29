@@ -8,7 +8,7 @@
       <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
     </div>
   <% end %>
-  <%= unless @live_action in [:completed, :finalized, :processed, :shipped] do %>
+  <%= if @live_action in [:pending, :new] do %>
     <div class="text-end mb-2">
       <%= live_patch "Create Order",
         to: Routes.order_index_path(@socket, :new),
@@ -71,12 +71,6 @@
       <%= live_redirect "Pending",
         to: Routes.order_index_path(@socket, :pending),
         class: ["nav-link"] ++ (if @live_action in [:new, :pending], do: [" active"], else: [])
-      %>
-    </li>
-    <li class="nav-item">
-      <%= live_redirect "Finalized",
-        to: Routes.order_index_path(@socket, :finalized),
-        class: ["nav-link"] ++ (if @live_action in [:finalized, :mark_processed], do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">

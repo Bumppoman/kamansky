@@ -178,7 +178,9 @@ defmodule Kamansky.Sales.Orders do
   @impl true
   @spec sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :id})
-  def sort(query, %{column: 1, direction: direction}), do: order_by(query, {^direction, :ordered_at})
+  def sort(query, %{column: 1, direction: direction}) do
+    order_by(query, [{^direction, :ordered_at}, {^direction, :id}])
+  end
 
   @spec total_gross_profit(:all) :: integer
   def total_gross_profit(:all) do

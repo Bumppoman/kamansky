@@ -7,6 +7,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
 
+  @spec all_paid :: %{required(String.t) => any}
   def all_paid do
     with {:ok, response} <-
       Hipstamp.get("/stores/#{hipstamp_username()}/sales/paid")
@@ -15,12 +16,12 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
+  @spec all_pending(DateTime.t) :: %{required(String.t) => any}
   def all_pending(%DateTime{} = from_time) do
     with(
       from_time <-
         from_time
-        |> DateTime.shift_zone("America/New_York")
-        |> elem(1)
+        |> DateTime.shift_zone!("America/New_York")
         |> Calendar.strftime("%c"),
       {:ok, response} <-
         Hipstamp.get(
@@ -32,6 +33,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
+  @spec load_new_orders :: :ok
   def load_new_orders do
     with %Order{ordered_at: from_date} <- Orders.most_recent_order(),
       new_orders <- all_pending(from_date)
@@ -106,8 +108,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
       hipstamp_fees <-
         item_price
         |> Decimal.add(shipping_price)
-        |> Decimal.mult(hipstamp_coefficient)
-        |> Decimal.round(2, :floor),
+        |> Decimal.mult(hipstamp_coefficient),
       paypal_fees <-
         item_price
         |> Decimal.add(shipping_price)

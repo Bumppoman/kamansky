@@ -24,15 +24,17 @@ defmodule Kamansky.Helpers do
   end
 
   @doc "Return a formatted date"
-  @spec formatted_date(any) :: String.t | nil
+  @spec formatted_date(DateTime.t) :: String.t
   def formatted_date(%DateTime{} = date) do
     date
-    |> DateTime.shift_zone("America/New_York")
-    |> elem(1)
+    |> DateTime.shift_zone!("America/New_York")
     |> Calendar.strftime("%B %-d, %Y")
   end
 
+  @spec formatted_date(Date.t) :: String.t
   def formatted_date(%Date{} = date), do: Calendar.strftime(date, "%B %-d, %Y")
+
+  @spec formatted_date(any) :: nil
   def formatted_date(_), do: nil
 
   @doc "Return a capitalized and humanized string"
@@ -49,16 +51,7 @@ defmodule Kamansky.Helpers do
   @spec humanize_enum_options([atom]) :: [String.t]
   def humanize_enum_options(values), do: Enum.map(values, &({humanize_and_capitalize(&1), &1}))
 
-  @doc "Returns a SHA256 hash of a file"
-  @spec sha256_file(File.Stream.t) :: String.t
-  def sha256_file(chunks_enum) do
-    chunks_enum
-    |> Enum.reduce(:crypto.hash_init(:sha256), &(:crypto.hash_update(&2, &1)))
-    |> :crypto.hash_final()
-    |> Base.encode16()
-    |> String.downcase()
-  end
-
+  @spec states :: [String.t]
   def states do
     [
       "AL", "AK", "AZ", "AR",

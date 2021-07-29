@@ -30,7 +30,7 @@ defmodule Kamansky.Sales.Orders.Order do
     field :selling_fees, :decimal
     field :shipping_cost, :decimal
     field :status, Ecto.Enum,
-      values: [pending: 1, finalized: 2, processed: 3, shipped: 4, completed: 5],
+      values: [pending: 1, processed: 2, shipped: 3, completed: 4],
       default: :pending
     field :ebay_id, :string
     field :hipstamp_id, :integer

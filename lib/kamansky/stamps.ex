@@ -234,9 +234,7 @@ defmodule Kamansky.Stamps do
 
   @spec handle_photos(Ecto.Changeset.t, Kamansky.Attachments.Attachment.t | nil, Kamansky.Attachments.Attachment.t)
     :: Ecto.Changeset.t
-  defp handle_photos(changeset, nil, nil) do
-    changeset
-  end
+  defp handle_photos(changeset, nil, nil), do: changeset
 
   defp handle_photos(changeset, front_photo, nil) do
     Ecto.Changeset.put_change(changeset, :front_photo_id, front_photo.id)
