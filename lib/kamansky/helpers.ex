@@ -51,6 +51,16 @@ defmodule Kamansky.Helpers do
   @spec humanize_enum_options([atom]) :: [String.t]
   def humanize_enum_options(values), do: Enum.map(values, &({humanize_and_capitalize(&1), &1}))
 
+  @doc "Returns a SHA256 hash of a file"
+  @spec sha256_file(File.Stream.t) :: String.t
+  def sha256_file(chunks_enum) do
+    chunks_enum
+    |> Enum.reduce(:crypto.hash_init(:sha256), &(:crypto.hash_update(&2, &1)))
+    |> :crypto.hash_final()
+    |> Base.encode16()
+    |> String.downcase()
+  end
+
   @spec states :: [String.t]
   def states do
     [
