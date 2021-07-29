@@ -176,6 +176,7 @@ defmodule Kamansky.Sales.Orders do
     |> order_by(desc: :ordered_at)
     |> limit(1)
     |> Repo.one()
+
   end
 
   @doc false
@@ -243,6 +244,7 @@ defmodule Kamansky.Sales.Orders do
         cond do
           Order.hipstamp?(order) -> :hipstamp
           Order.ebay?(order) -> :ebay
+          true -> nil
         end
     }
   end

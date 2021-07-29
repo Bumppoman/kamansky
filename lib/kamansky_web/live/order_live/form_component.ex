@@ -37,8 +37,8 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
     changeset
     |> Ecto.Changeset.get_field(:platform)
     |> case do
-      :hipstamp -> :hipstamp_id
       :ebay -> :ebay_id
+      _ -> :hipstamp_id
     end
   end
 
@@ -47,8 +47,8 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
     changeset
     |> Ecto.Changeset.get_field(:platform)
     |> case do
-      :hipstamp -> "Hipstamp ID"
       :ebay -> "eBay ID"
+      _ -> "Hipstamp ID"
     end
   end
 
