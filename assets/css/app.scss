@@ -53,6 +53,10 @@ main {
   line-height: 100%;
 }
 
+.cursor-disabled {
+  cursor: not-allowed;
+}
+
 .disappearing-success-message {
   max-height: 200px;
   overflow: hidden;

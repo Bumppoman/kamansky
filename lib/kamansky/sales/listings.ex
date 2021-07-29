@@ -138,7 +138,10 @@ defmodule Kamansky.Sales.Listings do
     order_by(
       query,
       [l, s],
-      [{^direction, s.grade}, {:asc, s.scott_number}]
+      [
+        {^String.to_existing_atom(Atom.to_string(direction) <> "_nulls_last"), s.grade},
+        {:asc, s.scott_number}
+      ]
     )
   end
 
@@ -155,16 +158,9 @@ defmodule Kamansky.Sales.Listings do
       query,
       [l, s],
       [
-        ^{
-          direction,
-          dynamic(
-            [l, s],
-            fragment(
-              "? + ?",
-              s.cost,
-              s.purchase_fees
-            )
-          )
+        {
+          ^direction,
+          fragment("? + ?", s.cost, s.purchase_fees)
         },
         {:asc, s.scott_number}
       ]
@@ -180,17 +176,9 @@ defmodule Kamansky.Sales.Listings do
       query,
       [l, s],
       [
-        ^{
-          direction,
-          dynamic(
-            [l, s],
-            fragment(
-              "? - (? + ?)",
-              l.sale_price,
-              s.cost,
-              s.purchase_fees
-            )
-          )
+        {
+          ^direction,
+          fragment("? - (? + ?)", l.sale_price, s.cost, s.purchase_fees)
         },
         {:asc, s.scott_number}
       ]

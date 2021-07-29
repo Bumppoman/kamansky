@@ -200,13 +200,15 @@ defmodule Kamansky.Stamps do
   end
 
   @impl true
-  @spec sort(Ecto.Query.t, %{column: integer, direction: :asc | :desc}) :: Ecto.Query.t
+  @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
 
-  def sort(query, %{column: 1, direction: direction}), do: order_by(query, {^direction, :grade})
+  def sort(query, %{column: 1, direction: direction}) do
+    order_by(query, {^String.to_existing_atom(Atom.to_string(direction) <> "_nulls_last"), :grade})
+  end
 
   def sort(query, %{column: 2, direction: direction}) do
-    order_by(query, ^{direction, dynamic([s], fragment("? + ?", field(s, :cost), field(s, :purchase_fees)))})
+    order_by(query, ^{direction, dynamic([s], fragment("? + ?", s.cost, s.purchase_fees))})
   end
 
   @spec update_stamp(
