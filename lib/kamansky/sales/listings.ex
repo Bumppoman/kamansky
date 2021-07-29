@@ -155,7 +155,17 @@ defmodule Kamansky.Sales.Listings do
       query,
       [l, s],
       [
-        ^{direction, dynamic(fragment("? + ?", field([l, s], s.cost), field([l, s], s.purchase_fees)))},
+        ^{
+          direction,
+          dynamic(
+            [l, s],
+            fragment(
+              "? + ?",
+              s.cost,
+              s.purchase_fees
+            )
+          )
+        },
         {:asc, s.scott_number}
       ]
     )
@@ -173,11 +183,12 @@ defmodule Kamansky.Sales.Listings do
         ^{
           direction,
           dynamic(
+            [l, s],
             fragment(
               "? - (? + ?)",
-              field([l], l.sale_price),
-              field([l, s], s.cost),
-              field([l, s], s.purchase_fees)
+              l.sale_price,
+              s.cost,
+              s.purchase_fees
             )
           )
         },
