@@ -53,7 +53,6 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   end
 
   def handle_event("sort", %{"sort" => sort, "sort_action" => sort_action, "sort_direction" => sort_direction}, socket) do
-    IO.inspect socket.assigns
     with(
       sort <-
         %{

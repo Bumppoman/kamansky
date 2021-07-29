@@ -25,7 +25,8 @@
     options: [
       go_to_record: Map.get(assigns, :go_to_record),
       sort: %{action: :sold, direction: :desc, column: 1}
-    ]
+    ],
+    parent_action: @live_action
   do %>
     <td><%= @item.stamp.scott_number %></td>
     <td><%= formatted_date(@item.order.ordered_at) %></td>
