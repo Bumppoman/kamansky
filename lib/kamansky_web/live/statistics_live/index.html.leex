@@ -1,0 +1,22 @@
+<section class="section-wrapper">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Gross Profit</th>
+        <th>Expenses</th>
+        <th>Net Profit/Loss</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for month <- @months do %>
+        <tr>
+          <td>Month</td>
+          <td>Gross Profit</td>
+          <td>Expenses</td>
+          <td>Net Profit/Loss</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

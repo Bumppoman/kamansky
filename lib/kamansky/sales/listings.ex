@@ -6,13 +6,21 @@ defmodule Kamansky.Sales.Listings do
   alias __MODULE__
   alias Kamansky.Repo
   alias Kamansky.Sales.Listings.Listing
+  alias Kamansky.Stamps
 
   @spec add_listing_to_order(Listing.t, map) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
-  def add_listing_to_order(%Listing{} = listing, attrs \\ %{}) do
-    listing
-    |> change_listing(attrs)
-    |> Ecto.Changeset.put_change(:status, :sold)
-    |> Repo.update()
+  def add_listing_to_order(%Listing{stamp_id: stamp_id} = listing, attrs \\ %{}) do
+    with(
+      {:ok, _stamp} <-
+        stamp_id
+        |> Stamps.get_stamp!()
+        |> Stamps.mark_stamp_as_sold()
+    ) do
+      listing
+      |> change_listing(attrs)
+      |> Ecto.Changeset.put_change(:status, :sold)
+      |> Repo.update()
+    end
   end
 
   @spec change_listing(Listing.t, map) :: Ecto.Changeset.t
@@ -122,7 +130,7 @@ defmodule Kamansky.Sales.Listings do
     order_by(
       query,
       [l, s],
-      [{^direction, s.inventory_key}, {:asc, l.id}]
+      [{^direction, s.scott_number}, {^direction, s.inventory_key}]
     )
   end
 

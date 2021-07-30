@@ -56,6 +56,7 @@
           <%= @order.customer.name %><br />
           <%= @order.customer.street_address %><br />
           <%= @order.customer.city %>, <%= @order.customer.state %> <%= @order.customer.zip %><br />
+          <%= if @order.customer.country, do: raw("#{@order.customer.country}<br />") %>
           <%= @order.customer.email %>
         </div>
         <div class="mt-4">

@@ -23,6 +23,8 @@ defmodule KamanskyWeb.Router do
 
     live "/dashboard", DashboardLive.Index, :index
 
+    live "/expenses", ExpenseLive.Index, :index
+
     live "/listings", ListingLive.Active, :index
     live "/listings/sold", ListingLive.Sold, :index
     live "/listings/:id/add-to-order", ListingLive.Active, :add_to_order
@@ -53,6 +55,8 @@ defmodule KamanskyWeb.Router do
     live "/stamps/:id/edit", StampLive.Index, :edit
     live "/stamps/:id/move-to-stock", StampLive.Index, :move_to_stock
     live "/stamps/:id/sell", StampLive.Index, :sell
+
+    live "/statistics", StatisticsLive.Index, :index
   end
 
   # Other scopes may use custom stacks.

@@ -12,6 +12,7 @@ defmodule Kamansky.Sales.Customers.Customer do
     city: String.t,
     state: String.t,
     zip: String.t,
+    country: String.t,
     hipstamp_id: integer,
     ebay_id: integer,
     amount_spent_ytd: Decimal.t,
@@ -26,6 +27,7 @@ defmodule Kamansky.Sales.Customers.Customer do
     field :city, :string
     field :state, :string
     field :zip, :string
+    field :country, :string
     field :hipstamp_id, :integer
     field :ebay_id, :integer
 
@@ -40,8 +42,8 @@ defmodule Kamansky.Sales.Customers.Customer do
     customer
     |> cast(attrs,
       [
-        :city, :email, :hipstamp_id, :name,
-        :state, :street_address, :zip
+        :city, :country, :email, :hipstamp_id,
+        :name, :state, :street_address, :zip
       ]
     )
   end
@@ -57,6 +59,7 @@ defmodule Kamansky.Sales.Customers.Customer do
       customer.city,
       "#{customer.state} #{customer.zip}"
     ]
+    |> Kernel.++(if customer.country, do: [customer.country], else: [])
     |> Enum.join(", ")
   end
 end

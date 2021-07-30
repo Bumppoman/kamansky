@@ -7,6 +7,8 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
   alias Kamansky.Sales.Orders.Order
 
   @impl true
+  @spec update(%{required(:listing) => Kamansky.Sales.Listings.Listing.t}, Phoenix.LiveView.Socket.t)
+    :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{listing: listing} = assigns, socket) do
     with changeset <- Listings.change_listing(listing),
       socket <-
@@ -19,6 +21,7 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
   end
 
   @impl true
+  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"listing" => listing_params}, socket) do
     changeset =
       socket.assigns.listing
