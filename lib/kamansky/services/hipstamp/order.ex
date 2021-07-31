@@ -49,6 +49,8 @@ defmodule Kamansky.Services.Hipstamp.Order do
                 hipstamp_order["ShippingAddress"]["name_first"],
                 hipstamp_order["ShippingAddress"]["name_last"]
               ),
+            state <- determine_state(hipstamp_order["ShippingAddress"]),
+            country <- determine_country(hipstamp_order["ShippingAddress"]["country_name"]),
             {:ok, %{id: customer_id}} <-
               Customers.insert_or_update_hipstamp_customer(
                 %{
@@ -56,8 +58,9 @@ defmodule Kamansky.Services.Hipstamp.Order do
                   name: customer_name,
                   street_address: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["address"])),
                   city: humanize_and_capitalize(String.downcase(hipstamp_order["ShippingAddress"]["city"])),
-                  state: String.upcase(hipstamp_order["ShippingAddress"]["state_abbreviation"]),
+                  state: state,
                   zip: hipstamp_order["ShippingAddress"]["postal_code"],
+                  country: country,
                   email: String.downcase(hipstamp_order["buyer_email"])
                 }
               ),
@@ -120,6 +123,14 @@ defmodule Kamansky.Services.Hipstamp.Order do
       |> Decimal.round(2)
     end
   end
+
+  @spec determine_country(String.t) :: String.t | nil
+  defp determine_country("United States"), do: nil
+  defp determine_country(country_name), do: country_name
+
+  @spec determine_state(%{required(String.t) => String.t}) :: String.t
+  defp determine_state(%{"state_abbreviation" => state}), do: String.upcase(state)
+  defp determine_state(%{"state_name" => state}), do: state
 
   @spec hipstamp_username :: String.t
   defp hipstamp_username, do: Application.get_env(:kamansky, :hipstamp_username)

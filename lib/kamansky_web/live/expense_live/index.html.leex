@@ -33,7 +33,7 @@
       sort: 0
     ]
   do %>
-  <td>Date</td>
+  <td><%= formatted_date(@item.date) %></td>
   <td>Description</td>
   <td>Category</td>
   <td>Amount</td>
@@ -44,13 +44,13 @@
   </td>
   <% end %>
 </section>
-<%# if @live_action in [:new, :edit] do %>
-  <%# live_modal KamanskyWeb.StampReferenceLive.FormComponent,
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal KamanskyWeb.ExpenseLive.FormComponent,
     action: @live_action,
-    form_id: "stamp-reference-form",
-    id: "stamp-reference-form-modal",
-    stamp_reference: @stamp_reference,
-    title: (if @live_action == :new, do: "Add New Stamp Reference", else: "Edit Stamp Reference"),
-    return_to: Routes.stamp_reference_index_path(@socket, :index)
+    form_id: "expense-form",
+    id: "expense-form-modal",
+    expense: @expense,
+    title: (if @live_action == :new, do: "Add New Expense", else: "Edit Expense"),
+    return_to: Routes.expense_index_path(@socket, :index)
   %>
-<%# end %>
+<% end %>

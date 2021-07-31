@@ -45,6 +45,12 @@
               %>
             </li>
             <li>
+              <%= live_redirect "Expenses",
+                to: Routes.expense_index_path(@socket, :index),
+                class: "dropdown-item"
+              %>
+            </li>
+            <li>
               <%= live_redirect "Stamp References",
                 to: Routes.stamp_reference_index_path(@socket, :index),
                 class: "dropdown-item"

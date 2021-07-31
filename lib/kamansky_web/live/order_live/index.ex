@@ -79,6 +79,12 @@ defmodule KamanskyWeb.OrderLive.Index do
     end
   end
 
+  defp apply_action(socket, :load, _params) do
+    with :ok <- Hipstamp.Order.load_new_orders do
+      push_redirect(socket, to: Routes.order_index_path(socket, :pending))
+    end
+  end
+
   defp apply_action(socket, :mark_completed, %{"id" => id}) do
     with order <- Orders.get_order!(id) do
       socket

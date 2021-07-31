@@ -9,11 +9,19 @@
     </div>
   <% end %>
   <%= if @live_action in [:mark_processed, :pending, :new] do %>
-    <div class="text-end mb-2">
-      <%= live_patch "Create Order",
-        to: Routes.order_index_path(@socket, :new),
+    <div class="row mb-2">
+      <div class="col-md-6">
+      <%= live_patch "Load New Orders",
+        to: Routes.order_index_path(@socket, :load),
         class: "btn btn-primary"
       %>
+      </div>
+      <div class="col-md-6 text-end">
+        <%= live_patch "Create Order",
+          to: Routes.order_index_path(@socket, :new),
+          class: "btn btn-primary"
+        %>
+      </div>
     </div>
   <% end %>
   <%= live_component KamanskyWeb.ComponentLive.TableComponent,

@@ -24,6 +24,7 @@ defmodule KamanskyWeb.Router do
     live "/dashboard", DashboardLive.Index, :index
 
     live "/expenses", ExpenseLive.Index, :index
+    live "/expenses/new", ExpenseLive.Index, :new
 
     live "/listings", ListingLive.Active, :index
     live "/listings/sold", ListingLive.Sold, :index
@@ -37,6 +38,7 @@ defmodule KamanskyWeb.Router do
     live "/orders/processed", OrderLive.Index, :processed
     live "/orders/shipped", OrderLive.Index, :shipped
     live "/orders/completed", OrderLive.Index, :completed
+    live "/orders/load", OrderLive.Index, :load
     live "/orders/new", OrderLive.Index, :new
     live "/orders/:id", OrderLive.Show, :show
     live "/orders/:id/edit", OrderLive.Index, :edit
