@@ -1,6 +1,4 @@
 defmodule Kamansky.Operations.Statistics do
-  import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
-
   alias Kamansky.Sales.Orders
 
   @spec get_statistics(integer, integer) :: map

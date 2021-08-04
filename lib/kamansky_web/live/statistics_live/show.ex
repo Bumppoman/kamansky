@@ -1,6 +1,8 @@
 defmodule KamanskyWeb.StatisticsLive.Show do
   use KamanskyWeb, :live_view
 
+  import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
+
   alias Kamansky.Operations.Statistics
 
   @impl true
