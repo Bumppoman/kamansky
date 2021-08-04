@@ -10,7 +10,7 @@
           data-bs-toggle="collapse"
           data-bs-target="gross-profit"
         >
-          Gross Profit: <span class="tx-success"><%= @statistics.gross_profit %></span>
+          Gross Profit: <span class="text-success"><%= format_decimal_as_currency(@statistics.gross_profit) %></span>
         </button>
       </div>
     </div>
