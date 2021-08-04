@@ -13,7 +13,7 @@ defmodule KamanskyWeb.StatisticsLive.Show do
     with year <- String.to_integer(year),
       month <- String.to_integer(month),
       dummy_date <- Date.new(year, month, 1),
-      month_name <- Calendar.strftime("%B"),
+      month_name <- Calendar.strftime(dummy_date, "%B"),
       socket <-
         socket
         |> assign(:page_title, "Statistics for #{month_name} #{year}")
