@@ -59,6 +59,7 @@ defmodule KamanskyWeb.Router do
     live "/stamps/:id/sell", StampLive.Index, :sell
 
     live "/statistics", StatisticsLive.Index, :index
+    live "/statistics/report", StatisticsLive.Show, :index
   end
 
   # Other scopes may use custom stacks.

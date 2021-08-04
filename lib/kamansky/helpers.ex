@@ -1,7 +1,11 @@
 defmodule Kamansky.Helpers do
   def cast_enum_fields(attrs, fields) do
     attrs
-    |> Enum.map(fn {key, value} -> if key in fields, do: {key, String.to_existing_atom(value)}, else: {key, value} end)
+    |> Enum.map(
+      fn {key, value} ->
+        if key in fields, do: {key, String.to_existing_atom(value)}, else: {key, value}
+      end
+    )
     |> Enum.into(%{})
   end
 

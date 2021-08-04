@@ -36,7 +36,7 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
     attrs = cast_enum_fields(attrs, ["issue_type"])
 
     stamp_reference
-    |> cast(attrs, [:color, :denomination, :scott_number, :title, :year_of_issue])
+    |> cast(attrs, [:color, :denomination, :issue_type, :scott_number, :title, :year_of_issue])
     |> validate_required([])
   end
 

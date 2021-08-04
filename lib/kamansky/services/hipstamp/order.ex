@@ -84,7 +84,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
               selling_fees: selling_fees,
               shipping_cost: Decimal.add(
                 Decimal.from_float(0.55),
-                Decimal.from_float(0.2 * Float.floor(Enum.count(listings) / 4))
+                Decimal.from_float(0.2 * Float.floor(Enum.count(listings) / 6))
               )
             )
           end
@@ -106,8 +106,8 @@ defmodule Kamansky.Services.Hipstamp.Order do
   @spec calculate_selling_fees(Decimal.t, Decimal.t) :: Decimal.t
   defp calculate_selling_fees(item_price, shipping_price) do
     with hipstamp_coefficient <- Decimal.from_float(0.0895),
-      paypal_coefficient <- Decimal.from_float(0.029),
-      paypal_flat_fee <- Decimal.from_float(0.3),
+      paypal_coefficient <- Decimal.from_float(0.0349),
+      paypal_flat_fee <- Decimal.from_float(0.49),
       hipstamp_fees <-
         item_price
         |> Decimal.add(shipping_price)

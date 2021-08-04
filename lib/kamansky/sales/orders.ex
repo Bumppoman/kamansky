@@ -200,13 +200,25 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.one()
   end
 
+  @spec total_gross_profit([month: integer, year: integer]) :: Decimal.t
+  def total_gross_profit(month: month, year: year) do
+    Order
+    |> where(
+      [o],
+      fragment("DATE_PART('month', ?)", o.ordered_at) == ^month
+        and fragment("DATE_PART('year', ?)", o.ordered_at) == ^year
+    )
+    |> select(sum(fragment("item_price + shipping_price")))
+    |> Repo.one()
+  end
+
   @spec total_net_profit(atom) :: Decimal.t
   def total_net_profit(:all), do: total_net_profit_calculation(Order)
 
   @spec total_net_profit([month: integer]) :: Decimal.t
   def total_net_profit(month: month) do
     Order
-    |> where([s], fragment("DATE_PART('month', ?)", s.ordered_at) == ^month)
+    |> where([o], fragment("DATE_PART('month', ?)", o.ordered_at) == ^month)
     |> total_net_profit_calculation()
   end
 
@@ -215,7 +227,7 @@ defmodule Kamansky.Sales.Orders do
 
   def total_stamps_in_orders(month: month) do
     Order
-    |> where([s], fragment("DATE_PART('month', ?)", s.ordered_at) == ^month)
+    |> where([o], fragment("DATE_PART('month', ?)", o.ordered_at) == ^month)
     |> stamps_in_orders_calculation()
   end
 
