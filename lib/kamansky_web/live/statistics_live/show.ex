@@ -12,7 +12,7 @@ defmodule KamanskyWeb.StatisticsLive.Show do
   def handle_params(%{"month" => month, "year" => year}, _uri, socket) do
     with year <- String.to_integer(year),
       month <- String.to_integer(month),
-      dummy_date <- Date.new(year, month, 1),
+      dummy_date <- Date.new!(year, month, 1),
       month_name <- Calendar.strftime(dummy_date, "%B"),
       socket <-
         socket
