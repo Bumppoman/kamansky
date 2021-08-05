@@ -14,24 +14,38 @@ defmodule Kamansky.Operations.Statistics do
         |> select(
           [o],
           %{
+            ebay_sales: fragment(
+              "SUM(CASE WHEN ? IS NOT NULL THEN (? + ?) ELSE 0 END)",
+              o.ebay_id,
+              o.item_price,
+              o.shipping_price
+            ),
             ebay_selling_fees: fragment("SUM(CASE WHEN ? IS NOT NULL THEN ? ELSE 0 END)", o.ebay_id, o.selling_fees),
+            hipstamp_sales: fragment(
+              "SUM(CASE WHEN ? IS NOT NULL THEN (? + ?) ELSE 0 END)",
+              o.hipstamp_id,
+              o.item_price,
+              o.shipping_price
+            ),
             hipstamp_selling_fees: fragment("SUM(CASE WHEN ? IS NOT NULL THEN ? ELSE 0 END)", o.hipstamp_id, o.selling_fees),
-            gross_profit: sum(fragment("? + ?", o.item_price, o.shipping_price)),
+            gross_sales: sum(fragment("? + ?", o.item_price, o.shipping_price)),
             selling_fees: sum(o.selling_fees),
             shipping_cost: sum(o.shipping_cost),
           }
         )
         |> Repo.one(),
       stamp_cost <- total_stamp_cost(orders),
-      net_profit <- total_net_profit(orders),
+      net_sales <- total_net_sales(orders),
       calculated_statistics <-
         %{
-          net_profit: net_profit,
-          net_profit_percentage: calculate_percentage(net_profit, base_statistics.gross_profit),
-          selling_fees_percentage: calculate_percentage(base_statistics.selling_fees, base_statistics.gross_profit),
-          shipping_cost_percentage: calculate_percentage(base_statistics.shipping_cost, base_statistics.gross_profit),
+          ebay_sales_percentage: calculate_percentage(base_statistics.ebay_sales, base_statistics.gross_sales),
+          hipstamp_sales_percentage: calculate_percentage(base_statistics.hipstamp_sales, base_statistics.gross_sales),
+          net_sales: net_sales,
+          net_sales_percentage: calculate_percentage(net_sales, base_statistics.gross_sales),
+          selling_fees_percentage: calculate_percentage(base_statistics.selling_fees, base_statistics.gross_sales),
+          shipping_cost_percentage: calculate_percentage(base_statistics.shipping_cost, base_statistics.gross_sales),
           stamp_cost: stamp_cost,
-          stamp_cost_percentage: calculate_percentage(stamp_cost, base_statistics.gross_profit)
+          stamp_cost_percentage: calculate_percentage(stamp_cost, base_statistics.gross_sales)
         }
     do
       {orders, Map.merge(base_statistics, calculated_statistics)}
@@ -54,8 +68,8 @@ defmodule Kamansky.Operations.Statistics do
             o.shipping_price,
             o.shipping_cost,
             o.selling_fees,
-            s.cost,
-            s.purchase_fees
+            sum(s.cost),
+            sum(s.purchase_fees)
           ),
         stamp_cost: sum(fragment("? + ?", s.cost, s.purchase_fees))
       }
@@ -101,7 +115,7 @@ defmodule Kamansky.Operations.Statistics do
     end
   end
 
-  defp total_net_profit(orders) do
+  defp total_net_sales(orders) do
     Enum.reduce(orders, Decimal.new(0), &(Decimal.add(&1.net_profit, &2)))
   end
 
