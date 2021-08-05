@@ -1,7 +1,7 @@
 <h1><%= @page_title %></h1>
 <section>
-  <h3>Income</h3>
-  <div id="income-accordion" class="accordion">
+  <h3>Sales</h3>
+  <div id="sales-accordion" class="accordion">
     <div
       id="gross-profit-accordion-item"
       class="accordion-item"
@@ -18,7 +18,7 @@
           Gross Profit: <span class="text-success ms-2"><%= format_decimal_as_currency(@statistics.gross_profit) %></span>
         </button>
       </div>
-      <div id="gross_profit-collapse" class="accordion-collapse collapse" data-bs-parent="#income-accordion">
+      <div id="gross_profit-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">
         <div class="accordion-body">
           <table class="table">
             <thead>
@@ -42,6 +42,45 @@
       </div>
     </div>
     <div
+      id="stamp_cost-accordion-item"
+      class="accordion-item"
+      phx-hook="accordionHook"
+      data-info="stamp_cost"
+    >
+      <div class="accordion-header" phx-update="ignore">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#stamp_cost-collapse"
+        >
+          Stamp Cost: <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.stamp_cost) %></span>
+        </button>
+      </div>
+      <div id="stamp_cost-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">
+        <div class="accordion-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order Number</th>
+                <th>Order Date</th>
+                <th>Stamp Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= for order <- @orders do %>
+                <tr>
+                  <td>#<%= Order.order_number(order) %></td>
+                  <td><%= formatted_date(order.ordered_at) %></td>
+                  <td class="text-danger"><%= format_decimal_as_currency(order.stamp_cost) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div
       id="shipping_cost-accordion-item"
       class="accordion-item"
       phx-hook="accordionHook"
@@ -57,7 +96,7 @@
           Shipping Cost: <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.shipping_cost) %></span>
         </button>
       </div>
-      <div id="shipping_cost-collapse" class="accordion-collapse collapse" data-bs-parent="#income-accordion">
+      <div id="shipping_cost-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">
         <div class="accordion-body">
           <table class="table">
             <thead>
@@ -101,7 +140,7 @@
             )
         </button>
       </div>
-      <div id="selling_fees-collapse" class="accordion-collapse collapse" data-bs-parent="#income-accordion">
+      <div id="selling_fees-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">
         <div class="accordion-body">
           <div id="inner-selling_fees-accordion" class="accordion">
             <%= for {group_key, group_name} <- [hipstamp: "Hipstamp", ebay: "eBay"] do %>
@@ -132,7 +171,7 @@
                         <tr>
                           <th>Order Number</th>
                           <th>Order Date</th>
-                          <th>Shipping Cost</th>
+                          <th>Selling Fees</th>
                         </tr>
                       </thead>
                       <tbody>

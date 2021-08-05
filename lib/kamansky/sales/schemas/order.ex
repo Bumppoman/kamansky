@@ -40,6 +40,7 @@ defmodule Kamansky.Sales.Orders.Order do
 
     field :gross_profit, :decimal, virtual: true
     field :platform, Ecto.Enum, values: [:hipstamp, :ebay], virtual: true, default: :hipstamp
+    field :stamp_cost, :decimal, virtual: true
 
     belongs_to :customer, Kamansky.Sales.Customers.Customer, on_replace: :update
     has_many :listings, Kamansky.Sales.Listings.Listing

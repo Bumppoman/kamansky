@@ -12,14 +12,24 @@ defmodule Kamansky.Operations.Statistics do
       gross_profit: Orders.total_gross_profit(month: month, year: year),
       hipstamp_selling_fees: orders_total_hipstamp_selling_fees(month, year),
       selling_fees: orders_total_selling_fees(month, year),
-      shipping_cost: orders_total_shipping_cost(month, year)
+      shipping_cost: orders_total_shipping_cost(month, year),
+      stamp_cost: Decimal.new(0)
     }
   end
 
   @spec list_orders_for_month_and_year(integer, integer) :: [Order.t]
   def list_orders_for_month_and_year(month, year) do
     order_for_month_and_year_query(month, year)
-    |> select_merge([o], %{gross_profit: fragment("item_price + shipping_price")})
+    |> join(:left, [o], l in assoc(o, :listings))
+    |> join(:left, [o, l], s in assoc(l, :stamp))
+    |> select_merge(
+      [o, ..., s],
+      %{
+        gross_profit: fragment("item_price + shipping_price"),
+        stamp_cost: sum(fragment("? + ?", s.cost, s.purchase_fees))
+      }
+    )
+    |> group_by([o], o.id)
     |> order_by(:id)
     |> Repo.all()
   end
