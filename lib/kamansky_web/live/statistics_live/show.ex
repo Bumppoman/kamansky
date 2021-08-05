@@ -36,9 +36,9 @@ defmodule KamanskyWeb.StatisticsLive.Show do
       socket <-
         socket
         |> assign(:month, month)
-        |> assign(:orders, Statistics.list_orders_for_month_and_year(month, year))
+        |> assign(:orders, Statistics.list_orders_for_year_and_month(year, month))
         |> assign(:page_title, "Statistics for #{month_name} #{year}")
-        |> assign(:statistics, Statistics.get_base_statistics(month, year))
+        |> assign(:statistics, Statistics.get_base_statistics(year, month))
         |> assign(:year, year)
     do
       {:noreply, socket}

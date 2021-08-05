@@ -175,11 +175,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <%= for order <-
-                          Enum.filter(
-                            @orders,
-                            Function.capture(Order, String.to_existing_atom("#{group_key}?"), 1)
-                          ) do %>
+                        <%= for order <- @orders, apply(Order, String.to_existing_atom("#{group_key}?"), [order]) do %>
                           <tr>
                             <td>#<%= Order.order_number(order) %></td>
                             <td><%= formatted_date(order.ordered_at) %></td>
