@@ -54,7 +54,9 @@
           data-bs-toggle="collapse"
           data-bs-target="#stamp_cost-collapse"
         >
-          Stamp Cost: <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.stamp_cost) %></span>
+          Stamp Cost:
+          <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.stamp_cost) %></span>
+          <span class="ms-1">(<%= @statistics.stamp_cost_percentage %>%)</span>
         </button>
       </div>
       <div id="stamp_cost-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">

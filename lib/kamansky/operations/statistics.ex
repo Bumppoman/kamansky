@@ -21,10 +21,20 @@ defmodule Kamansky.Operations.Statistics do
             shipping_cost: sum(o.shipping_cost),
           }
         )
-        |> Repo.one()
-        |> Map.put(:stamp_cost, total_stamp_cost(orders))
+        |> Repo.one(),
+      stamp_cost <- total_stamp_cost(orders),
+      calculated_statistics <-
+        %{
+          stamp_cost: stamp_cost,
+          stamp_cost_percentage:
+            stamp_cost
+            |> Decimal.div(base_statistics.gross_profit)
+            |> Decimal.round()
+            |> Decimal.to_integer()
+            |> Kernel.*(100)
+        }
     do
-      {orders, base_statistics}
+      {orders, Map.merge(base_statistics, calculated_statistics)}
     end
   end
 
