@@ -33,12 +33,13 @@ defmodule KamanskyWeb.StatisticsLive.Show do
       month <- String.to_integer(month),
       dummy_date <- Date.new!(year, month, 1),
       month_name <- Calendar.strftime(dummy_date, "%B"),
+      {orders, statistics} <- Statistics.get_order_statistics(year, month),
       socket <-
         socket
         |> assign(:month, month)
-        |> assign(:orders, Statistics.list_orders_for_year_and_month(year, month))
+        |> assign(:orders, orders)
         |> assign(:page_title, "Statistics for #{month_name} #{year}")
-        |> assign(:statistics, Statistics.get_base_statistics(year, month))
+        |> assign(:statistics, statistics)
         |> assign(:year, year)
     do
       {:noreply, socket}
