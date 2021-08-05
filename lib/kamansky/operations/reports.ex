@@ -6,11 +6,10 @@ defmodule Kamansky.Operations.Reports do
 
   @spec get_order_data(integer, integer) :: map
   def get_order_data(year, month) do
-    with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month),
-      orders <- list_orders_for_year_and_month(year, month),
+    with(
       base_data <-
         from(o in "orders")
-        |> where([o], fragment("? BETWEEN ? AND ?", o.ordered_at, ^begin_date, ^end_date))
+        |> order_for_year_and_month_query(year, month)
         |> select(
           [o],
           %{
@@ -35,7 +34,12 @@ defmodule Kamansky.Operations.Reports do
         )
         |> Repo.one(),
       stamp_cost <- total_stamp_cost_for_year_and_month(year, month),
-      net_sales <- total_net_sales(orders),
+      net_sales <- total_net_sales(
+        gross_sales: base_data.gross_sales,
+        selling_fees: base_data.selling_fees,
+        shipping_cost: base_data.shipping_cost,
+        stamp_cost: stamp_cost
+      ),
       calculated_data <-
         %{
           ebay_sales_percentage: calculate_percentage(base_data.ebay_sales, base_data.gross_sales),
@@ -47,36 +51,9 @@ defmodule Kamansky.Operations.Reports do
           stamp_cost: stamp_cost,
           stamp_cost_percentage: calculate_percentage(stamp_cost, base_data.gross_sales)
         }
-    do
+    ) do
       Map.merge(base_data, calculated_data)
     end
-  end
-
-  @spec list_orders_for_year_and_month(integer, integer) :: [Order.t]
-  def list_orders_for_year_and_month(year, month) do
-    order_for_year_and_month_query(year, month)
-    |> join(:left, [o], l in assoc(o, :listings))
-    |> join(:left, [o, l], s in assoc(l, :stamp))
-    |> select_merge(
-      [o, ..., s],
-      %{
-        gross_profit: fragment("? + ?", o.item_price, o.shipping_price),
-        net_profit:
-          fragment(
-            "(? + ?) - (? + ? + ? + ?)",
-            o.item_price,
-            o.shipping_price,
-            o.shipping_cost,
-            o.selling_fees,
-            sum(s.cost),
-            sum(s.purchase_fees)
-          ),
-        stamp_cost: sum(fragment("? + ?", s.cost, s.purchase_fees))
-      }
-    )
-    |> group_by([o], o.id)
-    |> order_by(:id)
-    |> Repo.all()
   end
 
   defp begin_and_end_date_for_year_and_month(year, month) do
@@ -105,32 +82,39 @@ defmodule Kamansky.Operations.Reports do
     |> Kernel.round()
   end
 
-  defp order_for_year_and_month_query(year, month) do
+  defp order_for_year_and_month_query(query, year, month) do
     with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month) do
       where(
-        Order,
+        query,
         [o],
         fragment("? BETWEEN ? AND ?", o.ordered_at, ^begin_date, ^end_date)
       )
     end
   end
 
-  defp total_net_sales(orders) do
-    Enum.reduce(orders, Decimal.new(0), &(Decimal.add(&1.net_profit, &2)))
+  defp total_net_sales(
+    gross_sales: gross_sales, selling_fees: selling_fees, shipping_cost: shipping_cost, stamp_cost: stamp_cost
+  ) do
+    Decimal.sub(gross_sales,
+      Decimal.add(
+        selling_fees,
+        Decimal.add(shipping_cost, stamp_cost)
+      )
+    )
   end
 
   defp total_stamp_cost_for_year_and_month(year, month) do
     with(
       order_subquery <-
-        year
-        |> order_for_year_and_month_query(month)
+        Order
+        |> order_for_year_and_month_query(year, month)
         |> select([o], o.id)
     ) do
       from(l in "listings")
       |> where([l], l.order_id in subquery(order_subquery))
-      |> join(:left, [l], s in assoc(l, :stamp))
-      |> select([l, s], fragment("? + ?", s.cost, s.purchase_fees))
-      |> Repo.aggregate(:sum)
+      |> join(:left, [l], s in "stamps", on: l.stamp_id == s.id)
+      |> select([l, s], sum(fragment("? + ?", s.cost, s.purchase_fees)))
+      |> Repo.one()
     end
   end
 end

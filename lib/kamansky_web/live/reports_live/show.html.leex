@@ -9,39 +9,39 @@
     <tbody>
       <tr>
         <td colspan="2">Gross Sales</td>
-        <td><%= format_decimal_as_currency(@statistics.gross_sales) %></td>
+        <td><%= format_decimal_as_currency(@data.gross_sales) %></td>
       </tr>
       <tr>
         <td></td>
         <td>Hipstamp</td>
         <td>
-          <%= format_decimal_as_currency(@statistics.hipstamp_sales) %>
-          <span class="ms-1">(<%= @statistics.hipstamp_sales_percentage %>%)</span>
+          <%= format_decimal_as_currency(@data.hipstamp_sales) %>
+          <span class="ms-1">(<%= @data.hipstamp_sales_percentage %>%)</span>
         </td>
       </tr>
       <tr>
         <td></td>
         <td>eBay</td>
         <td>
-          <%= format_decimal_as_currency(@statistics.ebay_sales) %>
-          <span class="ms-1">(<%= @statistics.ebay_sales_percentage %>%)</span>
+          <%= format_decimal_as_currency(@data.ebay_sales) %>
+          <span class="ms-1">(<%= @data.ebay_sales_percentage %>%)</span>
         </td>
       </tr>
       <tr>
         <td colspan="2">Stamp Cost</td>
-        <td><%= format_decimal_as_currency(@statistics.stamp_cost) %></td>
+        <td><%= format_decimal_as_currency(@data.stamp_cost) %></td>
       </tr>
       <tr>
         <td colspan="2">Shipping Cost</td>
-        <td><%= format_decimal_as_currency(@statistics.shipping_cost) %></td>
+        <td><%= format_decimal_as_currency(@data.shipping_cost) %></td>
       </tr>
       <tr>
         <td colspan="2">Selling Fees</td>
-        <td><%= format_decimal_as_currency(@statistics.selling_fees) %></td>
+        <td><%= format_decimal_as_currency(@data.selling_fees) %></td>
       </tr>
       <tr>
         <td colspan="2">Net Sales</td>
-        <td><%= format_decimal_as_currency(@statistics.net_sales) %></td>
+        <td><%= format_decimal_as_currency(@data.net_sales) %></td>
       </tr>
     </tbody>
   </table>
