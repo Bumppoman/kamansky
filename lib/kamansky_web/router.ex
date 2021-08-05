@@ -46,6 +46,9 @@ defmodule KamanskyWeb.Router do
     live "/orders/:id/mark-processed", OrderLive.Index, :mark_processed
     live "/orders/:id/mark-shipped", OrderLive.Index, :mark_shipped
 
+    live "/reports", ReportsLive.Index, :index
+    live "/reports/overall", ReportsLive.Show, :index
+
     live "/stamp_references", StampReferenceLive.Index, :index
     live "/stamp_references/new", StampReferenceLive.Index, :new
     live "/stamp_references/:id/edit", StampReferenceLive.Index, :edit
@@ -57,9 +60,6 @@ defmodule KamanskyWeb.Router do
     live "/stamps/:id/edit", StampLive.Index, :edit
     live "/stamps/:id/move-to-stock", StampLive.Index, :move_to_stock
     live "/stamps/:id/sell", StampLive.Index, :sell
-
-    live "/statistics", StatisticsLive.Index, :index
-    live "/statistics/report", StatisticsLive.Show, :index
   end
 
   # Other scopes may use custom stacks.

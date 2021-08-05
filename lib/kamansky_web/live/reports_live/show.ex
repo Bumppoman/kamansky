@@ -1,10 +1,9 @@
-defmodule KamanskyWeb.StatisticsLive.Show do
+defmodule KamanskyWeb.ReportsLive.Show do
   use KamanskyWeb, :live_view
 
-  import Kamansky.Helpers, only: [format_decimal_as_currency: 1, formatted_date: 1]
+  import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
 
-  alias Kamansky.Operations.Statistics
-  alias Kamansky.Sales.Orders.Order
+  alias Kamansky.Operations.Reports
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
@@ -33,13 +32,12 @@ defmodule KamanskyWeb.StatisticsLive.Show do
       month <- String.to_integer(month),
       dummy_date <- Date.new!(year, month, 1),
       month_name <- Calendar.strftime(dummy_date, "%B"),
-      {orders, statistics} <- Statistics.get_order_statistics(year, month),
+      data <- Reports.get_order_data(year, month),
       socket <-
         socket
         |> assign(:month, month)
-        |> assign(:orders, orders)
-        |> assign(:page_title, "Statistics for #{month_name} #{year}")
-        |> assign(:statistics, statistics)
+        |> assign(:page_title, "Report for #{month_name} #{year}")
+        |> assign(:data, data)
         |> assign(:year, year)
     do
       {:noreply, socket}

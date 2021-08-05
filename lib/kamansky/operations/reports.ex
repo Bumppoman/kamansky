@@ -1,14 +1,14 @@
-defmodule Kamansky.Operations.Statistics do
+defmodule Kamansky.Operations.Reports do
   import Ecto.Query, warn: false
 
   alias Kamansky.Repo
   alias Kamansky.Sales.Orders.Order
 
-  @spec get_order_statistics(integer, integer) :: {[Order.t], map}
-  def get_order_statistics(year, month) do
+  @spec get_order_data(integer, integer) :: map
+  def get_order_data(year, month) do
     with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month),
       orders <- list_orders_for_year_and_month(year, month),
-      base_statistics <-
+      base_data <-
         from(o in "orders")
         |> where([o], fragment("? BETWEEN ? AND ?", o.ordered_at, ^begin_date, ^end_date))
         |> select(
@@ -34,21 +34,21 @@ defmodule Kamansky.Operations.Statistics do
           }
         )
         |> Repo.one(),
-      stamp_cost <- total_stamp_cost(orders),
+      stamp_cost <- total_stamp_cost_for_year_and_month(year, month),
       net_sales <- total_net_sales(orders),
-      calculated_statistics <-
+      calculated_data <-
         %{
-          ebay_sales_percentage: calculate_percentage(base_statistics.ebay_sales, base_statistics.gross_sales),
-          hipstamp_sales_percentage: calculate_percentage(base_statistics.hipstamp_sales, base_statistics.gross_sales),
+          ebay_sales_percentage: calculate_percentage(base_data.ebay_sales, base_data.gross_sales),
+          hipstamp_sales_percentage: calculate_percentage(base_data.hipstamp_sales, base_data.gross_sales),
           net_sales: net_sales,
-          net_sales_percentage: calculate_percentage(net_sales, base_statistics.gross_sales),
-          selling_fees_percentage: calculate_percentage(base_statistics.selling_fees, base_statistics.gross_sales),
-          shipping_cost_percentage: calculate_percentage(base_statistics.shipping_cost, base_statistics.gross_sales),
+          net_sales_percentage: calculate_percentage(net_sales, base_data.gross_sales),
+          selling_fees_percentage: calculate_percentage(base_data.selling_fees, base_data.gross_sales),
+          shipping_cost_percentage: calculate_percentage(base_data.shipping_cost, base_data.gross_sales),
           stamp_cost: stamp_cost,
-          stamp_cost_percentage: calculate_percentage(stamp_cost, base_statistics.gross_sales)
+          stamp_cost_percentage: calculate_percentage(stamp_cost, base_data.gross_sales)
         }
     do
-      {orders, Map.merge(base_statistics, calculated_statistics)}
+      Map.merge(base_data, calculated_data)
     end
   end
 
@@ -119,7 +119,18 @@ defmodule Kamansky.Operations.Statistics do
     Enum.reduce(orders, Decimal.new(0), &(Decimal.add(&1.net_profit, &2)))
   end
 
-  defp total_stamp_cost(orders) do
-    Enum.reduce(orders, Decimal.new(0), &(Decimal.add(&1.stamp_cost, &2)))
+  defp total_stamp_cost_for_year_and_month(year, month) do
+    with(
+      order_subquery <-
+        year
+        |> order_for_year_and_month_query(month)
+        |> select([o], o.id)
+    ) do
+      from(l in "listings")
+      |> where([l], l.order_id in subquery(order_subquery))
+      |> join(:left, [l], s in assoc(l, :stamp))
+      |> select([l, s], fragment("? + ?", s.cost, s.purchase_fees))
+      |> Repo.aggregate(:sum)
+    end
   end
 end
