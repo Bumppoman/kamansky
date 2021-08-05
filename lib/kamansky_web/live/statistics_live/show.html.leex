@@ -95,7 +95,9 @@
           data-bs-toggle="collapse"
           data-bs-target="#shipping_cost-collapse"
         >
-          Shipping Cost: <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.shipping_cost) %></span>
+          Shipping Cost:
+          <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.shipping_cost) %></span>
+          <span class="ms-1">(<%= @statistics.shipping_cost_percentage %>%)</span>
         </button>
       </div>
       <div id="shipping_cost-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">
@@ -138,8 +140,8 @@
             <span class="text-danger ms-2 me-1"><%= format_decimal_as_currency(@statistics.selling_fees) %></span>
             (
               <span class="text-danger me-1"><%= format_decimal_as_currency(@statistics.hipstamp_selling_fees) %></span> Hipstamp /
-              <span class="text-danger ms-1 me-1"><%= format_decimal_as_currency(@statistics.ebay_selling_fees) %></span> eBay
-            )
+              <span class="text-danger ms-1 me-1"><%= format_decimal_as_currency(@statistics.ebay_selling_fees) %></span> eBay)
+            <span class="ms-1">(<%= @statistics.selling_fees_percentage %>%)</span>
         </button>
       </div>
       <div id="selling_fees-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">

@@ -25,13 +25,10 @@ defmodule Kamansky.Operations.Statistics do
       stamp_cost <- total_stamp_cost(orders),
       calculated_statistics <-
         %{
+          selling_fees_percentage: calculate_percentage(base_statistics.selling_fees, base_statistics.gross_profit),
+          shipping_cost_percentage: calculate_percentage(base_statistics.shipping_cost, base_statistics.gross_profit),
           stamp_cost: stamp_cost,
-          stamp_cost_percentage:
-            stamp_cost
-            |> Decimal.div(base_statistics.gross_profit)
-            |> Decimal.round()
-            |> Decimal.to_integer()
-            |> Kernel.*(100)
+          stamp_cost_percentage: calculate_percentage(base_statistics.shipping_cost, base_statistics.gross_profit)
         }
     do
       {orders, Map.merge(base_statistics, calculated_statistics)}
@@ -71,6 +68,14 @@ defmodule Kamansky.Operations.Statistics do
     ) do
       {begin_date, end_date}
     end
+  end
+
+  defp calculate_percentage(numerator, denominator) do
+    numerator
+    |> Decimal.div(denominator)
+    |> Decimal.to_float()
+    |> Kernel.*(100)
+    |> Kernel.round()
   end
 
   defp order_for_year_and_month_query(year, month) do
