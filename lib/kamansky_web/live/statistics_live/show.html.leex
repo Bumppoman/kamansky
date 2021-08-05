@@ -1,17 +1,158 @@
 <h1><%= @page_title %></h1>
 <section>
   <h3>Income</h3>
-  <div class="accordion">
-    <div class="accordion-item">
-      <div class="accordion-header">
+  <div id="income-accordion" class="accordion">
+    <div
+      id="gross-profit-accordion-item"
+      class="accordion-item"
+      phx-hook="accordionHook"
+      data-info="gross_profit"
+    >
+      <div class="accordion-header" phx-update="ignore">
         <button
-          class="accordion-button"
+          class="accordion-button collapsed"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="gross-profit"
+          data-bs-target="#gross_profit-collapse"
         >
-          Gross Profit: <span class="text-success"><%= format_decimal_as_currency(@statistics.gross_profit) %></span>
+          Gross Profit: <span class="text-success ms-2"><%= format_decimal_as_currency(@statistics.gross_profit) %></span>
         </button>
+      </div>
+      <div id="gross_profit-collapse" class="accordion-collapse collapse" data-bs-parent="#income-accordion">
+        <div class="accordion-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order Number</th>
+                <th>Order Date</th>
+                <th>Gross Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= for order <- @orders do %>
+                <tr>
+                  <td><%= Order.order_number(order) %></td>
+                  <td><%= formatted_date(order.ordered_at) %></td>
+                  <td class="text-success"><%= format_decimal_as_currency(order.gross_profit) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div
+      id="shipping_cost-accordion-item"
+      class="accordion-item"
+      phx-hook="accordionHook"
+      data-info="shipping_cost"
+    >
+      <div class="accordion-header" phx-update="ignore">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#shipping_cost-collapse"
+        >
+          Shipping Cost: <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.shipping_cost) %></span>
+        </button>
+      </div>
+      <div id="shipping_cost-collapse" class="accordion-collapse collapse" data-bs-parent="#income-accordion">
+        <div class="accordion-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order Number</th>
+                <th>Order Date</th>
+                <th>Shipping Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= for order <- @orders do %>
+                <tr>
+                  <td><%= Order.order_number(order) %></td>
+                  <td><%= formatted_date(order.ordered_at) %></td>
+                  <td class="text-danger"><%= format_decimal_as_currency(order.shipping_cost) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div
+      id="selling_fees-accordion-item"
+      class="accordion-item"
+      phx-hook="accordionHook"
+      data-info="selling_fees"
+    >
+      <div class="accordion-header" phx-update="ignore">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#selling_fees-collapse"
+        >
+          Selling Fees:
+            <span class="text-danger ms-2 me-1"><%= format_decimal_as_currency(@statistics.selling_fees) %></span>
+            (
+              <span class="text-danger me-1"><%= format_decimal_as_currency(@statistics.hipstamp_selling_fees) %></span> Hipstamp /
+              <span class="text-danger ms-1 me-1"><%= format_decimal_as_currency(@statistics.ebay_selling_fees) %></span> eBay
+            )
+        </button>
+      </div>
+      <div id="selling_fees-collapse" class="accordion-collapse collapse" data-bs-parent="#income-accordion">
+        <div class="accordion-body">
+          <div id="inner-selling_fees-accordion" class="accordion">
+            <%= for {group_key, group_name} <- [hipstamp: "Hipstamp", ebay: "eBay"] do %>
+              <div id="<%= group_key %>_selling_fees-accordion-item" class="accordion-item">
+                <div class="accordion-header" phx-update="ignore">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#<%= group_key%>_selling_fees-collapse"
+                  >
+                    <%= group_name %>:
+                    <span class="text-danger ms-2">
+                      <%= format_decimal_as_currency(Map.get(@statistics, "#{group_key}_shipping_fees")) %>
+                    </span>
+                  </button>
+                </div>
+                <div
+                  id="<%= group_key %>_selling_fees-collapse"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#inner-selling_fees-accordion"
+                >
+                  <div class="accordion_body">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Order Number</th>
+                          <th>Order Date</th>
+                          <th>Shipping Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <%= for order <-
+                          Enum.filter(
+                            @orders,
+                            Function.capture(Order, String.to_existing_atom("#{group_key}?"), 1)
+                          ) do %>
+                          <tr>
+                            <td><%= Order.order_number(order) %></td>
+                            <td><%= formatted_date(order.ordered_at) %></td>
+                            <td class="text-danger"><%= format_decimal_as_currency(order.selling_fees) %></td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
       </div>
     </div>
   </div>

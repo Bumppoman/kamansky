@@ -1,3 +1,4 @@
+import { accordionHook } from './accordion';
 import { dataTableInit } from './datatable';
 import { disappearingSuccessMessage } from './utils';
 import { fileUpload } from './file_upload';
@@ -15,6 +16,7 @@ export interface Hook {
 }
 
 export const Hooks = {
+  accordionHook,
   dataTableInit,
   disappearingSuccessMessage,
   fileUpload,
