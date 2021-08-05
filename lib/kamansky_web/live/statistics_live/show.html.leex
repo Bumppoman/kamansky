@@ -31,7 +31,7 @@
             <tbody>
               <%= for order <- @orders do %>
                 <tr>
-                  <td><%= Order.order_number(order) %></td>
+                  <td>#<%= Order.order_number(order) %></td>
                   <td><%= formatted_date(order.ordered_at) %></td>
                   <td class="text-success"><%= format_decimal_as_currency(order.gross_profit) %></td>
                 </tr>
@@ -70,7 +70,7 @@
             <tbody>
               <%= for order <- @orders do %>
                 <tr>
-                  <td><%= Order.order_number(order) %></td>
+                  <td>#<%= Order.order_number(order) %></td>
                   <td><%= formatted_date(order.ordered_at) %></td>
                   <td class="text-danger"><%= format_decimal_as_currency(order.shipping_cost) %></td>
                 </tr>
@@ -115,7 +115,9 @@
                   >
                     <%= group_name %>:
                     <span class="text-danger ms-2">
-                      <%= format_decimal_as_currency(Map.get(@statistics, "#{group_key}_shipping_fees")) %>
+                      <%= format_decimal_as_currency(
+                        Map.get(@statistics, String.to_existing_atom("#{group_key}_shipping_fees"))
+                      ) %>
                     </span>
                   </button>
                 </div>
@@ -140,7 +142,7 @@
                             Function.capture(Order, String.to_existing_atom("#{group_key}?"), 1)
                           ) do %>
                           <tr>
-                            <td><%= Order.order_number(order) %></td>
+                            <td>#<%= Order.order_number(order) %></td>
                             <td><%= formatted_date(order.ordered_at) %></td>
                             <td class="text-danger"><%= format_decimal_as_currency(order.selling_fees) %></td>
                           </tr>

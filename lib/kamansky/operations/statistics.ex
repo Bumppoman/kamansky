@@ -20,7 +20,7 @@ defmodule Kamansky.Operations.Statistics do
   def list_orders_for_month_and_year(month, year) do
     order_for_month_and_year_query(month, year)
     |> select_merge([o], %{gross_profit: fragment("item_price + shipping_price")})
-    |> order_by(:ordered_at)
+    |> order_by(:id)
     |> Repo.all()
   end
 
