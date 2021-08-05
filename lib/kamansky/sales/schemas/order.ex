@@ -19,6 +19,10 @@ defmodule Kamansky.Sales.Orders.Order do
     processed_at: DateTime.t,
     shipped_at: DateTime.t,
     completed_at: DateTime.t,
+    gross_profit: Decimal.t,
+    net_profit: Decimal.t,
+    platform: atom,
+    stamp_cost: Decimal.t,
     customer: Kamansky.Sales.Customers.Customer.t,
     listings: [Kamansky.Sales.Listings.Listing.t]
   }
@@ -39,6 +43,7 @@ defmodule Kamansky.Sales.Orders.Order do
     field :completed_at, :utc_datetime
 
     field :gross_profit, :decimal, virtual: true
+    field :net_profit, :decimal, virtual: true
     field :platform, Ecto.Enum, values: [:hipstamp, :ebay], virtual: true, default: :hipstamp
     field :stamp_cost, :decimal, virtual: true
 

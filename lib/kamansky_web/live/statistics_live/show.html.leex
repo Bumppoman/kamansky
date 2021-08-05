@@ -196,5 +196,46 @@
         </div>
       </div>
     </div>
+    <div
+      id="net_profit-accordion-item"
+      class="accordion-item"
+      phx-hook="accordionHook"
+      data-info="net_profit"
+    >
+      <div class="accordion-header" phx-update="ignore">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#net_profit-collapse"
+        >
+          Net Profit:
+          <span class="text-danger ms-2"><%= format_decimal_as_currency(@statistics.net_profit) %></span>
+          <span class="ms-1">(<%= @statistics.net_profit_percentage %>%)</span>
+        </button>
+      </div>
+      <div id="net_profit-collapse" class="accordion-collapse collapse" data-bs-parent="#sales-accordion">
+        <div class="accordion-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order Number</th>
+                <th>Order Date</th>
+                <th>Net Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= for order <- @orders do %>
+                <tr>
+                  <td>#<%= Order.order_number(order) %></td>
+                  <td><%= formatted_date(order.ordered_at) %></td>
+                  <td class="text-danger"><%= format_decimal_as_currency(order.net_profit) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </section>

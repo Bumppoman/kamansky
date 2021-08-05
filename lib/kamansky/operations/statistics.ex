@@ -23,12 +23,15 @@ defmodule Kamansky.Operations.Statistics do
         )
         |> Repo.one(),
       stamp_cost <- total_stamp_cost(orders),
+      net_profit <- total_net_profit(orders),
       calculated_statistics <-
         %{
+          net_profit: net_profit,
+          net_profit_percentage: calculate_percentage(net_profit, base_statistics.gross_profit),
           selling_fees_percentage: calculate_percentage(base_statistics.selling_fees, base_statistics.gross_profit),
           shipping_cost_percentage: calculate_percentage(base_statistics.shipping_cost, base_statistics.gross_profit),
           stamp_cost: stamp_cost,
-          stamp_cost_percentage: calculate_percentage(base_statistics.shipping_cost, base_statistics.gross_profit)
+          stamp_cost_percentage: calculate_percentage(stamp_cost, base_statistics.gross_profit)
         }
     do
       {orders, Map.merge(base_statistics, calculated_statistics)}
@@ -44,6 +47,16 @@ defmodule Kamansky.Operations.Statistics do
       [o, ..., s],
       %{
         gross_profit: fragment("? + ?", o.item_price, o.shipping_price),
+        net_profit:
+          fragment(
+            "(? + ?) - (? + ? + ? + ?)",
+            o.item_price,
+            o.shipping_price,
+            o.shipping_cost,
+            o.selling_fees,
+            s.cost,
+            s.purchase_fees
+          ),
         stamp_cost: sum(fragment("? + ?", s.cost, s.purchase_fees))
       }
     )
@@ -86,6 +99,10 @@ defmodule Kamansky.Operations.Statistics do
         fragment("? BETWEEN ? AND ?", o.ordered_at, ^begin_date, ^end_date)
       )
     end
+  end
+
+  defp total_net_profit(orders) do
+    Enum.reduce(orders, Decimal.new(0), &(Decimal.add(&1.net_profit, &2)))
   end
 
   defp total_stamp_cost(orders) do
