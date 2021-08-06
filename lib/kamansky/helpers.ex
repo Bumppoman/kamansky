@@ -42,6 +42,15 @@ defmodule Kamansky.Helpers do
     |> Enum.into(%{})
   end
 
+  @spec get_value_for_ecto_enum(atom, atom, atom) :: integer | String.t
+  def get_value_for_ecto_enum(schema, field, enum_key) do
+    schema
+    |> apply(:__schema__, [:type, field])
+    |> elem(2)
+    |> Map.get(:on_dump)
+    |> Keyword.get(enum_key)
+  end
+
   @spec filter_query_for_month(Ecto.Queryable.t, pos_integer, atom | nil) :: Ecto.Query.t
   def filter_query_for_month(query, month, field_name \\ :inserted_at) do
     with {begin_date, end_date} <- begin_and_end_date_for_month(month) do

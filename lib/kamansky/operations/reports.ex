@@ -1,6 +1,6 @@
 defmodule Kamansky.Operations.Reports do
   import Ecto.Query, warn: false
-  import Kamansky.Helpers, only: [filter_query_for_year_and_month: 3]
+  import Kamansky.Helpers
 
   alias Kamansky.Repo
   alias Kamansky.Stamps.Stamp
@@ -14,7 +14,21 @@ defmodule Kamansky.Operations.Reports do
         |> where([s], s.status != ^:collection)
         |> select([s], sum(s.cost + s.purchase_fees))
         |> Repo.one(),
-      base_data <- %{},
+      month_begin <- Date.new(year, month, 1),
+      base_data <-
+        from(e in "expenses")
+        |> where([e], fragment("? BETWEEN ? AND ?", e.date, ^month_begin, ^Date.end_of_month(month_begin)))
+        |> select(
+          [e],
+          %{
+            platform_fees: fragment(
+              "SUM(CASE WHEN ? = ? THEN ? ELSE 0 END)",
+              e.category,
+              ^get_value_for_ecto_enum(Expense, :category, :platform_fees),
+              e.amount
+            )
+          }
+        ),
       calculated_data <- %{
         stamp_cost: stamp_cost
       }
@@ -33,7 +47,7 @@ defmodule Kamansky.Operations.Reports do
         |> select([s], %{stamp_cost: sum(s.cost + s.purchase_fees)}),
       base_data <-
         from(o in "orders", as: :order)
-        |> filter_query_for_year_and_month(year, month)
+        |> filter_query_for_year_and_month(year, month, :ordered_at)
         |> join(:left_lateral, [o], ss in subquery(stamps_query))
         |> select(
           [o, ss],
