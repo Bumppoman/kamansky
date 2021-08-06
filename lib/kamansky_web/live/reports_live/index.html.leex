@@ -9,13 +9,18 @@
       </tr>
     </thead>
     <tbody>
-      <%= for {year, month} <- @months do %>
+      <%= for {year, months} <- @report_months do %>
         <tr>
-          <td>Month</td>
-          <td>Gross Profit</td>
-          <td>Expenses</td>
-          <td>Net Profit/Loss</td>
+          <th colspan="4"><%= year %></th>
         </tr>
+        <%= for month <- months do %>
+          <tr>
+            <td><%= Calendar.strftime(Date.new!(year, month, 1), "%B %Y") %></td>
+            <td>Gross Profit</td>
+            <td>Expenses</td>
+            <td>Net Profit/Loss</td>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>

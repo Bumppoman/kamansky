@@ -15,7 +15,7 @@ defmodule KamanskyWeb.ReportsLive.Index do
   def handle_params(_params, _uri, socket) do
     {
       :noreply,
-      assign(socket, :months, Reports.list_report_months())
+      assign(socket, :report_months, Reports.list_report_months())
     }
   end
 end
