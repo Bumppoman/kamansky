@@ -16,7 +16,7 @@
         <td>Hipstamp</td>
         <td>
           <span class="text-success"><%= format_decimal_as_currency(@order_data.hipstamp_gross_sales) %></span>
-          <span class="ms-1">(<%= @data.hipstamp_sales_percentage %>% of gross sales)</span>
+          <span class="ms-1">(<%= @order_data.hipstamp_sales_percentage %>% of gross sales)</span>
         </td>
       </tr>
       <tr>
@@ -24,7 +24,7 @@
         <td>eBay</td>
         <td>
           <span class="text-success"><%= format_decimal_as_currency(@order_data.ebay_gross_sales) %></span>
-          <span class="ms-1">(<%= @data.ebay_sales_percentage %>% of gross sales)</span>
+          <span class="ms-1">(<%= @order_data.ebay_sales_percentage %>% of gross sales)</span>
         </td>
       </tr>
       <tr>
