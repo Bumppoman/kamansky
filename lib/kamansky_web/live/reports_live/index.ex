@@ -1,4 +1,4 @@
-defmodule KamanskyWeb.StatisticsLive.Index do
+defmodule KamanskyWeb.ReportsLive.Index do
   use KamanskyWeb, :live_view
 
   alias Kamansky.Operations.Reports
