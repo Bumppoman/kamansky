@@ -29,7 +29,9 @@ defmodule KamanskyWeb.ExpenseLive.Index do
 
   @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :edit, %{"id" => id}) do
-
+    socket
+    |> assign(:expense, Expenses.get_expense!(id))
+    |> assign(:page_title, "Add New Expense")
   end
 
   defp apply_action(socket, :index, _params) do

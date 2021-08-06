@@ -1,23 +1,25 @@
 defmodule Kamansky.Operations.Reports do
   import Ecto.Query, warn: false
-  import Kamansky.Helpers, only: [begin_and_end_date_for_year_and_month: 2]
+  import Kamansky.Helpers, only: [filter_query_for_year_and_month: 3]
 
   alias Kamansky.Repo
   alias Kamansky.Stamps.Stamp
 
-  @spec get_expense_data(integer, integer) :: map
+  @spec get_expense_data(pos_integer, pos_integer) :: map
   def get_expense_data(year, month) do
-    with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month),
+    with(
       stamp_cost <-
         Stamp
-        |> where([s], fragment("? BETWEEN ? AND ?", s.inserted_at, ^begin_date, ^end_date))
+        |> filter_query_for_year_and_month(year, month)
         |> where([s], s.status != ^:collection)
         |> select([s], sum(s.cost + s.purchase_fees))
-        |> Repo.one()
-    do
-      %{
+        |> Repo.one(),
+      base_data <- %{},
+      calculated_data <- %{
         stamp_cost: stamp_cost
       }
+    ) do
+      Map.merge(base_data, calculated_data)
     end
   end
 
@@ -31,36 +33,25 @@ defmodule Kamansky.Operations.Reports do
         |> select([s], %{stamp_cost: sum(s.cost + s.purchase_fees)}),
       base_data <-
         from(o in "orders", as: :order)
-        |> order_for_year_and_month_query(year, month)
+        |> filter_query_for_year_and_month(year, month)
         |> join(:left_lateral, [o], ss in subquery(stamps_query))
         |> select(
           [o, ss],
           %{
             ebay_gross_sales: fragment(
-              "SUM(CASE WHEN ? IS NOT NULL THEN (? + ?) ELSE 0 END)",
+              "SUM(CASE WHEN ? IS NOT NULL THEN ? ELSE 0 END)",
               o.ebay_id,
-              o.item_price,
-              o.shipping_price
+              o.item_price + o.shipping_price
             ),
             ebay_selling_fees: fragment("SUM(CASE WHEN ? IS NOT NULL THEN ? ELSE 0 END)", o.ebay_id, o.selling_fees),
             hipstamp_gross_sales: fragment(
-              "SUM(CASE WHEN ? IS NOT NULL THEN (? + ?) ELSE 0 END)",
+              "SUM(CASE WHEN ? IS NOT NULL THEN ? ELSE 0 END)",
               o.hipstamp_id,
-              o.item_price,
-              o.shipping_price
+              o.item_price + o.shipping_price
             ),
             hipstamp_selling_fees: fragment("SUM(CASE WHEN ? IS NOT NULL THEN ? ELSE 0 END)", o.hipstamp_id, o.selling_fees),
-            gross_sales: sum(fragment("? + ?", o.item_price, o.shipping_price)),
-            net_sales: sum(
-              fragment(
-                "(? + ?) - ? - ? - ?",
-                o.item_price,
-                o.shipping_price,
-                o.selling_fees,
-                o.shipping_cost,
-                ss.stamp_cost
-              )
-            ),
+            gross_sales: sum(o.item_price + o.shipping_price),
+            net_sales: sum((o.item_price + o.shipping_price) - o.selling_fees - o.shipping_cost - ss.stamp_cost),
             selling_fees: sum(o.selling_fees),
             shipping_cost: sum(o.shipping_cost),
             stamp_cost: sum(ss.stamp_cost)
@@ -93,16 +84,5 @@ defmodule Kamansky.Operations.Reports do
     |> Decimal.to_float()
     |> Kernel.*(100)
     |> Kernel.round()
-  end
-
-  @spec order_for_year_and_month_query(Ecto.Queryable.t, integer, integer) :: Ecto.Query.t
-  defp order_for_year_and_month_query(query, year, month) do
-    with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month) do
-      where(
-        query,
-        [o],
-        fragment("? BETWEEN ? AND ?", o.ordered_at, ^begin_date, ^end_date)
-      )
-    end
   end
 end

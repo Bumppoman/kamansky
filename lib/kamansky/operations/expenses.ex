@@ -25,6 +25,9 @@ defmodule Kamansky.Operations.Expenses do
     Paginate.find_row_number(Expense, Expense.display_column_for_sorting(options[:sort][:column]), options)
   end
 
+  @spec get_expense!(pos_integer) :: Expense.t
+  def get_expense!(id), do: Repo.get!(Expense, id)
+
   @spec list_expenses(Paginate.params) :: [Expense.t]
   def list_expenses(params), do: Paginate.list(Expenses, Expense, params)
 
