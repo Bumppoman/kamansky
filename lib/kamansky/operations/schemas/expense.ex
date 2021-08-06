@@ -14,7 +14,7 @@ defmodule Kamansky.Operations.Expenses.Expense do
   }
 
   schema "expenses" do
-    field :category, Ecto.Enum, values: [equipment: 1, platform_fee: 2]
+    field :category, Ecto.Enum, values: [equipment: 1, platform_fee: 2, supplies: 3]
     field :description, :string
     field :date, :date
     field :amount, :decimal

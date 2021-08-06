@@ -48,7 +48,7 @@ defmodule Kamansky.Helpers do
     |> apply(:__schema__, [:type, field])
     |> elem(2)
     |> Map.get(:on_dump)
-    |> Keyword.get(enum_key)
+    |> Map.get(enum_key)
   end
 
   @spec filter_query_for_month(Ecto.Queryable.t, pos_integer, atom | nil) :: Ecto.Query.t

@@ -2,6 +2,7 @@ defmodule Kamansky.Operations.Reports do
   import Ecto.Query, warn: false
   import Kamansky.Helpers
 
+  alias Kamansky.Operations.Expenses.Expense
   alias Kamansky.Repo
   alias Kamansky.Stamps.Stamp
 
@@ -14,7 +15,7 @@ defmodule Kamansky.Operations.Reports do
         |> where([s], s.status != ^:collection)
         |> select([s], sum(s.cost + s.purchase_fees))
         |> Repo.one(),
-      month_begin <- Date.new(year, month, 1),
+      month_begin <- Date.new!(year, month, 1),
       base_data <-
         from(e in "expenses")
         |> where([e], fragment("? BETWEEN ? AND ?", e.date, ^month_begin, ^Date.end_of_month(month_begin)))
@@ -24,11 +25,12 @@ defmodule Kamansky.Operations.Reports do
             platform_fees: fragment(
               "SUM(CASE WHEN ? = ? THEN ? ELSE 0 END)",
               e.category,
-              ^get_value_for_ecto_enum(Expense, :category, :platform_fees),
+              ^get_value_for_ecto_enum(Expense, :category, :platform_fee),
               e.amount
             )
           }
-        ),
+        )
+        |> Repo.one(),
       calculated_data <- %{
         stamp_cost: stamp_cost
       }
@@ -87,6 +89,22 @@ defmodule Kamansky.Operations.Reports do
         }
     ) do
       Map.merge(base_data, calculated_data)
+    end
+  end
+
+  @spec list_report_months :: [{pos_integer, pos_integer}]
+  def list_report_months do
+    Expense
+    |> select([e], fragment("DISTINCT(DATE_PART('year', ?), DATE_PART('month', ?))", e.date, e.date))
+    |> Repo.all()
+  end
+
+  @spec total_expenses_for_year_and_month(pos_integer, pos_integer) :: Decimal.t
+  def total_expenses_for_year_and_month(year, month) do
+    with month_begin <- Date.new!(year, month, 1) do
+      Expense
+      |> where([e], fragment("? BETWEEN ? AND ?", e.date, ^month_begin, ^Date.end_of_month(month_begin)))
+      |> Repo.aggregate(:sum, :amount)
     end
   end
 
