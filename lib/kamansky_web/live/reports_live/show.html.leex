@@ -9,55 +9,68 @@
     <tbody>
       <tr>
         <td colspan="2">Gross Sales</td>
-        <td><%= format_decimal_as_currency(@data.gross_sales) %></td>
+        <td class="text-success"><%= format_decimal_as_currency(@order_data.gross_sales) %></td>
       </tr>
       <tr>
         <td></td>
         <td>Hipstamp</td>
         <td>
-          <%= format_decimal_as_currency(@data.hipstamp_gross_sales) %>
-          <span class="ms-1">(<%= @data.hipstamp_sales_percentage %>%)</span>
+          <span class="text-success"><%= format_decimal_as_currency(@order_data.hipstamp_gross_sales) %></span>
+          <span class="ms-1">(<%= @data.hipstamp_sales_percentage %>% of gross sales)</span>
         </td>
       </tr>
       <tr>
         <td></td>
         <td>eBay</td>
         <td>
-          <%= format_decimal_as_currency(@data.ebay_gross_sales) %>
-          <span class="ms-1">(<%= @data.ebay_sales_percentage %>%)</span>
+          <span class="text-success"><%= format_decimal_as_currency(@order_data.ebay_gross_sales) %></span>
+          <span class="ms-1">(<%= @data.ebay_sales_percentage %>% of gross sales)</span>
         </td>
       </tr>
       <tr>
         <td colspan="2">Stamp Cost</td>
-        <td><%= format_decimal_as_currency(@data.stamp_cost) %></td>
+        <td class="text-danger"><%= format_decimal_as_currency(@order_data.stamp_cost) %></td>
       </tr>
       <tr>
         <td colspan="2">Shipping Cost</td>
-        <td><%= format_decimal_as_currency(@data.shipping_cost) %></td>
+        <td class="text-danger"><%= format_decimal_as_currency(@order_data.shipping_cost) %></td>
       </tr>
       <tr>
         <td colspan="2">Selling Fees</td>
-        <td><%= format_decimal_as_currency(@data.selling_fees) %></td>
+        <td class="text-danger"><%= format_decimal_as_currency(@order_data.selling_fees) %></td>
       </tr>
       <tr>
         <td></td>
         <td>Hipstamp</td>
         <td>
-          <span class="text-danger"><%= format_decimal_as_currency(@data.hipstamp_selling_fees) %></span>
-          <span class="ms-1">(<%= @data.hipstamp_selling_fees_percentage_of_gross %>% of gross sales)</span>
+          <span class="text-danger"><%= format_decimal_as_currency(@order_data.hipstamp_selling_fees) %></span>
+          <span class="ms-1">(<%= @order_data.hipstamp_selling_fees_percentage_of_gross %>% of gross sales on Hipstamp)</span>
         </td>
       </tr>
       <tr>
         <td></td>
         <td>eBay</td>
         <td>
-          <span class="text-danger"><%= format_decimal_as_currency(@data.ebay_selling_fees) %></span>
-          <span class="ms-1">(<%= @data.ebay_selling_fees_percentage_of_gross %>% of gross sales)</span>
+          <span class="text-danger"><%= format_decimal_as_currency(@order_data.ebay_selling_fees) %></span>
+          <span class="ms-1">(<%= @order_data.ebay_selling_fees_percentage_of_gross %>% of gross sales on eBay)</span>
         </td>
       </tr>
       <tr>
         <td colspan="2">Net Sales</td>
-        <td><%= format_decimal_as_currency(@data.net_sales) %></td>
+        <td class="text-success"><%= format_decimal_as_currency(@order_data.net_sales) %></td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table">
+    <thead>
+      <tr>
+        <th colspan="3">Expenses</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">Stamps</td>
+        <td class="text-danger"><%= format_decimal_as_currency(@expense_data.stamp_cost) %></td>
       </tr>
     </tbody>
   </table>

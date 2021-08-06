@@ -4,6 +4,21 @@ defmodule Kamansky.Operations.Reports do
   alias Kamansky.Repo
   alias Kamansky.Stamps.Stamp
 
+  @spec get_expense_data(integer, integer) :: map
+  def get_expense_data(year, month) do
+    with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month),
+      stamp_cost <-
+        from(s in "stamps")
+        |> where([s], fragment("? BETWEEN ? AND ?", s.inserted_at, ^begin_date, ^end_date))
+        |> select([s], sum(s.cost + s.purchase_fees))
+        |> Repo.one()
+    do
+      %{
+        stamp_cost: stamp_cost
+      }
+    end
+  end
+
   @spec get_order_data(integer, integer) :: map
   def get_order_data(year, month) do
     with(

@@ -32,12 +32,12 @@ defmodule KamanskyWeb.ReportsLive.Show do
       month <- String.to_integer(month),
       dummy_date <- Date.new!(year, month, 1),
       month_name <- Calendar.strftime(dummy_date, "%B"),
-      data <- Reports.get_order_data(year, month),
       socket <-
         socket
+        |> assign(:expense_data, Reports.get_expense_data(year, month))
         |> assign(:month, month)
         |> assign(:page_title, "Report for #{month_name} #{year}")
-        |> assign(:data, data)
+        |> assign(:order_data, Reports.get_order_data(year, month))
         |> assign(:year, year)
     do
       {:noreply, socket}
