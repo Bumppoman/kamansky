@@ -40,6 +40,22 @@
         <td><%= format_decimal_as_currency(@data.selling_fees) %></td>
       </tr>
       <tr>
+        <td></td>
+        <td>Hipstamp</td>
+        <td>
+          <span class="text-danger"><%= format_decimal_as_currency(@data.hipstamp_selling_fees) %></span>
+          <span class="ms-1">(<%= @data.hipstamp_selling_fees_percentage_of_gross %>% of gross sales)</span>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>eBay</td>
+        <td>
+          <span class="text-danger"><%= format_decimal_as_currency(@data.ebay_selling_fees) %></span>
+          <span class="ms-1">(<%= @data.ebay_selling_fees_percentage_of_gross %>% of gross sales)</span>
+        </td>
+      </tr>
+      <tr>
         <td colspan="2">Net Sales</td>
         <td><%= format_decimal_as_currency(@data.net_sales) %></td>
       </tr>
