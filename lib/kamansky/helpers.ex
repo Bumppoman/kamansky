@@ -1,4 +1,37 @@
 defmodule Kamansky.Helpers do
+  import Ecto.Query, warn: false
+
+  @spec begin_and_end_date_for_month(integer) :: {DateTime.t, DateTime.t}
+  def begin_and_end_date_for_month(month) do
+    with(
+      year <-
+        "America/New_York"
+        |> DateTime.now!()
+        |> Map.get(:year)
+    ) do
+      begin_and_end_date_for_year_and_month(year, month)
+    end
+  end
+
+  @spec begin_and_end_date_for_year_and_month(integer, integer) :: {DateTime.t, DateTime.t}
+  def begin_and_end_date_for_year_and_month(year, month) do
+    with(
+      begin_date <-
+        year
+        |> Date.new!(month, 1)
+        |> DateTime.new!(Time.new!(0, 0, 0), "America/New_York")
+        |> DateTime.shift_zone!("Etc/UTC"),
+      end_date <-
+        year
+        |> Date.new!(month, 1)
+        |> Date.end_of_month()
+        |> DateTime.new!(Time.new!(23, 59, 59), "America/New_York")
+        |> DateTime.shift_zone!("Etc/UTC")
+    ) do
+      {begin_date, end_date}
+    end
+  end
+
   def cast_enum_fields(attrs, fields) do
     attrs
     |> Enum.map(
@@ -7,6 +40,22 @@ defmodule Kamansky.Helpers do
       end
     )
     |> Enum.into(%{})
+  end
+
+  @spec filter_query_for_month(Ecto.Queryable.t, integer, atom) :: Ecto.Query.t
+  def filter_query_for_month(query, month, field_name \\ :inserted_at) do
+    with {begin_date, end_date} <- begin_and_end_date_for_month(month) do
+      where(
+        query,
+        [q],
+        fragment(
+          "? BETWEEN ? AND ?",
+          field(q, ^field_name),
+          ^begin_date,
+          ^end_date
+        )
+      )
+    end
   end
 
   @spec format_decimal_as_currency(Decimal.t | nil) :: String.t

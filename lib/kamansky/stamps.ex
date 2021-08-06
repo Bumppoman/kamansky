@@ -2,6 +2,7 @@ defmodule Kamansky.Stamps do
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
+  import Kamansky.Helpers, only: [filter_query_for_month: 2]
 
   alias __MODULE__
   alias Kamansky.Repo
@@ -16,7 +17,7 @@ defmodule Kamansky.Stamps do
   def cost_of_stamps(status) do
     Stamp
     |> where(status: ^status)
-    |> select(sum(fragment("cost + purchase_fees")))
+    |> select([s], sum(s.cost + s.purchase_fees))
     |> Repo.one()
   end
 
@@ -208,7 +209,7 @@ defmodule Kamansky.Stamps do
   end
 
   def sort(query, %{column: 2, direction: direction}) do
-    order_by(query, ^{direction, dynamic([s], fragment("? + ?", s.cost, s.purchase_fees))})
+    order_by(query, ^{direction, dynamic([s], s.cost + s.purchase_fees)})
   end
 
   @spec update_stamp(
@@ -227,15 +228,15 @@ defmodule Kamansky.Stamps do
   @spec cost_of_stamps_for_month(Ecto.Query.t, integer) :: float
   defp cost_of_stamps_for_month(%Ecto.Query{} = query, month) do
     query
-    |> where([s], fragment("DATE_PART('month', ?)", s.inserted_at) == ^month)
-    |> select(sum(fragment("cost + purchase_fees")))
+    |> filter_query_for_month(month)
+    |> select([s], sum(s.cost + s.purchase_fees))
     |> Repo.one()
   end
 
   @spec count_stamps_purchased_in_month(Ecto.Query.t, integer) :: integer
   defp count_stamps_purchased_in_month(%Ecto.Query{} = query, month) do
     query
-    |> where([s], fragment("DATE_PART('month', ?)", s.inserted_at) == ^month)
+    |> filter_query_for_month(month)
     |> Repo.aggregate(:count, :id)
   end
 

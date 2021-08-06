@@ -1,5 +1,6 @@
 defmodule Kamansky.Operations.Reports do
   import Ecto.Query, warn: false
+  import Kamansky.Helpers, only: [begin_and_end_date_for_year_and_month: 2]
 
   alias Kamansky.Repo
   alias Kamansky.Stamps.Stamp
@@ -81,25 +82,6 @@ defmodule Kamansky.Operations.Reports do
         }
     ) do
       Map.merge(base_data, calculated_data)
-    end
-  end
-
-  @spec begin_and_end_date_for_year_and_month(integer, integer) :: {DateTime.t, DateTime.t}
-  defp begin_and_end_date_for_year_and_month(year, month) do
-    with(
-      begin_date <-
-        year
-        |> Date.new!(month, 1)
-        |> DateTime.new!(Time.new!(0, 0, 0), "America/New_York")
-        |> DateTime.shift_zone!("Etc/UTC"),
-      end_date <-
-        year
-        |> Date.new!(month, 1)
-        |> Date.end_of_month()
-        |> DateTime.new!(Time.new!(23, 59, 59), "America/New_York")
-        |> DateTime.shift_zone!("Etc/UTC")
-    ) do
-      {begin_date, end_date}
     end
   end
 

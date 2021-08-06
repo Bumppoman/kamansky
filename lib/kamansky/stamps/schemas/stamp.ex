@@ -149,6 +149,12 @@ defmodule Kamansky.Stamps.Stamp do
     |> validate_required([:scott_number])
   end
 
+  @spec display_column_for_sorting(integer) :: atom
+  def display_column_for_sorting(column) do
+    [:scott_number, :grade]
+    |> Enum.at(column)
+  end
+
   @spec flaws :: [atom]
   def flaws do
     [
