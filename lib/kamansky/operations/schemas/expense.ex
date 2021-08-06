@@ -13,7 +13,7 @@ defmodule Kamansky.Operations.Expenses.Expense do
   }
 
   schema "expenses" do
-    field :category, Ecto.Enum, values: [:equipment]
+    field :category, Ecto.Enum, values: [:equipment, :platform_fee]
     field :description, :string
     field :date, :utc_datetime
     field :amount, :decimal
@@ -22,7 +22,8 @@ defmodule Kamansky.Operations.Expenses.Expense do
   @spec categories :: [{String.t, atom}]
   def categories do
     [
-      {"Equipment", :equipment}
+      {"Equipment", :equipment},
+      {"Platform Fee", :platform_fee}
     ]
   end
 
@@ -41,7 +42,7 @@ defmodule Kamansky.Operations.Expenses.Expense do
   @spec formatted_category(t) :: String.t
   def formatted_category(%Expense{category: category}) do
     categories()
-    |> Enum.find(fn _name, key -> key == category end)
+    |> Enum.find(fn {_name, key} -> key == category end)
     |> elem(0)
   end
 end

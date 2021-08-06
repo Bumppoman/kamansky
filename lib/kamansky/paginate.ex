@@ -47,6 +47,34 @@ defmodule Kamansky.Paginate do
     end
   end
 
+  @spec find_row_number(Ecto.Queryable.t, atom, params) :: integer
+  def find_row_number(query, sort_column, options) do
+    with(
+      record_query <-
+        query
+        |> select(
+          [q],
+          %{
+            id: q.id,
+            row_number: over(
+              row_number(),
+              order_by:
+                {
+                  ^options[:sort][:direction],
+                  field(q, ^sort_column)
+                }
+            )
+          }
+        )
+    ) do
+      from(rq in subquery(record_query))
+      |> where(id: ^String.to_integer(options[:record_id]))
+      |> select([rq], [:row_number])
+      |> Repo.one()
+      |> Map.get(:row_number)
+    end
+  end
+
   @doc "Return an `Ecto.Query`, limited for display in a `KamanskyWeb.TableLiveComponent`."
   @spec limit_for_data_table(Ecto.Query.t, params) :: Ecto.Query.t
   def limit_for_data_table(query, %{limit: limit, offset: offset}) do
@@ -55,7 +83,7 @@ defmodule Kamansky.Paginate do
     |> offset(^offset)
   end
 
-  @spec list(atom, Ecto.Query.t, params) :: [any] | {integer, [any]}
+  @spec list(atom, Ecto.Queryable.t, params) :: [any] | {integer, [any]}
   def list(implementation, query, %{search: nil} = params), do: records(implementation, query, params)
 
   def list(implementation, query, %{search: search} = params) do
@@ -70,14 +98,14 @@ defmodule Kamansky.Paginate do
     end
   end
 
-  @spec sort_and_limit(atom, Ecto.Query.t, params) :: Ecto.Query.t
+  @spec sort_and_limit(atom, Ecto.Queryable.t, params) :: Ecto.Query.t
   def sort_and_limit(implementation, query, %{sort: sort} = params) do
     query
     |> implementation.sort(sort)
     |> limit_for_data_table(params)
   end
 
-  @spec records(atom, Ecto.Query.t, params) :: [any]
+  @spec records(atom, Ecto.Queryable.t, params) :: [any]
   defp records(implementation, query, params) do
     implementation
     |> sort_and_limit(query, params)

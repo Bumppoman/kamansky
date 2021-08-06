@@ -62,6 +62,12 @@ defmodule Kamansky.Sales.Orders.Order do
   def completed?(%Order{status: :completed}), do: true
   def completed?(%Order{}), do: false
 
+  @spec display_column_for_sorting(integer) :: atom
+  def display_column_for_sorting(column) do
+    [:id, :ordered_at]
+    |> Enum.at(column)
+  end
+
   @spec ebay?(Order.t) :: boolean
   def ebay?(%Order{ebay_id: nil}), do: false
   def ebay?(%Order{}), do: true

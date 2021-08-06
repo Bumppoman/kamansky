@@ -8,8 +8,9 @@ defmodule Kamansky.Operations.Reports do
   def get_expense_data(year, month) do
     with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month),
       stamp_cost <-
-        from(s in "stamps")
+        Stamp
         |> where([s], fragment("? BETWEEN ? AND ?", s.inserted_at, ^begin_date, ^end_date))
+        |> where([s], s.status != ^:collection)
         |> select([s], sum(s.cost + s.purchase_fees))
         |> Repo.one()
     do
@@ -103,6 +104,7 @@ defmodule Kamansky.Operations.Reports do
   end
 
   @spec calculate_percentage(Decimal.t, Decimal.t) :: integer
+  defp calculate_percentage(_numerator, %Decimal{coef: 0}), do: 0
   defp calculate_percentage(numerator, denominator) do
     numerator
     |> Decimal.div(denominator)

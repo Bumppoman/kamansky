@@ -41,10 +41,7 @@ defmodule Kamansky.Sales.Orders do
   def find_row_number_for_order(status, options) do
     Order
     |> where(status: ^status)
-    |> select([o], {o.id, row_number() |> over(order_by: [{:asc, o.id}])})
-    |> Repo.all
-    |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
-    |> elem(1)
+    |> Paginate.find_row_number(Order.display_column_for_sorting(options[:sort][:column]), options)
   end
 
   @spec get_or_initialize_order(keyword) :: Order.t
