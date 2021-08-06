@@ -45,16 +45,14 @@ defmodule Kamansky.Helpers do
   @spec filter_query_for_month(Ecto.Queryable.t, integer, atom) :: Ecto.Query.t
   def filter_query_for_month(query, month, field_name \\ :inserted_at) do
     with {begin_date, end_date} <- begin_and_end_date_for_month(month) do
-      where(
-        query,
-        [q],
-        fragment(
-          "? BETWEEN ? AND ?",
-          field(q, ^field_name),
-          ^begin_date,
-          ^end_date
-        )
-      )
+      filter_query_for_dates(query, field_name, begin_date, end_date)
+    end
+  end
+
+  @spec filter_query_for_year_and_month(Ecto.Queryable.t, integer, integer, atom) :: Ecto.Query.t
+  def filter_query_for_year_and_month(query, year, month, field_name \\ :inserted_at) do
+    with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month) do
+      filter_query_for_dates(query, field_name, begin_date, end_date)
     end
   end
 
@@ -127,5 +125,19 @@ defmodule Kamansky.Helpers do
       "UT", "VT", "VA", "WA",
       "WV", "WI", "WY"
     ]
+  end
+
+  @spec filter_query_for_dates(Ecto.Queryable.T, atom, DateTime.t, DateTime.t) :: Ecto.Query.t
+  defp filter_query_for_dates(query, field_name, begin_date, end_date) do
+    where(
+      query,
+      [q],
+      fragment(
+        "? BETWEEN ? AND ?",
+        field(q, ^field_name),
+        ^begin_date,
+        ^end_date
+      )
+    )
   end
 end

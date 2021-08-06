@@ -168,7 +168,7 @@ defmodule Kamansky.Sales.Listings do
       [
         {
           ^direction,
-          fragment("? + ?", s.cost, s.purchase_fees)
+          s.cost + s.purchase_fees
         },
         {:asc, s.scott_number}
       ]
@@ -186,7 +186,7 @@ defmodule Kamansky.Sales.Listings do
       [
         {
           ^direction,
-          fragment("? - (? + ?)", l.sale_price, s.cost, s.purchase_fees)
+          l.sale_price - (s.cost + s.purchase_fees)
         },
         {:asc, s.scott_number}
       ]

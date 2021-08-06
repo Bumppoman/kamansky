@@ -48,6 +48,12 @@ defmodule Kamansky.Sales.Customers.Customer do
     )
   end
 
+  @spec display_column_for_sorting(integer) :: atom
+  def display_column_for_sorting(column) do
+    [:id]
+    |> Enum.at(column)
+  end
+
   @spec formatted_email(Customer.t) :: String.t
   def formatted_email(%Customer{email: email}) when email in [nil, ""], do: "---"
   def formatted_email(%Customer{email: email}), do: email

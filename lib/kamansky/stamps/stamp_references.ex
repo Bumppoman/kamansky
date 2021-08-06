@@ -26,26 +26,7 @@ defmodule Kamansky.Stamps.StampReferences do
 
   @spec find_row_number_for_stamp_reference(map) :: integer
   def find_row_number_for_stamp_reference(options) do
-    StampReference
-    |> select(
-      [s],
-      {
-        s.id,
-        row_number()
-        |> over(
-          order_by:
-            [
-              {
-                ^options[:sort][:direction],
-                field(s, ^StampReference.display_column_for_sorting(options[:sort][:column]))
-              }
-            ]
-          )
-      }
-    )
-    |> Repo.all()
-    |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
-    |> elem(1)
+    Paginate.find_row_number(StampReference, StampReference.display_column_for_sorting(options[:sort][:column]), options)
   end
 
   @spec get_stamp_reference!(integer) :: StampReference.t

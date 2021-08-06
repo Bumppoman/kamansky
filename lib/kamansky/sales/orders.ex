@@ -2,6 +2,7 @@ defmodule Kamansky.Sales.Orders do
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
+  import Kamansky.Helpers, only: [filter_query_for_month: 3, filter_query_for_year_and_month: 4]
 
   alias __MODULE__
   alias Kamansky.Repo
@@ -19,7 +20,7 @@ defmodule Kamansky.Sales.Orders do
 
   def count_orders(month: month) do
     Order
-    |> where([o], fragment("DATE_PART('month', ?)", o.ordered_at) == ^month)
+    |> filter_query_for_month(month, :ordered_at)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -193,19 +194,15 @@ defmodule Kamansky.Sales.Orders do
   @spec total_gross_profit(:all) :: integer
   def total_gross_profit(:all) do
     Order
-    |> select(sum(fragment("item_price + shipping_price")))
+    |> select([o], sum(o.item_price + o.shipping_price))
     |> Repo.one()
   end
 
   @spec total_gross_profit([month: integer, year: integer]) :: Decimal.t
   def total_gross_profit(month: month, year: year) do
     Order
-    |> where(
-      [o],
-      fragment("DATE_PART('month', ?)", o.ordered_at) == ^month
-        and fragment("DATE_PART('year', ?)", o.ordered_at) == ^year
-    )
-    |> select(sum(fragment("item_price + shipping_price")))
+    |> filter_query_for_year_and_month(year, month, :ordered_at)
+    |> select([o], sum(o.item_price + o.shipping_price))
     |> Repo.one()
   end
 
@@ -215,7 +212,7 @@ defmodule Kamansky.Sales.Orders do
   @spec total_net_profit([month: integer]) :: Decimal.t
   def total_net_profit(month: month) do
     Order
-    |> where([o], fragment("DATE_PART('month', ?)", o.ordered_at) == ^month)
+    |> filter_query_for_month(month, :ordered_at)
     |> total_net_profit_calculation()
   end
 
@@ -224,7 +221,7 @@ defmodule Kamansky.Sales.Orders do
 
   def total_stamps_in_orders(month: month) do
     Order
-    |> where([o], fragment("DATE_PART('month', ?)", o.ordered_at) == ^month)
+    |> filter_query_for_month(month, :ordered_at)
     |> stamps_in_orders_calculation()
   end
 

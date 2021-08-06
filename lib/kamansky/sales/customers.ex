@@ -16,11 +16,7 @@ defmodule Kamansky.Sales.Customers do
 
   @spec find_row_number_for_customer(map) :: integer | nil
   def find_row_number_for_customer(options) do
-    Customer
-    |> select([c], {c.id, row_number() |> over(order_by: [{:asc, c.id}])})
-    |> Repo.all()
-    |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
-    |> elem(1)
+    Paginate.find_row_number(Customer, Customer.display_column_for_sorting(options[:sort][:column]), options)
   end
 
   @spec get_customer!(integer) :: Customer.t

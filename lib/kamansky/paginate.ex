@@ -69,9 +69,8 @@ defmodule Kamansky.Paginate do
     ) do
       from(rq in subquery(record_query))
       |> where(id: ^String.to_integer(options[:record_id]))
-      |> select([rq], [:row_number])
+      |> select([rq], rq.row_number)
       |> Repo.one()
-      |> Map.get(:row_number)
     end
   end
 
