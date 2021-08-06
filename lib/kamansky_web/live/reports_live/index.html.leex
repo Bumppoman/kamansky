@@ -9,7 +9,7 @@
       </tr>
     </thead>
     <tbody>
-      <%= for month <- @months do %>
+      <%= for {year, month} <- @months do %>
         <tr>
           <td>Month</td>
           <td>Gross Profit</td>

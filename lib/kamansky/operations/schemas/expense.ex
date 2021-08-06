@@ -24,7 +24,8 @@ defmodule Kamansky.Operations.Expenses.Expense do
   def categories do
     [
       {"Equipment", :equipment},
-      {"Platform Fee", :platform_fee}
+      {"Platform Fee", :platform_fee},
+      {"Supplies", :supplies}
     ]
   end
 

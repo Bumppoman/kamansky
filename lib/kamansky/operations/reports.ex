@@ -96,6 +96,7 @@ defmodule Kamansky.Operations.Reports do
   def list_report_months do
     Expense
     |> select([e], fragment("DISTINCT(DATE_PART('year', ?), DATE_PART('month', ?))", e.date, e.date))
+    |> order_by(:date)
     |> Repo.all()
   end
 
