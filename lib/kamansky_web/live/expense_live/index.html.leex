@@ -34,9 +34,9 @@
     ]
   do %>
   <td><%= formatted_date(@item.date) %></td>
-  <td>Description</td>
-  <td>Category</td>
-  <td>Amount</td>
+  <td><%= @item.description %></td>
+  <td><%= Expense.formatted_category(@item) %></td>
+  <td><%= format_decimal_as_currency(@item.amount) %></td>
   <td>
     <%= live_patch to: "#", class: "action-icon" do %>
       <i class="material-icons">edit</i>

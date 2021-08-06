@@ -226,7 +226,7 @@ defmodule Kamansky.Stamps do
   end
 
   @spec cost_of_stamps_for_month(Ecto.Query.t, integer) :: float
-  defp cost_of_stamps_for_month(%Ecto.Query{} = query, month) do
+  defp cost_of_stamps_for_month(query, month) do
     query
     |> filter_query_for_month(month)
     |> select([s], sum(s.cost + s.purchase_fees))
@@ -234,7 +234,7 @@ defmodule Kamansky.Stamps do
   end
 
   @spec count_stamps_purchased_in_month(Ecto.Query.t, integer) :: integer
-  defp count_stamps_purchased_in_month(%Ecto.Query{} = query, month) do
+  defp count_stamps_purchased_in_month(query, month) do
     query
     |> filter_query_for_month(month)
     |> Repo.aggregate(:count, :id)

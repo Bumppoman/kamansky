@@ -1,7 +1,7 @@
 defmodule Kamansky.Helpers do
   import Ecto.Query, warn: false
 
-  @spec begin_and_end_date_for_month(integer) :: {DateTime.t, DateTime.t}
+  @spec begin_and_end_date_for_month(pos_integer) :: {DateTime.t, DateTime.t}
   def begin_and_end_date_for_month(month) do
     with(
       year <-
@@ -13,7 +13,7 @@ defmodule Kamansky.Helpers do
     end
   end
 
-  @spec begin_and_end_date_for_year_and_month(integer, integer) :: {DateTime.t, DateTime.t}
+  @spec begin_and_end_date_for_year_and_month(pos_integer, pos_integer) :: {DateTime.t, DateTime.t}
   def begin_and_end_date_for_year_and_month(year, month) do
     with(
       begin_date <-
@@ -42,14 +42,14 @@ defmodule Kamansky.Helpers do
     |> Enum.into(%{})
   end
 
-  @spec filter_query_for_month(Ecto.Queryable.t, integer, atom) :: Ecto.Query.t
+  @spec filter_query_for_month(Ecto.Queryable.t, pos_integer, atom | nil) :: Ecto.Query.t
   def filter_query_for_month(query, month, field_name \\ :inserted_at) do
     with {begin_date, end_date} <- begin_and_end_date_for_month(month) do
       filter_query_for_dates(query, field_name, begin_date, end_date)
     end
   end
 
-  @spec filter_query_for_year_and_month(Ecto.Queryable.t, integer, integer, atom) :: Ecto.Query.t
+  @spec filter_query_for_year_and_month(Ecto.Queryable.t, pos_integer, pos_integer, atom) :: Ecto.Query.t
   def filter_query_for_year_and_month(query, year, month, field_name \\ :inserted_at) do
     with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month) do
       filter_query_for_dates(query, field_name, begin_date, end_date)
@@ -127,7 +127,7 @@ defmodule Kamansky.Helpers do
     ]
   end
 
-  @spec filter_query_for_dates(Ecto.Queryable.T, atom, DateTime.t, DateTime.t) :: Ecto.Query.t
+  @spec filter_query_for_dates(Ecto.Queryable.t, atom, DateTime.t, DateTime.t) :: Ecto.Queryable.t
   defp filter_query_for_dates(query, field_name, begin_date, end_date) do
     where(
       query,

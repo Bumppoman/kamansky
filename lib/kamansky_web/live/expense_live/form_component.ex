@@ -5,7 +5,8 @@ defmodule KamanskyWeb.ExpenseLive.FormComponent do
   alias Kamansky.Operations.Expenses.Expense
 
   @impl true
-  @spec update(%{required(:expense) => Expense.t}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
+  @spec update(%{required(:expense) => Expense.t, optional(atom) => any}, Phoenix.LiveView.Socket.t)
+    :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{expense: expense} = assigns, socket) do
     {
       :ok,
