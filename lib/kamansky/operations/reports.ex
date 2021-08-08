@@ -4,6 +4,7 @@ defmodule Kamansky.Operations.Reports do
 
   alias Kamansky.Operations.Expenses.Expense
   alias Kamansky.Repo
+  alias Kamansky.Sales.Orders.Order
   alias Kamansky.Stamps.Stamp
 
   @spec get_expense_data(pos_integer, pos_integer) :: map
@@ -94,24 +95,41 @@ defmodule Kamansky.Operations.Reports do
 
   @spec list_report_months :: %{required(integer) => [{integer, map}]}
   def list_report_months do
-    Expense
-    |> select([e], fragment("DISTINCT(DATE_PART('year', ?), DATE_PART('month', ?))", e.date, e.date))
+    Order
+    |> select([o], fragment("DISTINCT(DATE_PART('year', ?), DATE_PART('month', ?))", o.ordered_at, o.ordered_at))
     |> Repo.all()
     |> Enum.group_by(
       fn {year, _month} -> trunc(year) end,
       fn {year, month} ->
-        {
-          trunc(month),
-          from(o in "orders")
-          |> filter_query_for_year_and_month(year, month, :ordered_at)
-          |> select(
-            [o],
-            %{
-              gross_sales: sum(o.item_price + o.shipping_price)
-            }
-          )
-          |> Repo.one()
-        }
+        with year <- trunc(year),
+          month <- trunc(month),
+          order_data <-
+            from(o in "orders")
+            |> filter_query_for_year_and_month(year, month, :ordered_at)
+            |> select(
+              [o],
+              %{
+                gross_sales: sum(o.item_price + o.shipping_price)
+              }
+            )
+            |> Repo.one(),
+          month_begin <- Date.new!(year, month, 1),
+          expense_data <-
+            from(e in "expenses")
+            |> where([e], fragment("? BETWEEN ? AND ?", e.date, ^month_begin, ^Date.end_of_month(month_begin)))
+            |> select(
+              [e],
+              %{
+                total_expenses: sum(e.amount)
+              }
+            )
+            |> Repo.one()
+        do
+          {
+            month,
+            Map.merge(order_data, expense_data)
+          }
+        end
       end
     )
   end
