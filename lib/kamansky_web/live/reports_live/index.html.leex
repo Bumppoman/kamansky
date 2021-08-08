@@ -13,10 +13,14 @@
         <tr>
           <th colspan="4"><%= year %></th>
         </tr>
-        <%= for month <- months do %>
+        <%= for {month, data} <- months do %>
           <tr>
-            <td><%= Calendar.strftime(Date.new!(year, month, 1), "%B %Y") %></td>
-            <td>Gross Profit</td>
+            <td>
+              <%= live_redirect Calendar.strftime(Date.new!(year, month, 1), "%B %Y"),
+                to: Routes.reports_show_path(@socket, :index, year: year, month: month)
+              %>
+            </td>
+            <td><%= data.gross_sales %></td>
             <td>Expenses</td>
             <td>Net Profit/Loss</td>
           </tr>

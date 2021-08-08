@@ -92,12 +92,28 @@ defmodule Kamansky.Operations.Reports do
     end
   end
 
-  @spec list_report_months :: %{required(integer) => [integer]}
+  @spec list_report_months :: %{required(integer) => [{integer, map}]}
   def list_report_months do
     Expense
     |> select([e], fragment("DISTINCT(DATE_PART('year', ?), DATE_PART('month', ?))", e.date, e.date))
     |> Repo.all()
-    |> Enum.group_by(fn {year, _month} -> trunc(year) end, fn {_year, month} -> trunc(month) end)
+    |> Enum.group_by(
+      fn {year, _month} -> trunc(year) end,
+      fn {year, month} ->
+        {
+          trunc(month),
+          from(o in "orders")
+          |> filter_query_for_year_and_month(year, month, :ordered_at)
+          |> select(
+            [o],
+            %{
+              gross_sales: sum(o.item_price + o.shipping_price)
+            }
+          )
+          |> Repo.one()
+        }
+      end
+    )
   end
 
   @spec total_expenses_for_year_and_month(pos_integer, pos_integer) :: Decimal.t
