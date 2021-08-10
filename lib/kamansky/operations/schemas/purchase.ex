@@ -1,6 +1,8 @@
 defmodule Kamansky.Operations.Purchases.Purchase do
   use Ecto.Schema
 
+  import Ecto.Changeset
+
   alias __MODULE__
 
   @type t :: Ecto.Schema.t | %Purchase{
@@ -17,5 +19,17 @@ defmodule Kamansky.Operations.Purchases.Purchase do
     field :quantity, :integer
     field :cost, :decimal
     field :purchase_fees, :decimal
+  end
+
+  @spec changeset(t, map) :: Ecto.Changeset.t
+  def changeset(%Purchase{} = purchase, attrs) do
+    purchase
+    |> cast(attrs, [:cost, :date, :description, :purchase_fees, :quantity])
+  end
+
+  @spec display_column_for_sorting(integer) :: atom
+  def display_column_for_sorting(column) do
+    [:date]
+    |> Enum.at(column)
   end
 end

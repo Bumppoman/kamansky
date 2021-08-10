@@ -140,7 +140,7 @@ defmodule Kamansky.Stamps do
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
   def search_query(query, search) do
     where(query, [s],
-      ilike(s.scott_number, ^"%#{search}%")
+      ilike(s.scott_number, ^"#{search}%")
     )
   end
 
@@ -209,7 +209,7 @@ defmodule Kamansky.Stamps do
   end
 
   def sort(query, %{column: 2, direction: direction}) do
-    order_by(query, ^{direction, dynamic([s], s.cost + s.purchase_fees)})
+    order_by(query, [s], {^direction, s.cost + s.purchase_fees})
   end
 
   @spec update_stamp(

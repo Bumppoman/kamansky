@@ -1,4 +1,4 @@
-defmodule KamanskyWeb.ReportsLive.Index do
+defmodule KamanskyWeb.ReportLive.Index do
   use KamanskyWeb, :live_view
 
   import Kamansky.Helpers, only: [format_decimal_as_currency: 1]

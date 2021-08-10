@@ -51,8 +51,14 @@
               %>
             </li>
             <li>
+              <%= live_redirect "Purchases",
+                to: Routes.purchase_index_path(@socket, :index),
+                class: "dropdown-item"
+              %>
+            </li>
+            <li>
               <%= live_redirect "Reports",
-                to: Routes.reports_index_path(@socket, :index),
+                to: Routes.report_index_path(@socket, :index),
                 class: "dropdown-item"
               %>
             </li>

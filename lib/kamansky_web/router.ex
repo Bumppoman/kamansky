@@ -46,8 +46,11 @@ defmodule KamanskyWeb.Router do
     live "/orders/:id/mark-processed", OrderLive.Index, :mark_processed
     live "/orders/:id/mark-shipped", OrderLive.Index, :mark_shipped
 
-    live "/reports", ReportsLive.Index, :index
-    live "/reports/overall", ReportsLive.Show, :index
+    live "/purchases", PurchaseLive.Index, :index
+    live "/purchases/new", PurchaseLive.Index, :new
+
+    live "/reports", ReportLive.Index, :index
+    live "/reports/overall", ReportLive.Show, :index
 
     live "/stamp_references", StampReferenceLive.Index, :index
     live "/stamp_references/new", StampReferenceLive.Index, :new

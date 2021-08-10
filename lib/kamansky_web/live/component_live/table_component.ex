@@ -9,12 +9,12 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
 
   @spec end_value(integer, integer, integer) :: integer
   def end_value(current_page, per_page, total_items) do
-    start_value = start_value(current_page, per_page)
-
-    if total_items < (per_page + start_value) do
-      total_items
-    else
-      (start_value + per_page) - 1
+    with start_value <- start_value(current_page, per_page) do
+      if total_items < (per_page + start_value) do
+        total_items
+      else
+        (start_value + per_page) - 1
+      end
     end
   end
 

@@ -1,7 +1,7 @@
 <section class="section-wrapper">
   <%= if live_flash(@flash, :info) do %>
   <div
-    id="expenses-success-message"
+    id="purchases-success-message"
     class="disappearing-success-message"
     phx-hook="disappearingSuccessMessage"
   >
@@ -9,25 +9,25 @@
   </div>
   <% end %>
   <div class="text-end mb-2">
-    <%= live_patch "Add New Expense",
-      to: Routes.expense_index_path(@socket, :new),
+    <%= live_patch "Add New Purchase",
+      to: Routes.purchase_index_path(@socket, :new),
       class: "btn btn-primary"
     %>
   </div>
   <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "expenses-kamansky-data-table",
+    id: "purchases-kamansky-data-table",
     headers:
       [
         "Date",
         "Description",
-        "Category",
-        "Amount",
+        "Quantity",
+        "Total Cost",
         %{text: "Actions", sort: :disabled},
       ],
     data_count: @data_count,
     data_locator: @data_locator,
     data_source: @data_source,
-    empty_message: "There are no expenses to display.",
+    empty_message: "There are no purchases to display.",
     options: [
       go_to_record: Map.get(assigns, :go_to_record),
       sort: 0
@@ -35,8 +35,8 @@
   do %>
   <td><%= formatted_date(@item.date) %></td>
   <td><%= @item.description %></td>
-  <td><%= Expense.formatted_category(@item) %></td>
-  <td><%= format_decimal_as_currency(@item.amount) %></td>
+  <td><%= @item.quantity %></td>
+  <td><%= format_decimal_as_currency(@item.total_cost) %></td>
   <td>
     <%= live_patch to: "#", class: "action-icon" do %>
       <i class="material-icons">edit</i>
@@ -45,12 +45,12 @@
   <% end %>
 </section>
 <%= if @live_action in [:new, :edit] do %>
-  <%= live_modal KamanskyWeb.ExpenseLive.FormComponent,
+  <%= live_modal KamanskyWeb.PurchaseLive.FormComponent,
     action: @live_action,
-    form_id: "expense-form",
-    id: "expense-form-modal",
-    expense: @expense,
-    title: (if @live_action == :new, do: "Add New Expense", else: "Edit Expense"),
-    return_to: Routes.expense_index_path(@socket, :index)
+    form_id: "purchase-form",
+    id: "purchase-form-modal",
+    purchase: @purchase,
+    title: (if @live_action == :new, do: "Add New Purchase", else: "Edit Purchase"),
+    return_to: Routes.purchase_index_path(@socket, :index)
   %>
 <% end %>
