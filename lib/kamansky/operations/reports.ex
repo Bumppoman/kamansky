@@ -110,7 +110,9 @@ defmodule Kamansky.Operations.Reports do
                 |> select(
                   [o],
                   %{
-                    gross_sales: sum(o.item_price + o.shipping_price)
+                    gross_sales: sum(o.item_price + o.shipping_price),
+                    selling_fees: sum(o.selling_fees),
+                    shipping_cost: sum(o.shipping_cost)
                   }
                 )
                 |> Repo.one(),
@@ -120,13 +122,28 @@ defmodule Kamansky.Operations.Reports do
                 |> select(
                   [e],
                   %{
-                    total_expenses: sum(e.amount)
+                    total_non_stamp_expenses: sum(e.amount)
                   }
                 )
                 |> Repo.one(),
+              stamp_cost <-
+                  Stamp
+                  |> filter_query_for_year_and_month(year, month)
+                  |> where([s], s.status != ^:collection)
+                  |> select([s], sum(s.cost + s.purchase_fees))
+                  |> Repo.one(),
+              total_expenses <-
+                Decimal.add(
+                  stamp_cost || 0,
+                  Decimal.add(
+                    expense_data.total_non_stamp_expenses || 0,
+                      Decimal.add(order_data.selling_fees || 0, order_data.shipping_cost || 0)
+                  )
+                ),
               calculated_data <-
                 %{
-                  net_profit: Decimal.sub(order_data.gross_sales || 0, expense_data.total_expenses || 0)
+                  net_profit: Decimal.sub(order_data.gross_sales || 0, total_expenses),
+                  total_expenses: total_expenses
                 }
             do
               {
@@ -144,13 +161,13 @@ defmodule Kamansky.Operations.Reports do
           totals <-
             Enum.reduce(
               months,
-              {:total, %{gross_sales: 0, net_profit: 0, total_expenses: 0}},
+              {:totals, %{gross_sales: 0, net_profit: 0, total_expenses: 0}},
               fn
                 {_month, %{gross_sales: gross_sales, net_profit: net_profit, total_expenses: total_expenses}},
-                {:total, data}
+                {:totals, data}
               ->
                 {
-                  :total,
+                  :totals,
                   %{
                     gross_sales: Decimal.add(data.gross_sales, gross_sales || 0),
                     net_profit: Decimal.add(data.net_profit, net_profit || 0),

@@ -1,4 +1,4 @@
-defmodule KamanskyWeb.ReportsLive.Show do
+defmodule KamanskyWeb.ReportLive.Show do
   use KamanskyWeb, :live_view
 
   import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
@@ -8,13 +8,7 @@ defmodule KamanskyWeb.ReportsLive.Show do
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, session, socket) do
-    with(
-      socket <-
-        socket
-        |> assign_defaults(session)
-    ) do
-      {:ok, socket}
-    end
+    {:ok, assign_defaults(socket, session)}
   end
 
   @impl true
