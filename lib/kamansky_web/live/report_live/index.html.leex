@@ -23,7 +23,7 @@
               </td>
               <td><%= format_decimal_as_currency(data.gross_sales) %></td>
               <td><%= format_decimal_as_currency(data.total_expenses) %></td>
-              <td><%= format_decimal_as_currency(Decimal.sub(data.gross_sales, data.total_expenses)) %></td>
+              <td><%= format_decimal_as_currency(data.net_profit) %></td>
             </tr>
           <% end %>
         <% end %>

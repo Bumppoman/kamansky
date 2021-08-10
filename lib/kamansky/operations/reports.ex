@@ -124,7 +124,7 @@ defmodule Kamansky.Operations.Reports do
             |> Repo.one(),
           calculated_data <-
             %{
-              net_profit: Decimal.sub(order_data.gross_sales || 0, expense_data.gross_sales || 0)
+              net_profit: Decimal.sub(order_data.gross_sales || 0, expense_data.total_expenses || 0)
             }
         do
           {
