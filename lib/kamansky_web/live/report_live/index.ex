@@ -21,7 +21,7 @@ defmodule KamanskyWeb.ReportLive.Index do
   def handle_params(_params, _uri, socket) do
     with socket <- assign(socket, :report_months, Reports.list_report_months()),
       reports <- Map.get(socket.assigns.report_months, socket.assigns.year),
-      {totals, reports} <- List.pop_at(reports, 0)
+      {{:totals, totals}, reports} <- List.pop_at(reports, 0)
     do
       {
         :noreply,
