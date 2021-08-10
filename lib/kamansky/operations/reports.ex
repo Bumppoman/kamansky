@@ -16,10 +16,9 @@ defmodule Kamansky.Operations.Reports do
         |> where([s], s.status != ^:collection)
         |> select([s], sum(s.cost + s.purchase_fees))
         |> Repo.one(),
-      month_begin <- Date.new!(year, month, 1),
       base_data <-
         from(e in "expenses")
-        |> where([e], fragment("? BETWEEN ? AND ?", e.date, ^month_begin, ^Date.end_of_month(month_begin)))
+        |> filter_query_for_year_and_month_as_date(year, month)
         |> select(
           [e],
           %{
@@ -113,21 +112,26 @@ defmodule Kamansky.Operations.Reports do
               }
             )
             |> Repo.one(),
-          month_begin <- Date.new!(year, month, 1),
           expense_data <-
             from(e in "expenses")
-            |> where([e], fragment("? BETWEEN ? AND ?", e.date, ^month_begin, ^Date.end_of_month(month_begin)))
+            |> filter_query_for_year_and_month_as_date(year, month)
             |> select(
               [e],
               %{
                 total_expenses: sum(e.amount)
               }
             )
-            |> Repo.one()
+            |> Repo.one(),
+          calculated_data <-
+            %{
+              net_profit: Decimal.sub(order_data.gross_sales || 0, expense_data.gross_sales || 0)
+            }
         do
           {
             month,
-            Map.merge(order_data, expense_data)
+            order_data
+            |> Map.merge(expense_data)
+            |> Map.merge(calculated_data)
           }
         end
       end
@@ -136,11 +140,9 @@ defmodule Kamansky.Operations.Reports do
 
   @spec total_expenses_for_year_and_month(pos_integer, pos_integer) :: Decimal.t
   def total_expenses_for_year_and_month(year, month) do
-    with month_begin <- Date.new!(year, month, 1) do
-      Expense
-      |> where([e], fragment("? BETWEEN ? AND ?", e.date, ^month_begin, ^Date.end_of_month(month_begin)))
-      |> Repo.aggregate(:sum, :amount)
-    end
+    Expense
+    |> filter_query_for_year_and_month_as_date(year, month)
+    |> Repo.aggregate(:sum, :amount)
   end
 
   @spec calculate_percentage(Decimal.t, Decimal.t) :: integer
