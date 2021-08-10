@@ -10,24 +10,30 @@
         </tr>
       </thead>
       <tbody>
-        <%= for {year, months} <- @report_months do %>
+        <tr>
+          <th colspan="4"><%= @year %></th>
+        </tr>
+        <%= for {month, data} <- @reports, month != :totals do %>
           <tr>
-            <th colspan="4"><%= year %></th>
+            <td>
+              <%= live_redirect Calendar.strftime(Date.new!(@year, month, 1), "%B %Y"),
+                to: Routes.report_show_path(@socket, :index, year: @year, month: month)
+              %>
+            </td>
+            <td><%= format_decimal_as_currency(data.gross_sales) %></td>
+            <td><%= format_decimal_as_currency(data.total_expenses) %></td>
+            <td><%= format_decimal_as_currency(data.net_profit) %></td>
           </tr>
-          <%= for {month, data} <- months do %>
-            <tr>
-              <td>
-                <%= live_redirect Calendar.strftime(Date.new!(year, month, 1), "%B %Y"),
-                  to: Routes.report_show_path(@socket, :index, year: year, month: month)
-                %>
-              </td>
-              <td><%= format_decimal_as_currency(data.gross_sales) %></td>
-              <td><%= format_decimal_as_currency(data.total_expenses) %></td>
-              <td><%= format_decimal_as_currency(data.net_profit) %></td>
-            </tr>
-          <% end %>
         <% end %>
       </tbody>
+      <tfoot>
+        <tr>
+          <td>Totals for year</td>
+          <td><%= format_decimal_as_currency(@totals.gross_sales) %></td>
+          <td><%= format_decimal_as_currency(@totals.total_expenses) %></td>
+          <td><%= format_decimal_as_currency(@totals.net_profit) %></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

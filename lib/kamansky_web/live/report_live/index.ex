@@ -10,16 +10,25 @@ defmodule KamanskyWeb.ReportLive.Index do
   def mount(_params, session, socket) do
     {
       :ok,
-      assign_defaults(socket, session)
+      socket
+      |> assign_defaults(session)
+      |> assign(:year, DateTime.utc_now().year)
     }
   end
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(_params, _uri, socket) do
-    {
-      :noreply,
-      assign(socket, :report_months, Reports.list_report_months())
-    }
+    with socket <- assign(socket, :report_months, Reports.list_report_months()),
+      reports <- Map.get(socket.assigns.report_months, socket.assigns.year),
+      {totals, reports} <- List.pop_at(reports, 0)
+    do
+      {
+        :noreply,
+        socket
+        |> assign(:reports, reports)
+        |> assign(:totals, totals)
+      }
+    end
   end
 end
