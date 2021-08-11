@@ -18,6 +18,8 @@ defmodule KamanskyWeb.Router do
   scope "/", KamanskyWeb do
     pipe_through :browser
 
+    live "/", DashboardLive.Index, :index
+
     live "/customers", CustomerLive.Index, :index
     live "/customers/:id/edit", CustomerLive.Index, :edit
 

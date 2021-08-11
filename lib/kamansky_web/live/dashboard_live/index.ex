@@ -3,7 +3,8 @@ defmodule KamanskyWeb.DashboardLive.Index do
 
   import Kamansky.Helpers
 
-  alias Kamansky.Sales.{Listings, Orders}
+  alias Kamansky.Operations.Dashboard
+  alias Kamansky.Sales.Orders
   alias Kamansky.Stamps
 
   @impl true
@@ -19,15 +20,12 @@ defmodule KamanskyWeb.DashboardLive.Index do
         socket
         |> assign(
           [
-            collection_cost: Stamps.cost_of_stamps(:collection),
             cost_of_stamps_last_month_for_collection: Stamps.cost_of_stamps(:collection, previous_month),
             cost_of_stamps_last_month_for_listings: Stamps.cost_of_stamps([:listed, :sold], previous_month),
             cost_of_stamps_last_month_for_stock: Stamps.cost_of_stamps(:stock, previous_month),
             cost_of_stamps_this_month_for_collection: Stamps.cost_of_stamps(:collection, this_month),
             cost_of_stamps_this_month_for_listings: Stamps.cost_of_stamps([:listed, :sold], this_month),
             cost_of_stamps_this_month_for_stock: Stamps.cost_of_stamps(:stock, this_month),
-            listed_cost: Stamps.cost_of_stamps(:listed),
-            listing_price: Listings.total_listings_price(:active),
             net_profit_last_month: Orders.total_net_profit(month: previous_month),
             net_profit_this_month: Orders.total_net_profit(month: this_month),
             orders_last_month: Orders.count_orders(month: previous_month),
@@ -41,7 +39,6 @@ defmodule KamanskyWeb.DashboardLive.Index do
             stamps_this_month_for_collection: Stamps.count_stamps_purchased(:collection, this_month),
             stamps_this_month_for_listings: Stamps.count_stamps_purchased([:listed, :sold], this_month),
             stamps_this_month_for_stock: Stamps.count_stamps_purchased(:stock, this_month),
-            stock_cost: Stamps.cost_of_stamps(:stock),
             total_gross_profit: Orders.total_gross_profit(:all),
             total_net_profit: Orders.total_net_profit(:all),
             total_orders: Orders.count_orders(:all),
@@ -49,6 +46,7 @@ defmodule KamanskyWeb.DashboardLive.Index do
             total_stamps_in_all_orders: Orders.total_stamps_in_orders(:all)
           ]
         )
+        |> assign(:data, Dashboard.load_dashboard_data(socket.assigns.timezone))
     do
       {:ok, socket}
     end

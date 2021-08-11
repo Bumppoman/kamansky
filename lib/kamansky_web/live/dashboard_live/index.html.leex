@@ -4,7 +4,7 @@
       <div class="card-body">
         <h4 class="card-title">Collection</h4>
         <p class="card-text">
-          <span>Total cost: <%= format_decimal_as_currency(@collection_cost) %></span>
+          <span>Total cost: <%= format_decimal_as_currency(@data.collection_cost) %></span>
         </p>
       </div>
     </div>
@@ -14,7 +14,7 @@
       <div class="card-body">
         <h4 class="card-title">Stock</h4>
         <p class="card-text">
-          <span>Total cost: <%= format_decimal_as_currency(@stock_cost) %></span>
+          <span>Total cost: <%= format_decimal_as_currency(@data.stock_cost) %></span>
         </p>
       </div>
     </div>
@@ -25,8 +25,8 @@
         <h4 class="card-title">Listings</h4>
         <p class="card-text">
           <ul class="list-unstyled">
-            <li>Total cost: <%= format_decimal_as_currency(@listed_cost) %></li>
-            <li>Total listing price: <%= format_decimal_as_currency(@listing_price) %></li>
+            <li>Total cost: <%= format_decimal_as_currency(@data.listed_cost) %></li>
+            <li>Total listing price: <%= format_decimal_as_currency(@data.listing_price) %></li>
           </ul>
         </p>
       </div>

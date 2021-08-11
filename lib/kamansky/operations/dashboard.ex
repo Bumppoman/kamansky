@@ -3,6 +3,7 @@ defmodule Kamansky.Operations.Dashboard do
   import Kamansky.Helpers
 
   alias Kamansky.Repo
+  alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Stamps.Stamp
 
   def load_dashboard_data(timezone) do
@@ -20,28 +21,42 @@ defmodule Kamansky.Operations.Dashboard do
           [s],
           %{
             collection_cost: fragment(
-              "CASE WHEN ? = ? THEN ? END",
+              "SUM(CASE WHEN ? = ? THEN ? END)",
               s.status,
               ^get_value_for_ecto_enum(Stamp, :status, :collection),
-              sum(s.cost + s.purchase_fees)
+              s.cost + s.purchase_fees
             ),
             listed_cost: fragment(
-              "CASE WHEN ? = ? THEN ? END",
+              "SUM(CASE WHEN ? = ? THEN ? END)",
               s.status,
               ^get_value_for_ecto_enum(Stamp, :status, :listed),
-              sum(s.cost + s.purchase_fees)
+              s.cost + s.purchase_fees
             ),
             stock_cost: fragment(
-              "CASE WHEN ? = ? THEN ? END",
+              "SUM(CASE WHEN ? = ? THEN ? END)",
               s.status,
               ^get_value_for_ecto_enum(Stamp, :status, :stock),
-              sum(s.cost + s.purchase_fees)
+              s.cost + s.purchase_fees
             ),
+          }
+        )
+        |> Repo.one(),
+      listing_totals <-
+        from(l in "listings")
+        |> select(
+          [l],
+          %{
+            total_listing_price: fragment(
+              "SUM(CASE WHEN ? = ? THEN ? END)",
+              l.status,
+              ^get_value_for_ecto_enum(Listing, :status, :active),
+              l.listing_price
+            )
           }
         )
         |> Repo.one()
     do
-      stamp_totals
+      Map.merge(stamp_totals, listing_totals)
     end
   end
 end
