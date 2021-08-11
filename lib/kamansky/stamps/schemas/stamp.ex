@@ -210,12 +210,11 @@ defmodule Kamansky.Stamps.Stamp do
         "None"
       else
         flaws
-        |> Enum.map(fn flaw ->
+        |> Enum.map_join("; ", fn flaw ->
           flaw
           |> Atom.to_string()
           |> String.replace("_", " ")
         end)
-        |> Enum.join("; ")
         |> String.capitalize()
       end
     end
@@ -250,7 +249,7 @@ defmodule Kamansky.Stamps.Stamp do
   @spec letter_grade(%Stamp{grade: nil | integer}) :: String.t
   def letter_grade(%Stamp{grade: grade}) do
     @grade_classes
-    |> Enum.find(fn %{start: start, finish: finish} -> grade >= start && grade <= finish end)
+    |> Enum.find(&(grade in &1.start..&1.finish))
     |> Map.get(:name)
   end
 

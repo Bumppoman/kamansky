@@ -9,9 +9,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
 
   @spec all_paid :: %{required(String.t) => any}
   def all_paid do
-    with {:ok, response} <-
-      Hipstamp.get("/stores/#{hipstamp_username()}/sales/paid")
-    do
+    with {:ok, response} <- Hipstamp.get("/stores/#{hipstamp_username()}/sales/paid") do
       response.body["results"]
     end
   end

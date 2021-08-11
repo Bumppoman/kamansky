@@ -29,7 +29,7 @@ defmodule KamanskyWeb.ListingLive.Active do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
+  @spec apply_action(Phoenix.LiveView.Socket.t, :add_to_order | :index, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :index, params) do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))

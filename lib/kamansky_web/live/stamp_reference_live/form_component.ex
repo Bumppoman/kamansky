@@ -8,24 +8,27 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
   @spec update(%{required(:stamp_reference) => StampReference.t}, Phoenix.LiveView.Socket.t)
     :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{stamp_reference: stamp_reference} = assigns, socket) do
-    changeset = StampReferences.change_stamp_reference(stamp_reference)
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+    with changeset <- StampReferences.change_stamp_reference(stamp_reference) do
+      {
+        :ok,
+        socket
+        |> assign(assigns)
+        |> assign(:changeset, changeset)
+      }
+    end
   end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t)
     :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"stamp_reference" => stamp_reference_params}, socket) do
-    changeset =
+    with changeset <-
       socket.assigns.stamp_reference
       |> StampReferences.change_stamp_reference(stamp_reference_params)
       |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, :changeset, changeset)}
+    do
+      {:noreply, assign(socket, :changeset, changeset)}
+    end
   end
 
   def handle_event("submit", %{"stamp_reference" => stamp_reference_params}, socket) do
@@ -36,10 +39,12 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
   defp save_stamp_reference(socket, :edit, stamp_reference_params) do
     case StampReferences.update_stamp_reference(socket.assigns.stamp_reference, stamp_reference_params) do
       {:ok, _stamp_reference} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "You have successfully updated this stamp reference.")
-         |> push_redirect(to: socket.assigns.return_to)}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "You have successfully updated this stamp reference.")
+          |> push_redirect(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}

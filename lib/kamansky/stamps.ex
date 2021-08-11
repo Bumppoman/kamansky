@@ -138,11 +138,7 @@ defmodule Kamansky.Stamps do
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search) do
-    where(query, [s],
-      ilike(s.scott_number, ^"#{search}%")
-    )
-  end
+  def search_query(query, search), do: where(query, [s], ilike(s.scott_number, ^"#{search}%"))
 
   @spec sell_stamp(Stamp.t, map) :: {:ok, %Stamp{status: :listed}, integer} | {:error, Ecto.Changeset.t}
   def sell_stamp(%Stamp{} = stamp, attrs) do
@@ -177,7 +173,7 @@ defmodule Kamansky.Stamps do
       numeric_length <-
         if(!StampReference.standard?(stamp.stamp_reference), do: numeric_length + 1, else: numeric_length),
       formatted_scott_number <-
-        String.pad_leading(search_number, String.length(search_number) + (4-numeric_length), "0"),
+        String.pad_leading(search_number, String.length(search_number) + (4 - numeric_length), "0"),
       suffix_code <-
         case format do
           :single -> ""
@@ -243,15 +239,8 @@ defmodule Kamansky.Stamps do
   @spec handle_photos(Ecto.Changeset.t, Kamansky.Attachments.Attachment.t | nil, Kamansky.Attachments.Attachment.t)
     :: Ecto.Changeset.t
   defp handle_photos(changeset, nil, nil), do: changeset
-
-  defp handle_photos(changeset, front_photo, nil) do
-    Ecto.Changeset.put_change(changeset, :front_photo_id, front_photo.id)
-  end
-
-  defp handle_photos(changeset, nil, rear_photo) do
-    Ecto.Changeset.put_change(changeset, :rear_photo_id, rear_photo.id)
-  end
-
+  defp handle_photos(changeset, front_photo, nil), do: Ecto.Changeset.put_change(changeset, :front_photo_id, front_photo.id)
+  defp handle_photos(changeset, nil, rear_photo), do: Ecto.Changeset.put_change(changeset, :rear_photo_id, rear_photo.id)
   defp handle_photos(changeset, front_photo, rear_photo) do
     Ecto.Changeset.change(changeset, [front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
   end

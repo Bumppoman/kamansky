@@ -4,6 +4,15 @@ defmodule Kamansky.Attachments do
   alias Kamansky.Attachments.Attachment
   alias Kamansky.Repo
 
+  @spec create_attachment(
+    %{required(:path) => String.t, optional(any) => any},
+    %{
+      required(:client_size) => pos_integer,
+      required(:client_name) => String.t,
+      required(:client_type) => String.t,
+      optional(any) => any
+    }
+  ) :: {:ok, Attachment.t} | {:error, any}
   def create_attachment(%{path: tmp_path}, %{client_size: size, client_name: filename, client_type: content_type}) do
     Repo.transaction fn ->
       with hash <- hash_attachment(tmp_path),
@@ -43,8 +52,8 @@ defmodule Kamansky.Attachments do
   end
 
   defp save_attachment_file(tmp_path, hash, file_type) do
-    tmp_path
-    |> File.cp(
+    File.cp(
+      tmp_path,
       Path.join(
         [
           Application.get_env(:kamansky, :uploads_directory),

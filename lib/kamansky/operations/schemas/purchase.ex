@@ -8,7 +8,7 @@ defmodule Kamansky.Operations.Purchases.Purchase do
   @type t :: Ecto.Schema.t | %Purchase{
     date: DateTime.t,
     description: String.t,
-    quantity: integer,
+    quantity: pos_integer,
     cost: Decimal.t,
     purchase_fees: Decimal.t
   }
@@ -27,7 +27,7 @@ defmodule Kamansky.Operations.Purchases.Purchase do
     |> cast(attrs, [:cost, :date, :description, :purchase_fees, :quantity])
   end
 
-  @spec display_column_for_sorting(integer) :: atom
+  @spec display_column_for_sorting(pos_integer) :: atom
   def display_column_for_sorting(column) do
     [:date]
     |> Enum.at(column)

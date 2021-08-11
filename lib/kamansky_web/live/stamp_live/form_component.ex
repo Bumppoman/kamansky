@@ -52,7 +52,7 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     save_stamp(socket, socket.assigns.action, stamp_params)
   end
 
-  @spec manage_photo(Phoenix.LiveView.Socket.t, atom) :: {:ok, nil | Kamansky.Attachments.Attachment.t}
+  @spec manage_photo(Phoenix.LiveView.Socket.t, atom) :: {:ok, Kamansky.Attachments.Attachment.t | nil}
   defp manage_photo(socket, photo_name) do
     socket
     |> consume_uploaded_entries(photo_name, &Attachments.create_attachment/2)

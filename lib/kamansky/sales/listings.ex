@@ -50,7 +50,7 @@ defmodule Kamansky.Sales.Listings do
     Listing
     |> where(status: ^status)
     |> join(:left, [l], s in assoc(l, :stamp))
-    |> select([l, s], {l.id, row_number() |> over(order_by: [{:asc, s.scott_number}, {:asc, l.id}])})
+    |> select([l, s], {l.id, over(row_number(), order_by: [{:asc, s.scott_number}, {:asc, l.id}])})
     |> Repo.all
     |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
     |> elem(1)
@@ -110,11 +110,7 @@ defmodule Kamansky.Sales.Listings do
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search) do
-    where(query, [l, s],
-      ilike(s.scott_number, ^"%#{search}%")
-    )
-  end
+  def search_query(query, search), do: where(query, [l, s], ilike(s.scott_number, ^"%#{search}%"))
 
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
@@ -153,13 +149,8 @@ defmodule Kamansky.Sales.Listings do
     )
   end
 
-  def sort(query, %{action: :sold, column: 2, direction: direction}) do
-    order_by(query, {^direction, :sale_price})
-  end
-
-  def sort(query, %{action: :active, column: 3, direction: direction}) do
-    order_by(query, {^direction, :listing_price})
-  end
+  def sort(query, %{action: :sold, column: 2, direction: direction}), do: order_by(query, {^direction, :sale_price})
+  def sort(query, %{action: :active, column: 3, direction: direction}), do: order_by(query, {^direction, :listing_price})
 
   def sort(query, %{action: :sold, column: 3, direction: direction}) do
     order_by(
@@ -175,9 +166,7 @@ defmodule Kamansky.Sales.Listings do
     )
   end
 
-  def sort(query, %{action: :active, column: 4, direction: direction}) do
-    order_by(query, {^direction, :inserted_at})
-  end
+  def sort(query, %{action: :active, column: 4, direction: direction}), do: order_by(query, {^direction, :inserted_at})
 
   def sort(query, %{action: :sold, column: 4, direction: direction}) do
     order_by(

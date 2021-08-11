@@ -33,9 +33,7 @@ defmodule Kamansky.Stamps.StampReferences do
   def get_stamp_reference!(id), do: Repo.get!(StampReference, id)
 
   @spec list_stamp_references(Kamansky.Paginate.params) :: [StampReference.t]
-  def list_stamp_references(params) do
-    Paginate.list(StampReferences, from(StampReference), params)
-  end
+  def list_stamp_references(params), do: Paginate.list(StampReferences, StampReference, params)
 
   @doc false
   @impl true

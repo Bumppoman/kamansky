@@ -101,13 +101,17 @@ defmodule Kamansky.Helpers do
 
   @doc "Return a formatted date"
   @spec formatted_date(any) :: String.t | nil
-  def formatted_date(%DateTime{} = date) do
+  def formatted_date(date) when is_struct(date, DateTime) or is_struct(date, Date), do: formatted_date(date, "%B %-d, %Y")
+  def formatted_date(_), do: nil
+
+  @spec formatted_date(any, String.t) :: String.t | nil
+  def formatted_date(%DateTime{} = date, format) do
     date
     |> DateTime.shift_zone!("America/New_York")
-    |> Calendar.strftime("%B %-d, %Y")
+    |> Calendar.strftime(format)
   end
-  def formatted_date(%Date{} = date), do: Calendar.strftime(date, "%B %-d, %Y")
-  def formatted_date(_), do: nil
+  def formatted_date(%Date{} = date, format), do: Calendar.strftime(date, format)
+  def formatted_date(_, _), do: nil
 
   @doc "Return a capitalized and humanized string"
   @spec humanize_and_capitalize(atom | String.t) :: String.t
@@ -115,8 +119,7 @@ defmodule Kamansky.Helpers do
     string
     |> Phoenix.Naming.humanize()
     |> String.split()
-    |> Enum.map(&String.capitalize/1)
-    |> Enum.join(" ")
+    |> Enum.map_join(" ", &String.capitalize/1)
   end
 
   @doc "Return a capitalized and humanized list of enum values"

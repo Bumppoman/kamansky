@@ -60,16 +60,16 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
       |> Decimal.to_float()
       |> case do
         0.005 ->
-          "#{if Decimal.eq?(stamp_reference.denomination, Decimal.from_float(0.005)), do: '', else: Decimal.round(Decimal.mult(stamp_reference.denomination, 100), 0, :floor)}\u00BD¢"
+          "#{if Decimal.eq?(stamp_reference.denomination, Decimal.from_float(0.005)), do: "", else: Decimal.round(Decimal.mult(stamp_reference.denomination, 100), 0, :floor)}\u00BD¢"
         0.0025 ->
           "#{Decimal.round(Decimal.mult(stamp_reference.denomination, 100), 0, :floor)}\u00BC¢"
         0.0 ->
           "#{Decimal.round(Decimal.mult(stamp_reference.denomination, 100), 0)}¢"
         _ ->
-          "#{Decimal.mult(stamp_reference.denomination, 100)}¢"
+          "#{Decimal.round(Decimal.mult(stamp_reference.denomination, 100), 1)}¢"
         end
     else
-      "$#{if !Decimal.eq?(Decimal.rem(stamp_reference.denomination, Decimal.new(1)), Decimal.from_float(0.0)), do: :io_lib.format("~.2f", [Decimal.to_float(stamp_reference.denomination)]), else: Decimal.round(stamp_reference.denomination, 0)}"
+      "$#{if !Decimal.eq?(Decimal.rem(stamp_reference.denomination, 1), Decimal.from_float(0.0)), do: :io_lib.format("~.2f", [Decimal.to_float(stamp_reference.denomination)]), else: Decimal.round(stamp_reference.denomination, 0)}"
     end
   end
 

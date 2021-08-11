@@ -25,11 +25,9 @@ defmodule Kamansky.Attachments.Attachment do
 
   @doc "Return an empty `Ecto.Changeset` for an attachment."
   @spec changeset(t, map) :: Ecto.Changeset.t
-  def changeset(attachment, attrs \\ %{}) do
-    cast(attachment, attrs, [:content_type, :filename, :hash, :size])
-  end
+  def changeset(attachment, attrs \\ %{}), do: cast(attachment, attrs, [:content_type, :filename, :hash, :size])
 
-  @spec full_path(Attachment.t) :: String.t
+  @spec full_path(t) :: String.t
   def full_path(%Attachment{} = attachment) do
     attachment
     |> path()
@@ -37,15 +35,12 @@ defmodule Kamansky.Attachments.Attachment do
   end
 
   @spec hash_path(String.t) :: String.t
-  def hash_path(hash) do
-    [String.slice(hash, 0, 2), String.slice(hash, 2, 2), String.slice(hash, 4, 2)]
-    |> Path.join()
-  end
+  def hash_path(hash), do: Path.join([String.slice(hash, 0, 2), String.slice(hash, 2, 2), String.slice(hash, 4, 2)])
 
   @spec path(nil) :: nil
   def path(nil), do: nil
 
-  @spec path(Attachment.t) :: String.t
+  @spec path(t) :: String.t
   def path(%Attachment{} = attachment) do
     attachment.hash
     |> String.slice(0, 24)

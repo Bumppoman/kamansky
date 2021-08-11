@@ -7,7 +7,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     per_page: 10
   }
 
-  @spec end_value(integer, integer, integer) :: integer
+  @spec end_value(pos_integer, pos_integer, pos_integer) :: pos_integer
   def end_value(current_page, per_page, total_items) do
     with start_value <- start_value(current_page, per_page) do
       if total_items < (per_page + start_value) do
@@ -68,13 +68,13 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
 
   @spec load_data_for_page(
     %{
-      current_page: integer,
-      data_source: (map -> [Ecto.Schema.t] | {integer, [Ecto.Schema.t]}),
-      per_page: integer,
+      current_page: pos_integer,
+      data_source: (map -> [Ecto.Schema.t] | {pos_integer, [Ecto.Schema.t]}),
+      per_page: pos_integer,
       search: String.t | nil,
       sort: Kamansky.Paginate.sort
     }
-  ) :: [Ecto.Schema.t] | {integer, [Ecto.Schema.t]}
+  ) :: [Ecto.Schema.t] | {pos_integer, [Ecto.Schema.t]}
   def load_data_for_page(parameters) do
     parameters[:data_source].(
       %{
@@ -101,7 +101,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     end
   end
 
-  @spec page_links(integer, integer, String.t) :: [String.t]
+  @spec page_links(pos_integer, pos_integer, String.t) :: [String.t]
   def page_links(current_page, total_pages, target) do
     cond do
       total_pages < 8 ->
@@ -134,19 +134,19 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     end
   end
 
-  @spec start_value(integer, integer) :: integer
+  @spec start_value(pos_integer, pos_integer) :: pos_integer
   def start_value(current_page, per_page), do: ((current_page * per_page) - per_page) + 1
 
-  @spec sort_direction(integer, %{column: integer, direction: :asc | :desc}) :: String.t
+  @spec sort_direction(pos_integer, %{column: pos_integer, direction: :asc | :desc}) :: String.t
   def sort_direction(column, %{column: column, direction: :asc}), do: "asc"
   def sort_direction(column, %{column: column, direction: :desc}), do: "desc"
   def sort_direction(_column, _sort), do: nil
 
-  @spec total_items(%{data_count: integer} | %{data: Enum.t}) :: integer
+  @spec total_items(%{data_count: pos_integer} | %{data: Enum.t}) :: pos_integer
   def total_items(%{data_count: data_count}), do: data_count
   def total_items(%{data: data}), do: Enum.count(data)
 
-  @spec total_pages(integer, integer) :: integer
+  @spec total_pages(pos_integer, pos_integer) :: pos_integer
   def total_pages(total_items, per_page) do
     total_items / per_page
     |> Float.ceil()
@@ -211,7 +211,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     end
   end
 
-  @spec build_sort(map | integer | nil) :: %{column: integer, direction: :asc | :desc}
+  @spec build_sort(map | pos_integer | nil) :: %{column: pos_integer, direction: :asc | :desc}
   defp build_sort(sort_parameters) when is_map(sort_parameters), do: sort_parameters
   defp build_sort(sort_column) when is_integer(sort_column), do: %{column: sort_column, direction: :asc}
   defp build_sort(nil), do: %{column: 0, direction: :asc}
@@ -229,7 +229,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   defp invert_sort_direction("desc"), do: :asc
   defp invert_sort_direction(_), do: :desc
 
-  @spec link_to_page(integer, integer, String.t) :: Phoenix.HTML.safe
+  @spec link_to_page(pos_integer, pos_integer, String.t) :: Phoenix.HTML.safe
   defp link_to_page(page, current_page, target) do
     ~E"""
       <li>
@@ -244,7 +244,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
     """
   end
 
-  @spec record_location(Phoenix.LiveView.Socket.t, integer | nil) :: integer
+  @spec record_location(Phoenix.LiveView.Socket.t, pos_integer | nil) :: pos_integer
   defp record_location(socket, nil), do: socket.assigns.current_page
   defp record_location(socket, record_id) do
     %{

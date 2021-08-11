@@ -18,11 +18,12 @@ defmodule KamanskyWeb.OrderLive.Index do
     with order <- socket.assigns.order do
       case Orders.mark_order_as_completed(order) do
         {:ok, _order} ->
-          {:noreply,
-          socket
-          |> put_flash(:info, "You have successfully marked this order as completed.")
-          |> push_redirect(to: Routes.order_index_path(socket, order.status))
-        }
+          {
+            :noreply,
+            socket
+            |> put_flash(:info, "You have successfully marked this order as completed.")
+            |> push_redirect(to: Routes.order_index_path(socket, order.status))
+          }
 
         {:error, %Ecto.Changeset{} = changeset} ->
           {:noreply, assign(socket, changeset: changeset)}
@@ -39,7 +40,7 @@ defmodule KamanskyWeb.OrderLive.Index do
             socket
             |> put_flash(:info, "You have successfully marked this order as processed.")
             |> push_redirect(to: Routes.order_index_path(socket, order.status))
-        }
+          }
 
         {:error, %Ecto.Changeset{} = changeset} ->
           {:noreply, assign(socket, changeset: changeset)}
@@ -65,9 +66,7 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
+  def handle_params(params, _uri, socket), do: {:noreply, apply_action(socket, socket.assigns.live_action, params)}
 
   @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :edit, %{"id" => id}) do

@@ -180,9 +180,7 @@ defmodule Kamansky.Sales.Orders do
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search) do
-    where(query, [o], ilike(fragment("CAST(? AS text)", field(o, :id)), ^"%#{search}%"))
-  end
+  def search_query(query, search), do: where(query, [o], ilike(fragment("CAST(? AS text)", o.id), ^"%#{search}%"))
 
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
@@ -269,7 +267,7 @@ defmodule Kamansky.Sales.Orders do
     |> with_stamps_query()
     |> preload([o, l, s], listings: {l, [stamp: s]})
     |> Repo.all()
-    |> Enum.reduce(Decimal.new(0), &(Decimal.add(Order.net_profit(&1), &2)))
+    |> Enum.reduce(0, &(Decimal.add(Order.net_profit(&1), &2)))
   end
 
   @spec with_stamps_query(Ecto.Queryable.t) :: Ecto.Query.t

@@ -39,7 +39,7 @@ defmodule Kamansky.Operations.Reports do
     end
   end
 
-  @spec get_order_data(integer, integer) :: map
+  @spec get_order_data(pos_integer, pos_integer) :: map
   def get_order_data(year, month) do
     with(
       stamps_query <-
@@ -92,7 +92,7 @@ defmodule Kamansky.Operations.Reports do
     end
   end
 
-  @spec list_report_months :: %{required(integer) => [{integer, map}]}
+  @spec list_report_months :: %{required(pos_integer) => [{pos_integer, map}]}
   def list_report_months do
     with(
       report_years <-

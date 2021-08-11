@@ -43,7 +43,5 @@ defmodule Kamansky.Sales.Listings.Listing do
   end
 
   @spec net_profit(Listing.t) :: Decimal.t
-  def net_profit(%Listing{} = listing) do
-    Decimal.sub(listing.sale_price, Stamp.total_cost(listing.stamp))
-  end
+  def net_profit(%Listing{} = listing), do: Decimal.sub(listing.sale_price, Stamp.total_cost(listing.stamp))
 end

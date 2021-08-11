@@ -38,7 +38,7 @@ defmodule Kamansky.Operations.Expenses.Expense do
     |> cast(attrs, [:amount, :category, :date, :description])
   end
 
-  @spec display_column_for_sorting(integer) :: atom
+  @spec display_column_for_sorting(pos_integer) :: atom
   def display_column_for_sorting(column) do
     [:date]
     |> Enum.at(column)

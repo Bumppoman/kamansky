@@ -12,14 +12,15 @@ defmodule Kamansky.Services.Hipstamp do
   plug Tesla.Middleware.JSON
   plug Tesla.Middleware.Query, [api_key: Application.get_env(:kamansky, :hipstamp_api_key)]
 
+  @spec condition(Stamp.t) :: String.t
   def condition(%Stamp{hinged: hinged, hinge_remnant: hinge_remnant, no_gum: no_gum}) when
     hinged == true or hinge_remnant == true or no_gum == true
   do
     "unused"
   end
-
   def condition(%Stamp{}), do: "mint-nh"
 
+  @spec format(Stamp.t) :: String.t
   def format(%Stamp{format: format}) do
     case format do
       f when f in [:block, :mail_early_block] ->
@@ -35,6 +36,7 @@ defmodule Kamansky.Services.Hipstamp do
     end
   end
 
+  @spec grade(Stamp.t) :: String.t
   def grade(%Stamp{grade: grade}) do
     case grade do
       g when g in 95..100 ->
@@ -54,6 +56,7 @@ defmodule Kamansky.Services.Hipstamp do
     end
   end
 
+  @spec issue_type(Stamp.t) :: String.t
   def issue_type(%Stamp{stamp_reference: %StampReference{issue_type: issue_type}}) do
     case issue_type do
       :airmail ->

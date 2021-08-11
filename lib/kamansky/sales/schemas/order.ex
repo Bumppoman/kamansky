@@ -133,11 +133,10 @@ defmodule Kamansky.Sales.Orders.Order do
   end
 
   @spec total_paid(Order.t) :: Decimal.t
-  def total_paid(%Order{item_price: item_price, shipping_price: shipping_price}),
-    do: Decimal.add(item_price, shipping_price)
+  def total_paid(%Order{item_price: item_price, shipping_price: shipping_price}), do: Decimal.add(item_price, shipping_price)
 
   @spec total_stamp_cost(Order.t) :: Decimal.t
   def total_stamp_cost(%Order{listings: listings}) do
-    Enum.reduce(listings, Decimal.new(0), &Decimal.add(Stamp.total_cost(&1.stamp), &2))
+    Enum.reduce(listings, 0, &Decimal.add(Stamp.total_cost(&1.stamp), &2))
   end
 end

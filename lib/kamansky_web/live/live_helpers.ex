@@ -46,8 +46,10 @@ defmodule KamanskyWeb.LiveHelpers do
   """
   @spec live_modal(module, keyword) :: Phoenix.LiveView.Component.t
   def live_modal(component, opts) do
-    path = Keyword.fetch!(opts, :return_to)
-    modal_opts = [id: :modal, return_to: path, component: component, opts: opts]
-    live_component(KamanskyWeb.ComponentLive.ModalComponent, modal_opts)
+    with path <- Keyword.fetch!(opts, :return_to),
+      modal_opts <- [id: :modal, return_to: path, component: component, opts: opts]
+    do
+      live_component(KamanskyWeb.ComponentLive.ModalComponent, modal_opts)
+    end
   end
 end

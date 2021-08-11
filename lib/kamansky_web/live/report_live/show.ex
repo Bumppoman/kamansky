@@ -12,13 +12,6 @@ defmodule KamanskyWeb.ReportLive.Show do
   end
 
   @impl true
-  @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t)
-    :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_event("show", _params, socket) do
-    {:noreply, socket}
-  end
-
-  @impl true
   @spec handle_params(%{required(String.t) => String.t}, String.t, Phoenix.LiveView.Socket.t)
     :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(%{"month" => month, "year" => year}, _uri, socket) do

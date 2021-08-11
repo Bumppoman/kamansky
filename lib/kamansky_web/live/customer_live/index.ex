@@ -7,6 +7,7 @@ defmodule KamanskyWeb.CustomerLive.Index do
   alias Kamansky.Sales.Customers.Customer
 
   @impl true
+  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, session, socket) do
     socket =
       socket
@@ -21,10 +22,12 @@ defmodule KamanskyWeb.CustomerLive.Index do
   end
 
   @impl true
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(params, _uri, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  @spec apply_action(Phoenix.LiveView.Socket.t, :edit | :index, %{required(String.t) => any}) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Customer")

@@ -8,8 +8,10 @@ defmodule KamanskyWeb.ListingLive.Sold do
   alias Kamansky.Stamps.Stamp
 
   @impl true
+  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, session, socket) do
-    socket =
+    {
+      :ok,
       socket
       |> assign_defaults(session)
       |> assign([
@@ -18,7 +20,6 @@ defmodule KamanskyWeb.ListingLive.Sold do
         data_source: fn options -> Listings.list_sold_listings(options) end
       ])
       |> assign(:page_title, "Sold Listings")
-
-    {:ok, socket}
+    }
   end
 end

@@ -26,7 +26,8 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
   end
 
   @impl true
-  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t)
+    :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"listing" => listing_params}, socket) do
     with(
       changeset <-
