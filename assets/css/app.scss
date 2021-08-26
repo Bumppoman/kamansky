@@ -1,16 +1,16 @@
 /* This file is for your main application css. */
-@import "../node_modules/nprogress/nprogress.css";
+@import "../node_modules/nprogress/nprogress";
 
 @import '_variables';
 
-@import "~bootstrap/scss/bootstrap";
-@import '~choices.js/public/assets/styles/choices.min';
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import '../node_modules/choices.js/public/assets/styles/choices.min';
 
 @import 'datatable';
 
-a > *, button > * {
-  pointer-events: none;
-}
+//a > *, button > * {
+//  pointer-events: none;
+//}
 
 a[data-bs-toggle]:hover, a.photo-display-link:hover {
   cursor: pointer;

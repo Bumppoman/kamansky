@@ -140,7 +140,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   @spec sort_direction(pos_integer, %{column: pos_integer, direction: :asc | :desc}) :: String.t
   def sort_direction(column, %{column: column, direction: :asc}), do: "asc"
   def sort_direction(column, %{column: column, direction: :desc}), do: "desc"
-  def sort_direction(_column, _sort), do: nil
+  def sort_direction(_column, _sort), do: ""
 
   @spec total_items(%{data_count: pos_integer} | %{data: Enum.t}) :: pos_integer
   def total_items(%{data_count: data_count}), do: data_count

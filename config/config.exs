@@ -18,6 +18,23 @@ config :kamansky, KamanskyWeb.Endpoint,
   pubsub_server: Kamansky.PubSub,
   live_view: [signing_salt: "tCSNjkQC"]
 
+# Configure esbuild (the version is required)
+config :esbuild,
+  version: "0.12.18",
+  default: [
+    args: ~w(js/app.js --bundle --target=es2018 --outdir=../priv/static/assets),
+    cd: Path.expand("../assets", __DIR__),
+    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+  ]
+
+# Configure Dart Sass
+config :dart_sass,
+version: "1.36.0",
+default: [
+  args: ~w(css/app.scss ../priv/static/assets/app.css),
+  cd: Path.expand("../assets", __DIR__)
+]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
