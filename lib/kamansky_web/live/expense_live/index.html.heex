@@ -33,15 +33,16 @@
       sort: 0
     ]
   do %>
-  <td><%= formatted_date(@item.date) %></td>
-  <td><%= @item.description %></td>
-  <td><%= Expense.formatted_category(@item) %></td>
-  <td><%= format_decimal_as_currency(@item.amount) %></td>
-  <td>
-    <%= live_patch to: "#", class: "action-icon" do %>
-      <i class="material-icons">edit</i>
-    <% end %>
-  </td>
+    <% expense -> %>
+      <td><%= formatted_date(expense.date) %></td>
+      <td><%= expense.description %></td>
+      <td><%= Expense.formatted_category(expense) %></td>
+      <td><%= format_decimal_as_currency(expense.amount) %></td>
+      <td>
+        <%= live_patch to: "#", class: "action-icon" do %>
+          <i class="material-icons">edit</i>
+        <% end %>
+      </td>
   <% end %>
 </section>
 <%= if @live_action in [:new, :edit] do %>

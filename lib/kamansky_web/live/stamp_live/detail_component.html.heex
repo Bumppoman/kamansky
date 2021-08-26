@@ -3,23 +3,23 @@
     <div>
       <img
         height="200"
-        src="<%= elem(@current_photo, 1) %>"
+        src={elem(@current_photo, 1)}
       />
       <%= if display_photo_nav(@stamp) do %>
         <div class="text-center mt-2">
           <a
             href="#"
-            class="<%= ["photo-display-link"] ++ (if elem(@current_photo, 0) != :rear, do: [" fw-bold"], else: []) %>"
+            class={["photo-display-link"] ++ (if elem(@current_photo, 0) != :rear, do: [" fw-bold"], else: [])}
             phx-click="change_photo"
-            phx-target="<%= @myself %>"
+            phx-target={@myself}
             phx-value-display="front"
           >Front</a>
           |
           <a
             href="#"
-            class="<%= ["photo-display-link"] ++ (if elem(@current_photo, 0) == :rear, do: [" fw-bold"], else: []) %>"
+            class={["photo-display-link"] ++ (if elem(@current_photo, 0) == :rear, do: [" fw-bold"], else: [])}
             phx-click="change_photo"
-            phx-target="<%= @myself %>"
+            phx-target={@myself}
             phx-value-display="rear"
           >Rear</a>
         </div>

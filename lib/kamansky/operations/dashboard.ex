@@ -20,24 +20,36 @@ defmodule Kamansky.Operations.Dashboard do
         |> select(
           [s],
           %{
-            collection_cost: fragment(
+            collection_stamp_cost: fragment(
               "SUM(CASE WHEN ? = ? THEN ? END)",
               s.status,
               ^get_value_for_ecto_enum(Stamp, :status, :collection),
               s.cost + s.purchase_fees
             ),
-            listed_cost: fragment(
+            listed_stamp_cost: fragment(
               "SUM(CASE WHEN ? = ? THEN ? END)",
               s.status,
               ^get_value_for_ecto_enum(Stamp, :status, :listed),
               s.cost + s.purchase_fees
             ),
-            stock_cost: fragment(
+            sold_stamp_cost: fragment(
+              "SUM(CASE WHEN ? = ? THEN ? END)",
+              s.status,
+              ^get_value_for_ecto_enum(Stamp, :status, :sold),
+              s.cost + s.purchase_fees
+            ),
+            stock_stamp_cost: fragment(
               "SUM(CASE WHEN ? = ? THEN ? END)",
               s.status,
               ^get_value_for_ecto_enum(Stamp, :status, :stock),
               s.cost + s.purchase_fees
             ),
+            total_stamps_sold: fragment(
+              "COUNT(CASE WHEN ? = ? THEN ? END)",
+              s.status,
+              ^get_value_for_ecto_enum(Stamp, :status, :sold),
+              s.id
+            )
           }
         )
         |> Repo.one(),
@@ -54,9 +66,21 @@ defmodule Kamansky.Operations.Dashboard do
             )
           }
         )
+        |> Repo.one(),
+      order_totals <-
+        from(o in "orders")
+        |> select(
+          [o],
+          %{
+            total_gross_profit: sum(o.item_price + o.shipping_price),
+            total_orders: count(o.id)
+          }
+        )
         |> Repo.one()
     do
-      Map.merge(stamp_totals, listing_totals)
+      stamp_totals
+      |> Map.merge(listing_totals)
+      |> Map.merge(order_totals)
     end
   end
 end

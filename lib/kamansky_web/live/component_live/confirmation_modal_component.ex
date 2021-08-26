@@ -3,7 +3,7 @@ defmodule KamanskyWeb.ComponentLive.ConfirmationModalComponent do
 
   @spec render(map) :: Phoenix.LiveView.Rendered.t
   def render(assigns) do
-    ~L"""
+    ~H"""
     <p><%= @message %></p>
     """
   end

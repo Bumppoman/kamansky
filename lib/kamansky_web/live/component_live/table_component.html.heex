@@ -1,9 +1,10 @@
 <div
   id="kamansky-data-table-component"
   class="kamansky-data-table"
-  data-sort="<%= @sort.column %>"
-  data-sort-direction="<%= @sort.direction %>"
-  phx-hook="dataTableInit">
+  data-sort={@sort.column}
+  data-sort-direction={@sort.direction}
+  phx-hook="dataTableInit"
+>
   <div class="kamansky-data-table-header">
     <div class="kamansky-data-table-per-page" phx-update="ignore">
       <label class="mb-0">
@@ -20,8 +21,8 @@
       </label>
     </div>
     <div class="kamansky-data-table-search">
-      <form phx-change="search" phx-target="<%= @myself %>">
-        <input name="search" placeholder="Search..." value="<%= @search %>" />
+      <form phx-change="search" phx-target={@myself}>
+        <input name="search" placeholder="Search..." value={@search} />
       </form>
     </div>
   </div>
@@ -36,9 +37,9 @@
               <% _ -> %>
                 <th
                   phx-click="sort"
-                  phx-target="<%= @myself %>"
-                  phx-value-sort="<%= index %>"
-                  phx-value-sort_direction="<%= sort_direction(index, @sort) %>"
+                  phx-target={@myself}
+                  phx-value-sort={index}
+                  phx-value-sort_direction={sort_direction(index, @sort)}
                 >
                   <%= header %>
                 </th>
@@ -48,13 +49,13 @@
       </thead>
       <tbody>
         <%= for {item, index} <- Enum.with_index(@data) do %>
-          <tr class="<%= if rem(index, 2) == 0, do: 'even', else: 'odd' %>">
-            <%= render_block(@inner_block, item: item) %>
+          <tr class={if rem(index, 2) == 0, do: "even", else: "odd"}>
+            <%= render_block(@inner_block, item) %>
           </tr>
         <% end %>
         <%= if Enum.empty? @data do %>
           <tr>
-            <td class="text-center" colspan="<%= Enum.count(@headers) %>"><%= @empty_message %></td>
+            <td class="text-center" colspan={Enum.count(@headers)}><%= @empty_message %></td>
           </tr>
         <% end %>
       </tbody>

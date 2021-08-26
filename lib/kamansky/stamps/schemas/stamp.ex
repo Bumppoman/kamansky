@@ -136,10 +136,6 @@ defmodule Kamansky.Stamps.Stamp do
   @doc false
   @spec changeset(Stamp.t, map) :: Ecto.Changeset.t
   def changeset(stamp, attrs) do
-
-    # Workaround for Ecto.Enum (7/2021)
-    attrs = cast_enum_fields(attrs, ["format", "status"])
-
     stamp
     |> cast(attrs, [:scott_number, :grade, :cost, :purchase_fees,
       :format, :blind_perforation, :crease, :gum_disturbance,

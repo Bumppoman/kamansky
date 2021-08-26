@@ -31,13 +31,14 @@
       sort: 0
     ]
   do %>
-  <td><%= @item.scott_number %></td>
-  <td><%= StampReference.description(@item) %></td>
-  <td>
-    <%= live_patch to: Routes.stamp_reference_index_path(@socket, :edit, @item), class: "action-icon" do %>
-      <i class="material-icons">edit</i>
-    <% end %>
-  </td>
+    <% stamp_reference -> %>
+      <td><%= stamp_reference.scott_number %></td>
+      <td><%= StampReference.description(stamp_reference) %></td>
+      <td>
+        <%= live_patch to: Routes.stamp_reference_index_path(@socket, :edit, stamp_reference), class: "action-icon" do %>
+          <i class="material-icons">edit</i>
+        <% end %>
+      </td>
   <% end %>
 </section>
 <%= if @live_action in [:new, :edit] do %>

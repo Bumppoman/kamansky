@@ -20,7 +20,7 @@ defmodule Kamansky.Sales.Listings.Listing do
     field :sale_price, :decimal
     field :hipstamp_id, :integer
     field :ebay_id, :integer
-    field :status, Ecto.Enum, values: [pending: 1, active: 2, removed: 3, sold: 4], default: :active
+    field :status, Ecto.Enum, values: [pending: 1, active: 2, removed: 3, sold: 4, lost: 5], default: :active
 
     field :hipstamp, :boolean, virtual: true, default: true
 

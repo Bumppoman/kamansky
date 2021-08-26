@@ -41,9 +41,6 @@ defmodule KamanskyWeb.DashboardLive.Index do
             stamps_this_month_for_stock: Stamps.count_stamps_purchased(:stock, this_month),
             total_gross_profit: Orders.total_gross_profit(:all),
             total_net_profit: Orders.total_net_profit(:all),
-            total_orders: Orders.count_orders(:all),
-            total_sold_stamp_cost: Stamps.cost_of_stamps(:sold),
-            total_stamps_in_all_orders: Orders.total_stamps_in_orders(:all)
           ]
         )
         |> assign(:data, Dashboard.load_dashboard_data(socket.assigns.timezone))

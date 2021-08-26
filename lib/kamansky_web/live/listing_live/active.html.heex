@@ -29,29 +29,30 @@
     ],
     parent_action: :active
   do %>
-    <td><%= @item.stamp.scott_number %></td>
-    <td>#<%= @item.stamp.inventory_key %></td>
-    <td>
-      <span><%= Stamp.formatted_grade(@item.stamp) %></span>
-      <%= if Stamp.flaws?(@item.stamp) do %>
-        <sup class="fs-6">
-          <a
-            tabindex="0"
-            title="Flaws"
-            data-bs-content="flaws"
-            data-bs-toggle="popover"
-            data-bs-trigger="focus"
-          >*</a>
-        </sup>
-      <% end %>
-    </td>
-    <td><%= format_decimal_as_currency(@item.listing_price) %></td>
-    <td><%= formatted_date(@item.inserted_at) %></td>
-    <td>
-      <%= live_patch to: Routes.listing_active_path(@socket, :add_to_order, @item), class: "action-icon" do %>
-        <i class="material-icons">add_shopping_cart</i>
-      <% end %>
-    </td>
+    <% listing -> %>
+      <td><%= listing.stamp.scott_number %></td>
+      <td>#<%= listing.stamp.inventory_key %></td>
+      <td>
+        <span><%= Stamp.formatted_grade(listing.stamp) %></span>
+        <%= if Stamp.flaws?(listing.stamp) do %>
+          <sup class="fs-6">
+            <a
+              tabindex="0"
+              title="Flaws"
+              data-bs-content="flaws"
+              data-bs-toggle="popover"
+              data-bs-trigger="focus"
+            >*</a>
+          </sup>
+        <% end %>
+      </td>
+      <td><%= format_decimal_as_currency(listing.listing_price) %></td>
+      <td><%= formatted_date(listing.inserted_at) %></td>
+      <td>
+        <%= live_patch to: Routes.listing_active_path(@socket, :add_to_order, listing), class: "action-icon" do %>
+          <i class="material-icons">add_shopping_cart</i>
+        <% end %>
+      </td>
   <% end %>
   <ul class="nav nav-pills justify-content-center">
     <li class="nav-item">

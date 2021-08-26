@@ -73,10 +73,12 @@
       </ul>
     </nav>
   <% else %>
-    <%= f = form_for :login,
-      Routes.session_path(@socket, :create),
-      class: "row row-cols-md-auto p-3 align-items-center justify-content-center"
-    %>
+    <.form
+      let={f}
+      for={:login}
+      url={Routes.session_path(@socket, :create)}
+      class="row row-cols-md-auto p-3 align-items-center justify-content-center"
+    >
       <div class="col">
         <%= label f, :username, class: "visually-hidden" %>
         <%= text_input f, :username, class: "form-control", placeholder: "Username" %>
@@ -88,7 +90,7 @@
       <div class="col">
         <%= submit "Login", class: "btn btn-primary" %>
       </div>
-    </form>
+    </.form>
   <% end %>
 </header>
 <main role="main">

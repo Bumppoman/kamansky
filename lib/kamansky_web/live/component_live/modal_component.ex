@@ -4,13 +4,13 @@ defmodule KamanskyWeb.ComponentLive.ModalComponent do
   @impl true
   @spec render(map) :: Phoenix.LiveView.Rendered.t
   def render(assigns) do
-    ~L"""
-    <div id="<%= @id %>" class="modal fade"
+    ~H"""
+    <div id={@id} class="modal fade"
       phx-hook="modalHook"
-      phx-target="#<%= @id %>"
+      phx-target={"##{@id}"}
       phx-page-loading
     >
-      <div class="modal-dialog modal-dialog-centered <%= size_for_type(Keyword.get(@opts, :type)) %>">
+      <div class={"modal-dialog modal-dialog-centered #{size_for_type(Keyword.get(@opts, :type))}"}>
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title"><%= @opts[:title] %></h5>
@@ -25,8 +25,8 @@ defmodule KamanskyWeb.ComponentLive.ModalComponent do
               <button
                 type="submit"
                 class="btn btn-primary"
-                form="<%= Keyword.get(@opts, :form_id) %>"
-                phx-click="<%= Keyword.get(@opts, :button_action) %>"
+                form={Keyword.get(@opts, :form_id)}
+                phx-click={Keyword.get(@opts, :button_action)}
               ><%= @opts[:title] %></button>
             </div>
           <% end %>

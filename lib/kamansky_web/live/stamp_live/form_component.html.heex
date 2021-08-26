@@ -1,0 +1,178 @@
+<div class="form-wrapper">
+  <.form
+    let={f}
+    for={@changeset}
+    id={@form_id}
+    phx_target={@myself}
+    phx_change="validate"
+    phx_submit="submit"
+  >
+    <div class="row">
+      <div class="col-md-4 form-group required">
+        <%= label f, :scott_number, "Scott Number", class: "form-control-label" %>
+        <%= text_input f,
+          :scott_number,
+          class: "form-control",
+          "phx-blur": "find_in_collection",
+          "phx-target": @myself
+        %>
+      </div>
+      <div class="col-md-8">
+        <h6>Collection</h6>
+        <%= if @copy_in_collection do %>
+          <div class="d-flex">
+            <div class="me-3">
+              <img
+                height="60"
+                src={
+                  if @copy_in_collection.front_photo do
+                    Attachment.path(@copy_in_collection.front_photo)
+                  else
+                    Routes.static_path(@socket, "/images/blank-stamp.png")
+                  end
+                }
+              />
+            </div>
+            <div>
+              <p>
+                <%= StampReference.description(@copy_in_collection.stamp_reference) %><br />
+                <%= Stamp.formatted_grade(@copy_in_collection) %><br />
+                <%= Stamp.formatted_flaws(@copy_in_collection) %>
+              </p>
+            </div>
+          </div>
+        <% else %>
+          <p>No copy in collection.</p>
+        <% end %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 form-group required">
+        <%= label f, :grade, "Grade", class: "form-control-label" %>
+        <%= number_input f, :grade, class: "form-control" %>
+      </div>
+      <div class="col-md-4 form-group required" phx-update="ignore">
+        <%= label f, :format, "Item Type", class: "form-control-label" %>
+        <%= select f,
+          :format,
+          Stamp.formats,
+          class: "choices-select"
+        %>
+      </div>
+      <div class="col-md-5 form-group required d-flex flex-wrap">
+        <%= label f, :add_to, "Add To", class: "form-control-label w-100" %>
+        <div>
+          <div class="form-check form-check-inline">
+            <%= radio_button f, :add_to, :collection, class: "form-check-input" %>
+            <label for={input_id f, :add_to, :collection} class="form-check-label">Collection</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <%= radio_button f, :add_to, :stock, class: "form-check-input" %>
+            <label for={input_id f, :add_to, :stock} class="form-check-label">Stock</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col form-group required">
+        <%= label f, :cost, "Cost", class: "form-control-label" %>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="material-icons">attach_money</i>
+            </span>
+          </div>
+          <%= text_input f, :cost, class: "form-control" %>
+        </div>
+      </div>
+      <div class="col form-group required">
+        <%= label f, :purchase_fees, "Purchase Fees", class: "form-control-label" %>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="material-icons">attach_money</i>
+            </span>
+          </div>
+          <%= text_input f, :purchase_fees, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col form-group">
+        <%= label f, :flaws, class: "form-control-label" %>
+        <div class="row">
+          <%= for flaw_set <- Enum.chunk_every(Kamansky.Stamps.Stamp.flaws, 4) do %>
+            <div class="col-md-3">
+              <%= for flaw <- flaw_set do %>
+                <div class="form-check">
+                  <%= checkbox f,
+                    flaw,
+                    class: "form-check-input"
+                  %>
+                  <label
+                    class="form-check-label"
+                    for={"stamp_#{flaw}"}
+                  >
+                    <%= Phoenix.Naming.humanize(flaw) %>
+                  </label>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 form-group">
+        <%= label f, :front_photo, "Front", class: "form-control-label" %>
+        <div
+          id="stamp-front-photo-area"
+          phx-hook="fileUpload"
+        >
+          <div
+            id="stamp-front-photo-file-dropzone"
+            class="drag-and-drop-file-dropzone"
+            phx-drop-target={@uploads.front_photo.ref}
+          >
+            <i class="material-icons">cloud_upload</i>
+            <p>Drop file here</p>
+            <%= live_file_input @uploads.front_photo %>
+          </div>
+          <div
+            id="stamp-front-photo-file-preview"
+            class="drag-and-drop-file-preview d-none"
+          >
+            <%= for entry <- @uploads.front_photo.entries do %>
+              <%= live_img_preview entry, height: 100 %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 form-group">
+        <%= label f, :rear_photo, "Rear", class: "form-control-label" %>
+        <div
+          id="stamp-rear-photo-area"
+          phx-hook="fileUpload"
+        >
+          <div
+            id="stamp-rear-photo-file-dropzone"
+            class="drag-and-drop-file-dropzone"
+            phx-drop-target={@uploads.rear_photo.ref}
+          >
+            <i class="material-icons">cloud_upload</i>
+            <p>Drop file here</p>
+            <%= live_file_input @uploads.rear_photo %>
+          </div>
+          <div
+            id="stamp-rear-photo-file-preview"
+            class="drag-and-drop-file-preview d-none"
+          >
+            <%= for entry <- @uploads.rear_photo.entries do %>
+              <%= live_img_preview entry, height: 100 %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </.form>
+</div>

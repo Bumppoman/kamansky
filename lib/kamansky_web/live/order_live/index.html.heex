@@ -43,36 +43,37 @@
       sort: %{column: 1, direction: :desc}
     ]
   do %>
-    <td>
-      <%= live_redirect "##{Order.order_number(@item)}", to: Routes.order_show_path(@socket, :show, @item) %>
-    </td>
-    <td><%= formatted_date(@item.ordered_at) %></td>
-    <td><%= format_decimal_as_currency(Order.total_paid(@item)) %></td>
-    <td class="<%= if Decimal.gt?(Order.net_profit(@item), 0), do: "text-success", else: "text-danger" %>">
-      <%= format_decimal_as_currency(Order.net_profit(@item)) %>
-    </td>
-    <td>
-      <%= unless Order.completed?(@item) do %>
-        <%= live_patch to: Routes.order_index_path(@socket, :edit, @item), class: "action-icon" do %>
-          <i class="material-icons">edit</i>
+    <% order -> %>
+      <td>
+        <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
+      </td>
+      <td><%= formatted_date(order.ordered_at) %></td>
+      <td><%= format_decimal_as_currency(Order.total_paid(order)) %></td>
+      <td class={if Decimal.gt?(Order.net_profit(order), 0), do: "text-success", else: "text-danger"}>
+        <%= format_decimal_as_currency(Order.net_profit(order)) %>
+      </td>
+      <td>
+        <%= unless Order.completed?(order) do %>
+          <%= live_patch to: Routes.order_index_path(@socket, :edit, order), class: "action-icon" do %>
+            <i class="material-icons">edit</i>
+          <% end %>
         <% end %>
-      <% end %>
-      <%= cond do %>
-        <% Order.pending?(@item) -> %>
-          <%= live_patch to: Routes.order_index_path(@socket, :mark_processed, @item), class: "action-icon" do %>
-            <i class="material-icons">precision_manufacturing</i>
-          <% end %>
-        <% Order.processed?(@item) -> %>
-          <%= live_patch to: Routes.order_index_path(@socket, :mark_shipped, @item), class: "action-icon" do %>
-            <i class="material-icons">local_shipping</i>
-          <% end %>
-        <% Order.shipped?(@item) -> %>
-          <%= live_patch to: Routes.order_index_path(@socket, :mark_completed, @item), class: "action-icon" do %>
-            <i class="material-icons">done</i>
-          <% end %>
-        <% true -> %>
-      <% end %>
-    </td>
+        <%= cond do %>
+          <% Order.pending?(order) -> %>
+            <%= live_patch to: Routes.order_index_path(@socket, :mark_processed, order), class: "action-icon" do %>
+              <i class="material-icons">precision_manufacturing</i>
+            <% end %>
+          <% Order.processed?(order) -> %>
+            <%= live_patch to: Routes.order_index_path(@socket, :mark_shipped, order), class: "action-icon" do %>
+              <i class="material-icons">local_shipping</i>
+            <% end %>
+          <% Order.shipped?(order) -> %>
+            <%= live_patch to: Routes.order_index_path(@socket, :mark_completed, order), class: "action-icon" do %>
+              <i class="material-icons">done</i>
+            <% end %>
+          <% true -> %>
+        <% end %>
+      </td>
   <% end %>
   <ul class="nav nav-pills justify-content-center">
     <li class="nav-item">

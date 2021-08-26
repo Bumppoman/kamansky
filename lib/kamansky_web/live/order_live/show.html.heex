@@ -13,13 +13,13 @@
           <td>
             <%= if listing.stamp.front_photo do %>
               <img
-                src="<%= Attachment.path(listing.stamp.front_photo) %>"
+                src={Attachment.path(listing.stamp.front_photo)}
                 height="100"
                 class="me-4"
               />
             <% else %>
               <img
-                src="<%= Routes.static_path(@socket, "/images/blank-stamp.png") %>"
+                src={Routes.static_path(@socket, "/images/blank-stamp.png")}
                 height="100"
                 class="me-4"
               />
@@ -92,7 +92,7 @@
           <tfoot>
             <tr class="fw-bold">
               <td>Net profit/loss</td>
-              <td class="<%= if Decimal.gt?(Order.net_profit(@order), Decimal.new(0)), do: "text-success", else: "text-danger" %>">
+              <td class={if Decimal.gt?(Order.net_profit(@order), Decimal.new(0)), do: "text-success", else: "text-danger"}>
                 <%= format_decimal_as_currency(Order.net_profit(@order)) %>
               </td>
             </tr>

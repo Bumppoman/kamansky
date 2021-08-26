@@ -52,7 +52,7 @@ defmodule Kamansky.Sales.Customers do
         |> select_merge(
           [c, o, lo],
           %{
-            amount_spent_ytd: fragment("SUM ? AS amount_spent_ytd", o.item_price + o.shipping_price),
+            amount_spent_ytd: fragment("? AS amount_spent_ytd", sum(o.item_price + o.shipping_price)),
             most_recent_order_date: lo.ordered_at
           }
         )

@@ -33,21 +33,21 @@ defmodule Kamansky.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.9"},
-      {:phoenix_ecto, "~> 4.3"},
-      {:ecto_sql, "~> 3.6"},
-      {:postgrex, ">= 0.0.0"},
-      {:phoenix_live_view, "~> 0.15.7"},
+      {:phoenix, "~> 1.5.12"},
+      {:phoenix_ecto, "~> 4.4"},
+      {:ecto_sql, "~> 3.7"},
+      {:postgrex, ">= 0.15.10"},
+      {:phoenix_live_view, "~> 0.16"},
       {:floki, ">= 0.0.0", only: :test},
-      {:phoenix_html, "~> 2.14.3"},
+      {:phoenix_html, "~> 3.0.2"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
-      {:phoenix_live_dashboard, "~> 0.4.0"},
-      {:telemetry_metrics, "~> 0.5"},
+      {:phoenix_live_dashboard, "~> 0.5.0"},
+      {:telemetry_metrics, "~> 0.6.1"},
       {:telemetry_poller, "~> 0.5"},
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:tesla, "~> 1.4"},
+      {:tesla, "~> 1.4.3"},
       {:hackney, "~> 1.17.0"},
       {:tzdata, "~> 1.1"}
     ]
