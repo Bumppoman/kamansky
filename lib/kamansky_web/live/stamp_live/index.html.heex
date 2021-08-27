@@ -60,6 +60,12 @@
         <% end %>
       </td>
   <% end %>
+  <%= if @live_action in [:collection, :collection_to_replace] do %>
+    <KamanskyWeb.StampLive.CollectionComponents.types_footer 
+      socket={@socket}
+      live_action={@live_action}
+    />
+  <% end %>
 </section>
 <%= if @live_action in [:new, :edit] do %>
   <%= live_modal KamanskyWeb.StampLive.FormComponent,

@@ -1,5 +1,4 @@
 defmodule KamanskyWeb.LiveHelpers do
-  import Phoenix.LiveView
   import Phoenix.LiveView.Helpers
 
   @spec live_confirmation_modal(keyword) :: Phoenix.LiveView.Component.t

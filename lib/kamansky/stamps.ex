@@ -42,6 +42,14 @@ defmodule Kamansky.Stamps do
     |> Repo.aggregate(:count, :id)
   end
 
+  @spec count_stamps_in_collection_below_grade(pos_integer) :: integer
+  def count_stamps_in_collection_below_grade(grade) do
+    Stamp
+    |> where(status: :collection)
+    |> where([s], s.grade < ^grade)
+    |> Repo.aggregate(:count, :id)
+  end
+
   @spec count_stamps_purchased([atom], integer) :: integer
   def count_stamps_purchased(status, month) when is_list(status) do
     Stamp
@@ -69,14 +77,15 @@ defmodule Kamansky.Stamps do
   def find_row_number_for_stamp(status, options) do
     Stamp
     |> where(status: ^status)
-    |> select([s], {s.id, row_number() |> over(order_by: [{:asc, s.scott_number}])})
-    |> Repo.all
-    |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
-    |> case do
-      nil -> 1
-      {_id, nil} -> 1
-      {_id, row_number} -> row_number
-    end
+    |> stamp_row_number_lookup(options[:record_id])
+  end
+
+  @spec find_row_number_for_stamp_in_collection_below_grade(pos_integer, Paginate.params) :: integer
+  def find_row_number_for_stamp_in_collection_below_grade(grade, options) do
+    Stamp
+    |> where(status: :collection)
+    |> where([s], s.grade < ^grade)
+    |> stamp_row_number_lookup(options[:record_id])
   end
 
   @spec get_stamp!(integer) :: Stamp.t
@@ -112,10 +121,18 @@ defmodule Kamansky.Stamps do
     |> Repo.one!()
   end
 
-  @spec list_stamps(atom, Kamansky.Paginate.params) :: [Stamp.t]
+  @spec list_stamps(atom, Paginate.params) :: [Stamp.t]
   def list_stamps(status, params) do
     Stamp
     |> where(status: ^status)
+    |> then(&Paginate.list(Stamps, &1, params))
+  end
+
+  @spec list_stamps_in_collection_below_grade(pos_integer, Paginate.params) :: [Stamp.t]
+  def list_stamps_in_collection_below_grade(grade, params) do
+    Stamp
+    |> where(status: :collection)
+    |> where([s], s.grade < ^grade)
     |> then(&Paginate.list(Stamps, &1, params))
   end
 
@@ -243,5 +260,18 @@ defmodule Kamansky.Stamps do
   defp handle_photos(changeset, nil, rear_photo), do: Ecto.Changeset.put_change(changeset, :rear_photo_id, rear_photo.id)
   defp handle_photos(changeset, front_photo, rear_photo) do
     Ecto.Changeset.change(changeset, [front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
+  end
+
+  @spec stamp_row_number_lookup(Ecto.Queryable.t, pos_integer) :: integer
+  defp stamp_row_number_lookup(query, stamp_id) do
+    query
+    |> select([s], {s.id, row_number() |> over(order_by: [{:asc, s.scott_number}])})
+    |> Repo.all
+    |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(stamp_id) end)
+    |> case do
+      nil -> 1
+      {_id, nil} -> 1
+      {_id, row_number} -> row_number
+    end
   end
 end

@@ -101,21 +101,25 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
           link_to_page(page, current_page, target)
         end
       current_page - 3 > 1 and current_page + 3 < total_pages ->
-        pages =
-          for page <- (current_page - 2..current_page + 2) do
-            link_to_page(page, current_page, target)
-          end
-
-        [link_to_page(1, current_page, target), dummy_page_link()]
-        ++ pages
-        ++ [dummy_page_link(), link_to_page(total_pages, current_page, target)]
+        with(
+          pages <-
+            for page <- (current_page - 2..current_page + 2) do
+              link_to_page(page, current_page, target)
+            end
+        ) do
+          [link_to_page(1, current_page, target), dummy_page_link()]
+          ++ pages
+          ++ [dummy_page_link(), link_to_page(total_pages, current_page, target)]
+        end
       current_page + 7 < total_pages ->
-        pages =
-          for page <- (1..7) do
-            link_to_page(page, current_page, target)
-          end
-
-        pages ++ [dummy_page_link(), link_to_page(total_pages, current_page, target)]
+        with(
+          pages <-
+            for page <- (1..7) do
+              link_to_page(page, current_page, target)
+            end
+        ) do
+          pages ++ [dummy_page_link(), link_to_page(total_pages, current_page, target)]
+        end
       true ->
         pages =
           for page <- (total_pages - 7..total_pages) do
@@ -212,9 +216,9 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   @spec dummy_page_link :: Phoenix.HTML.safe
   defp dummy_page_link do
     ~E"""
-      <li>
-        <%= link "...", to: "#", class: "disabled" %>
-      </li>
+    <li>
+      <%= link "...", to: "#", class: "disabled" %>
+    </li>
     """
   end
 
@@ -225,15 +229,15 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   @spec link_to_page(pos_integer, pos_integer, String.t) :: Phoenix.HTML.safe
   defp link_to_page(page, current_page, target) do
     ~E"""
-      <li>
-        <%= link page,
-          to: "#",
-          class: (if page == current_page, do: "active"),
-          "phx-click": "go_to_page",
-          "phx-value-page": page,
-          "phx-target": target
-        %>
-      </li>
+    <li>
+      <%= link page,
+        to: "#",
+        class: (if page == current_page, do: "active"),
+        "phx-click": "go_to_page",
+        "phx-value-page": page,
+        "phx-target": target
+      %>
+    </li>
     """
   end
 

@@ -60,6 +60,8 @@ defmodule KamanskyWeb.Router do
       live "/stamp_references/:id/edit", StampReferenceLive.Index, :edit
 
       live "/stamps/collection", StampLive.Index, :collection
+      live "/stamps/collection/replaceable", StampLive.Index, :collection_to_replace
+      live "/stamps/collection/missing", StampReferenceLive.Index, :missing_from_collection
       live "/stamps/stock", StampLive.Index, :stock
       live "/stamps/new", StampLive.Index, :new
       live "/stamps/:id", StampLive.Index, :show

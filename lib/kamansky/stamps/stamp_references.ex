@@ -5,6 +5,7 @@ defmodule Kamansky.Stamps.StampReferences do
 
   alias __MODULE__
   alias Kamansky.Repo
+  alias Kamansky.Stamps.Stamp
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @spec change_stamp_reference(StampReference.t, map) :: Ecto.Changeset.t
@@ -13,9 +14,10 @@ defmodule Kamansky.Stamps.StampReferences do
   end
 
   @spec count_stamp_references :: integer
-  def count_stamp_references do
-    Repo.aggregate(StampReference, :count, :id)
-  end
+  def count_stamp_references, do: Repo.aggregate(StampReference, :count, :id)
+
+  @spec count_stamp_references_missing_from_collection :: integer
+  def count_stamp_references_missing_from_collection, do: Repo.aggregate(missing_from_collection_query(), :count, :id)
 
   @spec create_stamp_reference(map) :: {:ok, StampReference.t} | {:error, Ecto.Changeset.t}
   def create_stamp_reference(attrs) do
@@ -24,16 +26,30 @@ defmodule Kamansky.Stamps.StampReferences do
     |> Repo.insert()
   end
 
-  @spec find_row_number_for_stamp_reference(map) :: integer
+  @spec find_row_number_for_stamp_reference(Paginate.params) :: integer
   def find_row_number_for_stamp_reference(options) do
     Paginate.find_row_number(StampReference, StampReference.display_column_for_sorting(options[:sort][:column]), options)
+  end
+
+  @spec find_row_number_for_stamp_reference_missing_from_collection(Paginate.params) :: integer
+  def find_row_number_for_stamp_reference_missing_from_collection(options) do
+    Paginate.find_row_number(
+      missing_from_collection_query(),
+      StampReference.display_column_for_sorting(options[:sort][:column]),
+      options
+    )
   end
 
   @spec get_stamp_reference!(integer) :: StampReference.t
   def get_stamp_reference!(id), do: Repo.get!(StampReference, id)
 
-  @spec list_stamp_references(Kamansky.Paginate.params) :: [StampReference.t]
+  @spec list_stamp_references(Paginate.params) :: [StampReference.t]
   def list_stamp_references(params), do: Paginate.list(StampReferences, StampReference, params)
+
+  @spec list_stamp_references_missing_from_collection(Paginate.params) :: [StampReference.t]
+  def list_stamp_references_missing_from_collection(params) do
+    Paginate.list(StampReferences, missing_from_collection_query(), params)
+  end
 
   @doc false
   @impl true
@@ -53,5 +69,11 @@ defmodule Kamansky.Stamps.StampReferences do
     stamp_reference
     |> StampReference.changeset(attrs)
     |> Repo.update()
+  end
+
+  defp missing_from_collection_query do
+    StampReference
+    |> join(:left, [sr], s in Stamp, on: sr.scott_number == s.scott_number and s.status == :collection)
+    |> where([..., s], is_nil(s.scott_number))
   end
 end

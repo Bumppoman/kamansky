@@ -31,6 +31,12 @@ defmodule KamanskyWeb.StampLive.Index do
   end
 
   @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
+  defp apply_action(socket, :collection_to_replace, params) do
+    socket
+    |> assign(:go_to_record, Map.get(params, "go_to_record"))
+    |> assign(:page_title, "Collection Below XF")
+  end
+
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Stamp")
@@ -68,6 +74,14 @@ defmodule KamanskyWeb.StampLive.Index do
   end
 
   @spec load_stamps(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
+  defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{live_action: live_action}} = socket)
+    when live_action == :collection_to_replace
+  do
+    socket
+    |> assign(:data_count, Stamps.count_stamps_in_collection_below_grade(85))
+    |> assign(:data_locator, fn options -> Stamps.find_row_number_for_stamp_in_collection_below_grade(85, options) end)
+    |> assign(:data_source, fn options -> Stamps.list_stamps_in_collection_below_grade(85, options) end)
+  end
   defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{stamp: %Stamp{status: status}}} = socket) when not is_nil(status) do
     load_stamps(socket, status)
   end

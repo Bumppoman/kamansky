@@ -8,12 +8,14 @@
     <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
   </div>
   <% end %>
-  <div class="text-end mb-2">
-    <%= live_patch "Add New Stamp Reference",
-      to: Routes.stamp_reference_index_path(@socket, :new),
-      class: "btn btn-primary"
-    %>
-  </div>
+  <%= if @live_action != :missing_from_collection do %>
+    <div class="text-end mb-2">
+      <%= live_patch "Add New Stamp Reference",
+        to: Routes.stamp_reference_index_path(@socket, :new),
+        class: "btn btn-primary"
+      %>
+    </div>
+  <% end %>
   <%= live_component KamanskyWeb.ComponentLive.TableComponent,
     id: "stamp-references-kamansky-data-table",
     headers:
@@ -39,6 +41,12 @@
           <i class="material-icons">edit</i>
         <% end %>
       </td>
+  <% end %>
+  <%= if @live_action == :missing_from_collection do %>
+    <KamanskyWeb.StampLive.CollectionComponents.types_footer 
+      socket={@socket}
+      live_action={@live_action}
+    />
   <% end %>
 </section>
 <%= if @live_action in [:new, :edit] do %>
