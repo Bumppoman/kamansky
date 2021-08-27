@@ -6,16 +6,13 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     {
       :ok,
       socket
-      |> assign_defaults(session)
-      |> assign([
-        data_count: StampReferences.count_stamp_references(),
-        data_locator: fn options -> StampReferences.find_row_number_for_stamp_reference(options) end,
-        data_source: fn options -> StampReferences.list_stamp_references(options) end
-      ])
+      |> assign(:data_count, StampReferences.count_stamp_references())
+      |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference(options) end)
+      |> assign(:data_source, fn options -> StampReferences.list_stamp_references(options) end)
     }
   end
 

@@ -7,12 +7,6 @@ defmodule KamanskyWeb.StampLive.Index do
   alias Kamansky.Stamps.Stamp
 
   @impl true
-  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
-    {:ok, assign_defaults(socket, session)}
-  end
-
-  @impl true
   @spec handle_event(String.t, any, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("move_to_stock", _value, socket) do
     case Stamps.move_stamp_to_stock(socket.assigns.stamp) do
@@ -82,13 +76,9 @@ defmodule KamanskyWeb.StampLive.Index do
   @spec load_stamps(Phoenix.LiveView.Socket.t, atom) :: Phoenix.LiveView.Socket.t
   defp load_stamps(socket, status) do
     socket
-    |> assign(
-      [
-        data_count: Stamps.count_stamps(status),
-        data_locator: fn options -> Stamps.find_row_number_for_stamp(status, options) end,
-        data_source: fn options -> Stamps.list_stamps(status, options) end,
-        status: status
-      ]
-    )
+    |> assign(:data_count, Stamps.count_stamps(status))
+    |> assign(:data_locator, fn options -> Stamps.find_row_number_for_stamp(status, options) end)
+    |> assign(:data_source, fn options -> Stamps.list_stamps(status, options) end)
+    |> assign(:status, status)
   end
 end

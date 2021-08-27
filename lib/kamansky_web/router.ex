@@ -17,54 +17,56 @@ defmodule KamanskyWeb.Router do
 
   scope "/", KamanskyWeb do
     pipe_through :browser
-
-    live "/", DashboardLive.Index, :index
-
-    live "/customers", CustomerLive.Index, :index
-    live "/customers/:id/edit", CustomerLive.Index, :edit
-
-    live "/dashboard", DashboardLive.Index, :index
-
-    live "/expenses", ExpenseLive.Index, :index
-    live "/expenses/new", ExpenseLive.Index, :new
-
-    live "/listings", ListingLive.Active, :index
-    live "/listings/sold", ListingLive.Sold, :index
-    live "/listings/:id/add-to-order", ListingLive.Active, :add_to_order
-
     post "/login", SessionController, :create
     delete "/logout", SessionController, :delete
 
-    live "/orders/pending", OrderLive.Index, :pending
-    live "/orders/finalized", OrderLive.Index, :finalized
-    live "/orders/processed", OrderLive.Index, :processed
-    live "/orders/shipped", OrderLive.Index, :shipped
-    live "/orders/completed", OrderLive.Index, :completed
-    live "/orders/load", OrderLive.Index, :load
-    live "/orders/new", OrderLive.Index, :new
-    live "/orders/:id", OrderLive.Show, :show
-    live "/orders/:id/edit", OrderLive.Index, :edit
-    live "/orders/:id/mark-completed", OrderLive.Index, :mark_completed
-    live "/orders/:id/mark-processed", OrderLive.Index, :mark_processed
-    live "/orders/:id/mark-shipped", OrderLive.Index, :mark_shipped
+    live_session :default, on_mount: KamanskyWeb.InitAssigns do
+      live "/", DashboardLive.Index, :index
 
-    live "/purchases", PurchaseLive.Index, :index
-    live "/purchases/new", PurchaseLive.Index, :new
+      live "/customers", CustomerLive.Index, :index
+      live "/customers/:id/edit", CustomerLive.Index, :edit
+      live "/customers/:id/show", CustomerLive.Show, :show
 
-    live "/reports", ReportLive.Index, :index
-    live "/reports/overall", ReportLive.Show, :index
+      live "/dashboard", DashboardLive.Index, :index
 
-    live "/stamp_references", StampReferenceLive.Index, :index
-    live "/stamp_references/new", StampReferenceLive.Index, :new
-    live "/stamp_references/:id/edit", StampReferenceLive.Index, :edit
+      live "/expenses", ExpenseLive.Index, :index
+      live "/expenses/new", ExpenseLive.Index, :new
 
-    live "/stamps/collection", StampLive.Index, :collection
-    live "/stamps/stock", StampLive.Index, :stock
-    live "/stamps/new", StampLive.Index, :new
-    live "/stamps/:id", StampLive.Index, :show
-    live "/stamps/:id/edit", StampLive.Index, :edit
-    live "/stamps/:id/move-to-stock", StampLive.Index, :move_to_stock
-    live "/stamps/:id/sell", StampLive.Index, :sell
+      live "/listings", ListingLive.Active, :index
+      live "/listings/sold", ListingLive.Sold, :index
+      live "/listings/:id/add-to-order", ListingLive.Active, :add_to_order
+
+      live "/orders/pending", OrderLive.Index, :pending
+      live "/orders/finalized", OrderLive.Index, :finalized
+      live "/orders/processed", OrderLive.Index, :processed
+      live "/orders/shipped", OrderLive.Index, :shipped
+      live "/orders/completed", OrderLive.Index, :completed
+      live "/orders/load", OrderLive.Index, :load
+      live "/orders/new", OrderLive.Index, :new
+      live "/orders/:id", OrderLive.Show, :show
+      live "/orders/:id/edit", OrderLive.Index, :edit
+      live "/orders/:id/mark-completed", OrderLive.Index, :mark_completed
+      live "/orders/:id/mark-processed", OrderLive.Index, :mark_processed
+      live "/orders/:id/mark-shipped", OrderLive.Index, :mark_shipped
+
+      live "/purchases", PurchaseLive.Index, :index
+      live "/purchases/new", PurchaseLive.Index, :new
+
+      live "/reports", ReportLive.Index, :index
+      live "/reports/overall", ReportLive.Show, :index
+
+      live "/stamp_references", StampReferenceLive.Index, :index
+      live "/stamp_references/new", StampReferenceLive.Index, :new
+      live "/stamp_references/:id/edit", StampReferenceLive.Index, :edit
+
+      live "/stamps/collection", StampLive.Index, :collection
+      live "/stamps/stock", StampLive.Index, :stock
+      live "/stamps/new", StampLive.Index, :new
+      live "/stamps/:id", StampLive.Index, :show
+      live "/stamps/:id/edit", StampLive.Index, :edit
+      live "/stamps/:id/move-to-stock", StampLive.Index, :move_to_stock
+      live "/stamps/:id/sell", StampLive.Index, :sell
+    end
   end
 
   # Other scopes may use custom stacks.

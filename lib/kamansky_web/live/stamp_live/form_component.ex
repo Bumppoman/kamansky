@@ -40,17 +40,16 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   end
 
   def handle_event("validate", %{"stamp" => stamp_params}, socket) do
-    changeset =
+    with changeset <-
       socket.assigns.stamp
       |> Stamps.change_stamp(stamp_params)
       |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, :changeset, changeset)}
+    do
+      {:noreply, assign(socket, :changeset, changeset)}
+    end
   end
 
-  def handle_event("submit", %{"stamp" => stamp_params}, socket) do
-    save_stamp(socket, socket.assigns.action, stamp_params)
-  end
+  def handle_event("submit", %{"stamp" => stamp_params}, socket), do: save_stamp(socket, socket.assigns.action, stamp_params)
 
   @spec manage_photo(Phoenix.LiveView.Socket.t, atom) :: {:ok, Kamansky.Attachments.Attachment.t | nil}
   defp manage_photo(socket, photo_name) do

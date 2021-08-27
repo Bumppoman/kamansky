@@ -22,6 +22,13 @@ defmodule Kamansky.Sales.Customers do
   @spec get_customer!(integer) :: Customer.t
   def get_customer!(id), do: Repo.get(Customer, id)
 
+  @spec get_customer_detail(pos_integer) :: Customer.t
+  def get_customer_detail(id) do
+    Customer
+    |> where(id: ^id)
+    |> Repo.one()
+  end
+
   @spec insert_or_update_hipstamp_customer(map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
   def insert_or_update_hipstamp_customer(attrs) do
     Customer

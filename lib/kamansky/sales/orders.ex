@@ -30,6 +30,13 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.aggregate(:count, :id)
   end
 
+  @spec count_orders_for_customer(pos_integer) :: integer
+  def count_orders_for_customer(customer_id) do
+    Order
+    |> where(customer_id: ^customer_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
   @spec create_order(map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
   def create_order(attrs) do
     %Order{}
@@ -104,7 +111,7 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.all()
   end
 
-  @spec list_orders(:display, atom, map) :: [Order.t]
+  @spec list_orders(:display, atom, Paginate.params) :: [Order.t]
   def list_orders(:display, status, params) do
     with(
       listings_query <-
@@ -118,6 +125,13 @@ defmodule Kamansky.Sales.Orders do
       |> preload([o, c, l, s], [customer: c, listings: ^listings_query])
       |> then(&Paginate.list(Orders, &1, params))
     end
+  end
+
+  @spec list_orders_for_customer(pos_integer, Paginate.params) :: [Order.t]
+  def list_orders_for_customer(customer_id, params) do
+    Order
+    |> where(customer_id: ^customer_id)
+    |> then(&Paginate.list(Orders, &1, params))
   end
 
   @spec list_pending_orders_to_add_listing :: [Order.t]

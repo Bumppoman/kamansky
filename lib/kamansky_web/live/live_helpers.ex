@@ -2,20 +2,6 @@ defmodule KamanskyWeb.LiveHelpers do
   import Phoenix.LiveView
   import Phoenix.LiveView.Helpers
 
-  @spec assign_defaults(Phoenix.LiveView.Socket.t, map)
-    :: %Phoenix.LiveView.Socket{
-      assigns: %{
-        required(:logged_in) => boolean,
-        required(:timezone) => Calendar.time_zone,
-        optional(any) => any
-      }
-    }
-  def assign_defaults(socket, session) do
-    socket
-    |> assign(:logged_in, Map.get(session, "logged_in", false))
-    |> assign(:timezone, get_connect_params(socket)["timezone"] || "America/New_York")
-  end
-
   @spec live_confirmation_modal(keyword) :: Phoenix.LiveView.Component.t
   def live_confirmation_modal(opts) do
     live_modal(

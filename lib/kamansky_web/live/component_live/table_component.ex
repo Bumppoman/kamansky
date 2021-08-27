@@ -1,12 +1,6 @@
 defmodule KamanskyWeb.ComponentLive.TableComponent do
   use KamanskyWeb, :live_component
 
-  @default_table_data %{
-    current_page: 1,
-    page: 1,
-    per_page: 10
-  }
-
   @spec end_value(pos_integer, pos_integer, pos_integer) :: pos_integer
   def end_value(current_page, per_page, total_items) do
     with start_value <- start_value(current_page, per_page) do
@@ -89,14 +83,12 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   @impl true
   @spec mount(Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(socket) do
-    with(
-      socket <-
-        socket
-        |> assign(current_page: @default_table_data.current_page)
-        |> assign(page: @default_table_data.page)
-        |> assign(per_page: @default_table_data.per_page)
-        |> assign(search: nil)
-    ) do
+    with socket <-
+      socket
+      |> assign(current_page: 1)
+      |> assign(page: 1)
+      |> assign(search: nil)
+    do
       {:ok, socket}
     end
   end
@@ -161,6 +153,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
       socket <-
         socket
         |> assign(assigns)
+        |> assign(:per_page, Keyword.get(assigns.options, :per_page, 10))
         |> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
       socket <- assign(socket, :current_page, record_location(socket, assigns.options[:go_to_record])),
       socket <- assign_data(socket),

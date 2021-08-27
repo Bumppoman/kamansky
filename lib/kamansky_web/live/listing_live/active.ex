@@ -8,19 +8,14 @@ defmodule KamanskyWeb.ListingLive.Active do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
-    with(
-      socket <-
-        socket
-        |> assign_defaults(session)
-        |> assign([
-          data_count: Listings.count_listings(:active),
-          data_locator: fn options -> Listings.find_row_number_for_listing(:active, options) end,
-          data_source: fn options -> Listings.list_listings(:active, options) end
-        ])
-    ) do
-      {:ok, socket}
-    end
+  def mount(_params, _session, socket) do
+    {
+      :ok,
+      socket
+      |> assign(:data_count, Listings.count_listings(:active))
+      |> assign(:data_locator, fn options -> Listings.find_row_number_for_listing(:active, options) end)
+      |> assign(:data_source, fn options -> Listings.list_listings(:active, options) end)
+    }
   end
 
   @impl true

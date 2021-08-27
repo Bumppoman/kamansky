@@ -9,9 +9,8 @@ defmodule KamanskyWeb.DashboardLive.Index do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
-    with socket <- assign_defaults(socket, session),
-      date <- DateTime.now!(socket.assigns.timezone),
+  def mount(_params, _session, socket) do
+    with date <- DateTime.now!(socket.assigns.timezone),
       day <- date.day,
       days <- max(day, (Date.add(date, -day)).day),
       previous_month <- Date.add(date, -days).month,

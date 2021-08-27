@@ -8,16 +8,13 @@ defmodule KamanskyWeb.ExpenseLive.Index do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     {
       :ok,
       socket
-      |> assign_defaults(session)
-      |> assign([
-        data_count: Expenses.count_expenses(),
-        data_locator: fn options -> Expenses.find_row_number_for_expense(options) end,
-        data_source: fn options -> Expenses.list_expenses(options) end
-      ])
+      |> assign(:data_count, Expenses.count_expenses())
+      |> assign(:data_locator, fn options -> Expenses.find_row_number_for_expense(options) end)
+      |> assign(:data_source, fn options -> Expenses.list_expenses(options) end)
     }
   end
 
@@ -33,11 +30,7 @@ defmodule KamanskyWeb.ExpenseLive.Index do
     |> assign(:expense, Expenses.get_expense!(id))
     |> assign(:page_title, "Add New Expense")
   end
-
-  defp apply_action(socket, :index, _params) do
-    assign(socket, :page_title, "Expenses")
-  end
-
+  defp apply_action(socket, :index, _params), do: assign(socket, :page_title, "Expenses")
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:expense, %Expense{})

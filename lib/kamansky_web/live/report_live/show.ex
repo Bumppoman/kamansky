@@ -6,12 +6,6 @@ defmodule KamanskyWeb.ReportLive.Show do
   alias Kamansky.Operations.Reports
 
   @impl true
-  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
-    {:ok, assign_defaults(socket, session)}
-  end
-
-  @impl true
   @spec handle_params(%{required(String.t) => String.t}, String.t, Phoenix.LiveView.Socket.t)
     :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(%{"month" => month, "year" => year}, _uri, socket) do

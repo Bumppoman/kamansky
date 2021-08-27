@@ -29,7 +29,7 @@
     ]
   do %>
     <% customer -> %>
-      <td><%= customer.name %></td>
+      <td><%= live_redirect customer.name, to: Routes.customer_show_path(@socket, :show, customer) %></td>
       <td><%= Customer.full_address(customer) %></td>
       <td><%= Customer.formatted_email(customer) %></td>
       <td><%= format_decimal_as_currency(customer.amount_spent_ytd) %></td>

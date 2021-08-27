@@ -7,14 +7,7 @@ defmodule KamanskyWeb.ReportLive.Index do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
-    {
-      :ok,
-      socket
-      |> assign_defaults(session)
-      |> assign(:year, DateTime.utc_now().year)
-    }
-  end
+  def mount(_params, _session, socket), do: {:ok, assign(socket, :year, DateTime.utc_now().year)}
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}

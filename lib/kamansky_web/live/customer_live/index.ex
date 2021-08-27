@@ -8,17 +8,14 @@ defmodule KamanskyWeb.CustomerLive.Index do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, session, socket) do
-    socket =
+  def mount(_params, _session, socket) do
+    {
+      :ok,
       socket
-      |> assign_defaults(session)
-      |> assign([
-        data_count: Customers.count_customers(),
-        data_locator: fn options -> Customers.find_row_number_for_customer(options) end,
-        data_source: fn options -> Customers.list_customers(options) end
-      ])
-
-    {:ok, socket}
+      |> assign(:data_count, Customers.count_customers())
+      |> assign(:data_locator, fn options -> Customers.find_row_number_for_customer(options) end)
+      |> assign(:data_source, fn options -> Customers.list_customers(options) end)
+    }
   end
 
   @impl true
@@ -37,6 +34,6 @@ defmodule KamanskyWeb.CustomerLive.Index do
   defp apply_action(socket, :index, params) do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))
-    |> assign(page_title: "Customer List")
+    |> assign(:page_title, "Customer List")
   end
 end
