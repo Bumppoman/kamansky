@@ -38,12 +38,12 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
   @spec save_stamp_reference(Phoenix.LiveView.Socket.t, :edit | :new, map) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp save_stamp_reference(socket, :edit, stamp_reference_params) do
     case StampReferences.update_stamp_reference(socket.assigns.stamp_reference, stamp_reference_params) do
-      {:ok, _stamp_reference} ->
+      {:ok, %StampReference{id: id}} ->
         {
           :noreply,
           socket
           |> put_flash(:info, "You have successfully updated this stamp reference.")
-          |> push_redirect(to: socket.assigns.return_to)
+          |> push_redirect(to: Routes.stamp_reference_index_path(socket, :index, go_to_record: id))
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -53,7 +53,7 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
 
   defp save_stamp_reference(socket, :new, stamp_reference_params) do
     case StampReferences.create_stamp_reference(stamp_reference_params) do
-      {:ok, %{id: id}} ->
+      {:ok, %StampReference{id: id}} ->
         {
           :noreply,
           socket

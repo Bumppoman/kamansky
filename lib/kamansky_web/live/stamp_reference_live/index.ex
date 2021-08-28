@@ -32,6 +32,7 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))
     |> assign(:page_title, "Stamps Missing From Collection")
+    |> assign(:parent_index, nil)
   end
 
   defp apply_action(socket, :new, _params) do

@@ -36,7 +36,7 @@
     <% stamp -> %>
       <td>
         <%= live_patch stamp.scott_number,
-          to: Routes.stamp_index_path(@socket, :show, stamp)
+          to: Routes.stamp_index_path(@socket, :show, stamp, from: @live_action)
         %>
       </td>
       <td><%= Stamp.formatted_grade(stamp) %></td>
@@ -60,10 +60,11 @@
         <% end %>
       </td>
   <% end %>
-  <%= if @live_action in [:collection, :collection_to_replace] do %>
+  <%= if @live_action in [:collection, :collection_to_replace, :show] do %>
     <KamanskyWeb.StampLive.CollectionComponents.types_footer 
       socket={@socket}
       live_action={@live_action}
+      parent_index={@parent_index}
     />
   <% end %>
 </section>
@@ -84,7 +85,7 @@
     id: "stamp-detail-modal",
     stamp: @stamp,
     title: "View Stamp",
-    return_to: Routes.stamp_index_path(@socket, @status)
+    return_to: Routes.stamp_index_path(@socket, @parent_index)
   %>
 <% end %>
 <%= if @live_action == :move_to_stock do %>

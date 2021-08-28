@@ -33,11 +33,11 @@ defmodule Kamansky.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.12"},
+      {:phoenix, "~> 1.6.0-rc.0", override: true},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.7"},
       {:postgrex, ">= 0.15.10"},
-      {:phoenix_live_view, "~> 0.16"},
+      {:phoenix_live_view, "~> 0.16.1"},
       {:floki, ">= 0.0.0", only: :test},
       {:phoenix_html, "~> 3.0.2"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},

@@ -35,6 +35,7 @@ defmodule KamanskyWeb.StampLive.Index do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))
     |> assign(:page_title, "Collection Below XF")
+    |> assign(:parent_index, nil)
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -61,8 +62,9 @@ defmodule KamanskyWeb.StampLive.Index do
     |> assign(:stamp, Stamps.get_stamp!(id))
   end
 
-  defp apply_action(socket, :show, %{"id" => id}) do
+  defp apply_action(socket, :show, %{"id" => id, "from" => parent_index}) do
     socket
+    |> assign(:parent_index, String.to_existing_atom(parent_index))
     |> assign(:stamp, Stamps.get_stamp_detail!(id))
   end
 
@@ -70,12 +72,14 @@ defmodule KamanskyWeb.StampLive.Index do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))
     |> assign(:page_title, String.capitalize(Atom.to_string(action)))
+    |> assign(:parent_index, nil)
     |> assign(:status, socket.assigns.live_action)
   end
 
   @spec load_stamps(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
   defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{live_action: live_action}} = socket)
     when live_action == :collection_to_replace
+      or (is_map_key(socket.assigns, :parent_index) and socket.assigns.parent_index == :collection_to_replace)
   do
     socket
     |> assign(:data_count, Stamps.count_stamps_in_collection_below_grade(85))

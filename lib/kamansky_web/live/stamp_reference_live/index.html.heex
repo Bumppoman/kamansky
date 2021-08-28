@@ -37,8 +37,10 @@
       <td><%= stamp_reference.scott_number %></td>
       <td><%= StampReference.description(stamp_reference) %></td>
       <td>
-        <%= live_patch to: Routes.stamp_reference_index_path(@socket, :edit, stamp_reference), class: "action-icon" do %>
-          <i class="material-icons">edit</i>
+        <%= unless @live_action == :missing_from_collection do %>
+          <%= live_patch to: Routes.stamp_reference_index_path(@socket, :edit, stamp_reference), class: "action-icon" do %>
+            <i class="material-icons">edit</i>
+          <% end %>
         <% end %>
       </td>
   <% end %>
@@ -46,6 +48,7 @@
     <KamanskyWeb.StampLive.CollectionComponents.types_footer 
       socket={@socket}
       live_action={@live_action}
+      parent_index={@parent_index}
     />
   <% end %>
 </section>
