@@ -28,6 +28,7 @@ defmodule Kamansky.Attachments.Attachment do
   def changeset(attachment, attrs \\ %{}), do: cast(attachment, attrs, [:content_type, :filename, :hash, :size])
 
   @spec full_path(t) :: String.t
+  def full_path(nil), do: nil
   def full_path(%Attachment{} = attachment) do
     attachment
     |> path()

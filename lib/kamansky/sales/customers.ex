@@ -68,6 +68,13 @@ defmodule Kamansky.Sales.Customers do
     end
   end
 
+  @spec search_customers_by_name(String.t) :: [Customer.t]
+  def search_customers_by_name(name) do
+    Customer
+    |> where([c], ilike(c.name, ^"%#{String.downcase(name)}%"))
+    |> Repo.all()
+  end
+
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t

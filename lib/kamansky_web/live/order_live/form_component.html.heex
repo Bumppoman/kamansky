@@ -7,39 +7,81 @@
     phx_change="validate"
     phx_submit="submit"
   >
+    <div class="row">
+      <div class="col-md-6 form-group required">
+        <%= label f, :existing_customer, "Customer", class: "form-control-label" %>
+        <div>
+          <div class="form-check form-check-inline">
+            <%= radio_button f, :existing_customer, true, class: "form-check-input" %>
+            <label class="form-check-label">Existing</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <%= radio_button f, :existing_customer, false, class: "form-check-input" %>
+            <label class="form-check-label">New</label>
+          </div>
+        </div>
+      </div>
+    </div>
     <%= for cf <- inputs_for(f, :customer) do %>
       <div class="row">
         <div class="col-md-6 form-group required">
           <%= label cf, :name, class: "form-control-label" %>
-          <%= text_input cf, :name, class: "form-control" %>
+          <%= text_input cf, 
+            :name,
+            autocomplete: "off",
+            class: "form-control",
+            "phx-target": @myself,
+            "phx-keyup": (if existing_customer(@changeset), do: "search_for_customers")
+          %>
+          <%= if existing_customer(@changeset) and @searched do %>
+            <div id="customers">
+              <ul class="list-group">
+                <%= if Enum.any?(@matching_customers) do %>
+                  <%= for customer <- @matching_customers do %>
+                    <li class="list-group-item">
+                      <%= link customer.name,
+                        to: "#",
+                        "phx-click": "select_customer",
+                        "phx-target": @myself,
+                        "phx-value-customer_id": customer.id
+                      %>
+                    </li>
+                  <% end %>
+                <% else %>
+                  <li class="list-group-item">No results</li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
         </div>
         <div class="col-md-6 form-group">
           <%= label cf, :email, class: "form-control-label" %>
-          <%= text_input cf, :email, class: "form-control" %>
+          <%= text_input cf, :email, class: "form-control", disabled: existing_customer(@changeset) %>
         </div>
       </div>
       <div class="row">
         <div class="col form-group required">
           <%= label cf, :street_address, "Street Address", class: "form-control-label" %>
-          <%= text_input cf, :street_address, class: "form-control" %>
+          <%= text_input cf, :street_address, class: "form-control", disabled: existing_customer(@changeset) %>
         </div>
       </div>
       <div class="row">
         <div class="col-md-6 form-group required">
           <%= label cf, :city, class: "form-control-label" %>
-          <%= text_input cf, :city, class: "form-control" %>
+          <%= text_input cf, :city, class: "form-control", disabled: existing_customer(@changeset) %>
         </div>
         <div class="col-md-2 form-group required" phx-update="ignore">
-          <%= label cf, :state, class: "form-control-label" %>
+          <%= label cf, :state, class: "form-control-label", disabled: existing_customer(@changeset) %>
           <%= select cf,
             :state,
             states(),
-            class: "choices-select"
+            class: "choices-select",
+            disabled: existing_customer(@changeset)
           %>
         </div>
         <div class="col-md-4 form-group required">
           <%= label cf, :zip, class: "form-control-label" %>
-          <%= text_input cf, :zip, class: "form-control" %>
+          <%= text_input cf, :zip, class: "form-control", disabled: existing_customer(@changeset) %>
         </div>
       </div>
     <% end %>

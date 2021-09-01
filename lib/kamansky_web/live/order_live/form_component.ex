@@ -3,7 +3,7 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
 
   import Kamansky.Helpers
 
-  alias Kamansky.Sales.Orders
+  alias Kamansky.Sales.{Customers, Orders}
 
   @impl true
   @spec update(%{required(:order) => Kamansky.Sales.Orders.Order.t, optional(:any) => any}, Phoenix.LiveView.Socket.t)
@@ -14,6 +14,8 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
         socket
         |> assign(assigns)
         |> assign(:changeset, changeset)
+        |> assign(:matching_customers, [])
+        |> assign(:searched, false)
     do
       {:ok, socket}
     end
@@ -21,6 +23,38 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
 
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_event("search_for_customers", %{"value" => name}, socket) when byte_size(name) == 0 do
+    {
+      :noreply,
+      socket
+      |> assign(:matching_customers, [])
+      |> assign(:searched, false)
+    }
+  end
+
+  def handle_event("search_for_customers", %{"value" => name}, socket) do
+    {
+      :noreply,
+      socket
+      |> assign(:matching_customers, Customers.search_customers_by_name(name))
+      |> assign(:searched, true)
+    }
+  end
+
+  def handle_event("select_customer", %{"customer-id" => customer_id}, socket) do
+    {
+      :noreply,
+      socket
+      |> assign(:changeset, Orders.change_new_order_customer(socket.assigns.changeset, customer_id))
+      |> assign(:matching_customers, [])
+      |> assign(:searched, false)
+    }
+  end
+
+  def handle_event("submit", %{"order" => order_params}, socket) do
+    save_order(socket, socket.assigns.action, order_params)
+  end
+
   def handle_event("validate", %{"order" => order_params}, socket) do
     with changeset <-
       socket.assigns.order
@@ -31,9 +65,7 @@ defmodule KamanskyWeb.OrderLive.FormComponent do
     end
   end
 
-  def handle_event("submit", %{"order" => order_params}, socket) do
-    save_order(socket, socket.assigns.action, order_params)
-  end
+  def existing_customer(changeset), do: Ecto.Changeset.get_field(changeset, :existing_customer)
 
   @spec get_platform_id_field(Ecto.Changeset.t) :: :ebay_id | :hipstamp_id
   def get_platform_id_field(changeset) do

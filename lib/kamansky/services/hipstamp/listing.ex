@@ -22,13 +22,13 @@ defmodule Kamansky.Services.Hipstamp.Listing do
       private_id: stamp.inventory_key,
       quantity: 1,
       buyout_price: listing.listing_price,
-      images: Enum.join(
+      images:
         [
           Attachment.full_path(stamp.front_photo),
           Attachment.full_path(stamp.rear_photo)
-        ],
-        "||"
-      ),
+        ]
+        |> Enum.reject(&is_nil/1)
+        |> Enum.join("||"),
       item_specifics_01_country: "United States",
       item_specifics_02_catalog_number: stamp.scott_number,
       item_specifics_03_stamp_type: Hipstamp.issue_type(stamp),

@@ -42,12 +42,13 @@ defmodule Kamansky.Sales.Orders.Order do
     field :shipped_at, :utc_datetime
     field :completed_at, :utc_datetime
 
+    field :existing_customer, :boolean, virtual: true, default: false
     field :gross_profit, :decimal, virtual: true
     field :net_profit, :decimal, virtual: true
     field :platform, Ecto.Enum, values: [:hipstamp, :ebay], virtual: true, default: :hipstamp
     field :stamp_cost, :decimal, virtual: true
 
-    belongs_to :customer, Kamansky.Sales.Customers.Customer, on_replace: :update
+    belongs_to :customer, Kamansky.Sales.Customers.Customer, on_replace: :delete
     has_many :listings, Kamansky.Sales.Listings.Listing
   end
 
@@ -78,8 +79,8 @@ defmodule Kamansky.Sales.Orders.Order do
     |> cast(
       attrs,
       [
-        :ebay_id, :hipstamp_id, :item_price, :platform,
-        :selling_fees, :shipping_cost, :shipping_price
+        :ebay_id, :existing_customer, :hipstamp_id, :item_price,
+        :platform, :selling_fees, :shipping_cost, :shipping_price
       ]
     )
     |> cast_assoc(:customer, with: &Kamansky.Sales.Customers.Customer.changeset/2)
