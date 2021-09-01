@@ -30,9 +30,10 @@ defmodule KamanskyWeb.LiveHelpers do
         return_to: Routes.stamp_index_path(@socket, :index) %>
   """
   @spec live_modal(module, keyword) :: Phoenix.LiveView.Component.t
-  def live_modal(component, opts) do
+  def live_modal(component, opts \\ []) do
     with path <- Keyword.fetch!(opts, :return_to),
-      modal_opts <- [id: :modal, return_to: path, component: component, opts: opts]
+      button_text <- Keyword.get(opts, :button_text, opts[:title]),
+      modal_opts <- [id: :modal, return_to: path, button_text: button_text, component: component, opts: opts]
     do
       live_component(KamanskyWeb.ComponentLive.ModalComponent, modal_opts)
     end

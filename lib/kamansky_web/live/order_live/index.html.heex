@@ -8,7 +8,7 @@
       <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
     </div>
   <% end %>
-  <%= if @live_action in [:mark_processed, :pending, :new] do %>
+  <%= if show_topbar(assigns) do %>
     <div class="row mb-2">
       <div class="col-md-6">
       <%= live_patch "Load New Orders",
@@ -79,36 +79,48 @@
     <li class="nav-item">
       <%= live_redirect "Pending",
         to: Routes.order_index_path(@socket, :pending),
-        class: ["nav-link"] ++ (if @live_action in [:new, :pending], do: [" active"], else: [])
+        class: ["nav-link"] ++ (if active_status(assigns) == :pending, do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
       <%= live_redirect "Processed",
         to: Routes.order_index_path(@socket, :processed),
-        class: ["nav-link"] ++ (if @live_action in [:processed, :mark_shipped], do: [" active"], else: [])
+        class: ["nav-link"] ++ (if active_status(assigns) == :processed, do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
       <%= live_redirect "Shipped",
         to: Routes.order_index_path(@socket, :shipped),
-        class: ["nav-link"] ++ (if @live_action in [:shipped, :mark_completed], do: [" active"], else: [])
+        class: ["nav-link"] ++ (if active_status(assigns) == :shipped, do: [" active"], else: [])
       %>
     </li>
     <li class="nav-item">
       <%= live_redirect "Completed",
         to: Routes.order_index_path(@socket, :completed),
-        class: ["nav-link"] ++ (if @live_action == :completed, do: [" active"], else: [])
+        class: ["nav-link"] ++ (if active_status(assigns) == :completed, do: [" active"], else: [])
       %>
     </li>
   </ul>
 </section>
-<%= if @live_action in [:edit, :new] do %>
-  <%= live_modal KamanskyWeb.OrderLive.FormComponent,
+<%= if @live_action == :edit do %>
+  <%= live_modal KamanskyWeb.OrderLive.EditComponent,
     action: @live_action,
     form_id: "order-form",
     id: "order-form-modal",
     order: @order,
-    title: (if @live_action == :new, do: "Create Order", else: "Update Order"),
+    title: "Update Order",
+    return_to: Routes.order_index_path(@socket, @order.status)
+  %>
+<% end %>
+<%= if @live_action == :new do %>
+  <%= live_modal KamanskyWeb.OrderLive.NewComponent,
+    action: @live_action,
+    button_text: @button_text,
+    customer: @customer,
+    form_id: "customer-form",
+    id: "new-order-form-modal",
+    order: @order,
+    title: "Create Order",
     return_to: Routes.order_index_path(@socket, @order.status)
   %>
 <% end %>

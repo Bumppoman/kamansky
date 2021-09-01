@@ -32,6 +32,7 @@ defmodule Kamansky.Sales.Customers.Customer do
     field :ebay_id, :integer
 
     field :amount_spent_ytd, :decimal, virtual: true
+    field :existing, :boolean, virtual: true, default: false
     field :most_recent_order_date, :utc_datetime, virtual: true
 
     has_many :orders, Kamansky.Sales.Orders.Order
@@ -42,8 +43,9 @@ defmodule Kamansky.Sales.Customers.Customer do
     customer
     |> cast(attrs,
       [
-        :city, :country, :email, :hipstamp_id,
-        :name, :state, :street_address, :zip
+        :city, :country, :email, :existing,
+        :hipstamp_id, :name, :state, :street_address,
+        :zip
       ]
     )
   end

@@ -6,16 +6,11 @@ defmodule Kamansky.Sales.Orders do
 
   alias __MODULE__
   alias Kamansky.Repo
-  alias Kamansky.Sales.Customers
   alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Sales.Orders.Order
 
   @spec change_new_order(Order.t, map) :: Ecto.Changeset.t
   def change_new_order(%Order{} = order, attrs \\ %{}), do: Order.full_changeset(order, attrs)
-
-  def change_new_order_customer(changeset, customer_id) do
-    Ecto.Changeset.put_assoc(changeset, :customer, Customers.get_customer!(customer_id))
-  end
 
   @spec change_order(Order.t, map) :: Ecto.Changeset.t
   def change_order(%Order{} = order, attrs \\ %{}), do: Order.changeset(order, attrs)

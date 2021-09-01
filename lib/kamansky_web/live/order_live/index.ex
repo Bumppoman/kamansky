@@ -61,8 +61,31 @@ defmodule KamanskyWeb.OrderLive.Index do
   end
 
   @impl true
+  @spec handle_info({:update_new_order_step, %{step: pos_integer, customer: Customer.t}}, Phoenix.LiveView.Socket.t)
+    :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:update_new_order_step, %{step: 2, customer: customer}}, socket) do
+    {
+      :noreply,
+      socket
+      |> assign(:button_text, "Create Order")
+      |> assign(:customer, customer)
+    }
+  end
+
+  @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(params, _uri, socket), do: {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+
+  @spec active_status(map) :: atom
+  def active_status(%{order: %Order{status: status}}), do: status
+  def active_status(%{live_action: live_action}) do
+    if live_action in Ecto.Enum.values(Order, :status), do: live_action, else: :pending
+  end
+
+  @spec show_topbar(map) :: boolean
+  def show_topbar(%{live_action: live_action}) when live_action in [:new, :pending], do: true
+  def show_topbar(%{order: %Order{status: :pending}}), do: true
+  def show_topbar(_), do: false
 
   @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -112,8 +135,10 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "Create Order")
+    |> assign(:button_text, "Next")
+    |> assign(:customer, %Customer{})
     |> assign(:order, %Order{customer: %Customer{}})
+    |> assign(:page_title, "Create Order")
     |> load_orders(:pending)
   end
 

@@ -19,17 +19,15 @@ defmodule KamanskyWeb.ComponentLive.ModalComponent do
           <div class="modal-body">
             <%= live_component @component, @opts %>
           </div>
-          <%= unless @opts[:footer] == false do %>
-            <div class="modal-footer">
-              <a class="btn btn-secondary close-modal">Cancel</a>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                form={Keyword.get(@opts, :form_id)}
-                phx-click={Keyword.get(@opts, :button_action)}
-              ><%= @opts[:title] %></button>
-            </div>
-          <% end %>
+          <div class="modal-footer">
+            <a class="btn btn-secondary close-modal">Cancel</a>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              form={Keyword.get(@opts, :form_id)}
+              phx-click={Keyword.get(@opts, :button_action)}
+            ><%= @button_text %></button>
+          </div>
         </div>
       </div>
     </div>

@@ -42,13 +42,13 @@ defmodule Kamansky.Sales.Orders.Order do
     field :shipped_at, :utc_datetime
     field :completed_at, :utc_datetime
 
-    field :existing_customer, :boolean, virtual: true, default: false
+    field :existing_customer, :boolean, virtual: true, default: true
     field :gross_profit, :decimal, virtual: true
     field :net_profit, :decimal, virtual: true
     field :platform, Ecto.Enum, values: [:hipstamp, :ebay], virtual: true, default: :hipstamp
     field :stamp_cost, :decimal, virtual: true
 
-    belongs_to :customer, Kamansky.Sales.Customers.Customer, on_replace: :delete
+    belongs_to :customer, Kamansky.Sales.Customers.Customer, on_replace: :update
     has_many :listings, Kamansky.Sales.Listings.Listing
   end
 
@@ -69,21 +69,21 @@ defmodule Kamansky.Sales.Orders.Order do
     |> Enum.at(column)
   end
 
-  @spec ebay?(Order.t) :: boolean
+  @spec ebay?(t) :: boolean
   def ebay?(%Order{ebay_id: nil}), do: false
   def ebay?(%Order{}), do: true
 
-  @spec full_changeset(Order.t, map) :: Ecto.Changeset.t
-  def full_changeset(order, attrs) do
-    order
-    |> cast(
+  @spec full_changeset(t, map) :: Ecto.Changeset.t
+  def full_changeset(%Order{} = order, attrs) do
+    cast(
+      order,
       attrs,
       [
-        :ebay_id, :existing_customer, :hipstamp_id, :item_price,
-        :platform, :selling_fees, :shipping_cost, :shipping_price
+        :customer_id, :ebay_id, :existing_customer, :hipstamp_id,
+        :item_price, :platform, :selling_fees, :shipping_cost,
+        :shipping_price
       ]
     )
-    |> cast_assoc(:customer, with: &Kamansky.Sales.Customers.Customer.changeset/2)
   end
 
   @spec hipstamp?(Order.t) :: boolean

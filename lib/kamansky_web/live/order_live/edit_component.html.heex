@@ -1,0 +1,16 @@
+<div class="form-wrapper">
+  <.form
+    let={f}
+    for={@changeset}
+    id={@form_id}
+    phx_target={@myself}
+    phx_change="validate"
+    phx_submit="submit"
+  >
+    <KamanskyWeb.CustomerLive.RawFormComponent.customer_info customer={@customer} />
+    <KamanskyWeb.OrderLive.RawFormComponent.order_form 
+      f={f}
+      changeset={@changeset}
+    />
+  </.form>
+</div>
