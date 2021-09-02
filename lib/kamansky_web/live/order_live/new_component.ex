@@ -55,7 +55,7 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
   end
 
   def handle_event("submit_customer", %{"customer" => customer_params}, socket) do
-    with {:ok, customer} <- Customers.update_customer(socket.assigns.customer, customer_params),
+    with {:ok, customer} <- Customers.insert_or_update_customer(socket.assigns.customer, customer_params),
       _map <- send(self(), {:update_new_order_step, %{step: 2, customer: customer}}),
       order <- %Order{socket.assigns.order | customer: customer}
     do

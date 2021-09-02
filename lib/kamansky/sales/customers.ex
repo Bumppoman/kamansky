@@ -29,6 +29,13 @@ defmodule Kamansky.Sales.Customers do
     |> Repo.one()
   end
 
+  @spec insert_or_update_customer(Customer.t, map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
+  def insert_or_update_customer(%Customer{} = customer, attrs) do
+    customer
+    |> change_customer(attrs)
+    |> Repo.insert_or_update()
+  end
+
   @spec insert_or_update_hipstamp_customer(map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
   def insert_or_update_hipstamp_customer(attrs) do
     Customer
