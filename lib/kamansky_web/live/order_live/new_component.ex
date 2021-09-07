@@ -73,7 +73,7 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
 
   def handle_event("submit_order", %{"order" => order_params}, socket) do
     order_params
-    |> Map.put(:customer_id, socket.assigns.customer.id)
+    |> Map.put("customer_id", socket.assigns.customer.id)
     |> Orders.create_order()
     |> case do
       {:ok, %{id: id}} ->
