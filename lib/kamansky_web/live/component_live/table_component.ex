@@ -54,7 +54,7 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
           column: String.to_integer(sort),
           direction: invert_sort_direction(sort_direction),
         },
-      socket <- assign(socket, sort: sort)
+      socket <- assign(socket, :sort, sort)
     ) do
       {:noreply, assign_data(socket)}
     end
@@ -85,9 +85,9 @@ defmodule KamanskyWeb.ComponentLive.TableComponent do
   def mount(socket) do
     with socket <-
       socket
-      |> assign(current_page: 1)
-      |> assign(page: 1)
-      |> assign(search: nil)
+      |> assign(:current_page, 1)
+      |> assign(:page, 1)
+      |> assign(:search, nil)
     do
       {:ok, socket}
     end

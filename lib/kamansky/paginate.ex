@@ -47,6 +47,30 @@ defmodule Kamansky.Paginate do
     end
   end
 
+  defmacrop compare(field_name, operator, value) do
+    {
+      operator,
+      [context: Elixir, import: Kernel],
+      [
+        {
+          :field,
+          [],
+          [
+            {:b, [], Elixir},
+            field_name
+          ]
+        },
+        value
+      ]
+    }
+  end
+
+  def cursorize(query, order_by, last) do
+    Enum.reduce(order_by, query, fn clause, q ->
+      where(q, [{^clause.binding, b}], compare(^clause.field, :>, ^Map.get(last, clause.field)))
+    end)
+  end
+
   @spec find_row_number(Ecto.Queryable.t, atom, params) :: integer
   def find_row_number(query, sort_column, options) do
     with(

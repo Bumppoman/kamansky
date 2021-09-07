@@ -215,14 +215,14 @@ defmodule Kamansky.Stamps do
 
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
-  def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
+  def sort(query, %{column: 0, direction: direction}), do: order_by(query, [{^direction, :scott_number}, asc: :id])
 
   def sort(query, %{column: 1, direction: direction}) do
-    order_by(query, {^String.to_existing_atom(Atom.to_string(direction) <> "_nulls_last"), :grade})
+    order_by(query, [{^String.to_existing_atom(Atom.to_string(direction) <> "_nulls_last"), :grade}, asc: :id])
   end
 
   def sort(query, %{column: 2, direction: direction}) do
-    order_by(query, [s], {^direction, s.cost + s.purchase_fees})
+    order_by(query, [s], [{^direction, s.cost + s.purchase_fees}, asc: :id])
   end
 
   @spec update_stamp(
@@ -265,7 +265,7 @@ defmodule Kamansky.Stamps do
   @spec stamp_row_number_lookup(Ecto.Queryable.t, pos_integer) :: integer
   defp stamp_row_number_lookup(query, stamp_id) do
     query
-    |> select([s], {s.id, row_number() |> over(order_by: [{:asc, s.scott_number}])})
+    |> select([s], {s.id, row_number() |> over(order_by: [asc: s.scott_number, asc: s.id])})
     |> Repo.all
     |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(stamp_id) end)
     |> case do
