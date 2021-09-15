@@ -30,7 +30,11 @@
     parent_action: :active
   do %>
     <% listing -> %>
-      <td><%= listing.stamp.scott_number %></td>
+      <td>
+        <%= live_redirect listing.stamp.scott_number,
+          to: Routes.stamp_index_path(@socket, :show, listing.stamp, from: @live_action)
+        %>
+      </td>
       <td>#<%= listing.stamp.inventory_key %></td>
       <td>
         <span><%= Stamp.formatted_grade(listing.stamp) %></span>
