@@ -34,6 +34,8 @@ defmodule KamanskyWeb.Router do
 
       live "/listings", ListingLive.Active, :index
       live "/listings/sold", ListingLive.Sold, :index
+      live "/listings/sold/:id", ListingLive.Sold, :show
+      live "/listings/:id", ListingLive.Active, :show
       live "/listings/:id/add-to-order", ListingLive.Active, :add_to_order
 
       live "/orders/pending", OrderLive.Index, :pending

@@ -30,8 +30,8 @@
   do %>
     <% listing -> %>
       <td>
-        <%= live_redirect listing.stamp.scott_number,
-          to: Routes.stamp_index_path(@socket, :show, listing.stamp, from: @live_action)
+        <%= live_patch listing.stamp.scott_number,
+          to: Routes.listing_sold_path(@socket, :show, listing)
         %>
       </td>
       <td><%= formatted_date(listing.order.ordered_at) %></td>
@@ -52,3 +52,12 @@
     </li>
   </ul>
 </section>
+<%= if @live_action == :show do %>
+  <%= live_modal KamanskyWeb.StampLive.DetailComponent,
+    footer: false,
+    id: "stamp-detail-modal",
+    stamp: @stamp,
+    title: "View Stamp",
+    return_to: Routes.listing_sold_path(@socket, :index)
+  %>
+<% end %>

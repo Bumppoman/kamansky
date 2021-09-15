@@ -31,8 +31,8 @@
   do %>
     <% listing -> %>
       <td>
-        <%= live_redirect listing.stamp.scott_number,
-          to: Routes.stamp_index_path(@socket, :show, listing.stamp, from: @live_action)
+        <%= live_patch listing.stamp.scott_number,
+          to: Routes.listing_active_path(@socket, :show, listing)
         %>
       </td>
       <td>#<%= listing.stamp.inventory_key %></td>
@@ -75,6 +75,15 @@
     listing: @listing,
     pending_orders: @pending_orders,
     title: "Add Listing to Order",
+    return_to: Routes.listing_active_path(@socket, :index)
+  %>
+<% end %>
+<%= if @live_action == :show do %>
+  <%= live_modal KamanskyWeb.StampLive.DetailComponent,
+    footer: false,
+    id: "stamp-detail-modal",
+    stamp: @stamp,
+    title: "View Stamp",
     return_to: Routes.listing_active_path(@socket, :index)
   %>
 <% end %>

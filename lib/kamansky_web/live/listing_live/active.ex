@@ -4,6 +4,7 @@ defmodule KamanskyWeb.ListingLive.Active do
   import Kamansky.Helpers
 
   alias Kamansky.Sales.{Listings, Orders}
+  alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
 
   @impl true
@@ -24,7 +25,7 @@ defmodule KamanskyWeb.ListingLive.Active do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  @spec apply_action(Phoenix.LiveView.Socket.t, :add_to_order | :index, map) :: Phoenix.LiveView.Socket.t
+  @spec apply_action(Phoenix.LiveView.Socket.t, :add_to_order | :index | :show, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :index, params) do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))
@@ -38,5 +39,13 @@ defmodule KamanskyWeb.ListingLive.Active do
     |> assign(:listing, Listings.get_listing!(id))
     |> assign(:page_title, "Add Listing to Order")
     |> assign(:pending_orders, Orders.list_pending_orders_to_add_listing())
+  end
+
+  defp apply_action(socket, :show, %{"id" => id}) do
+    with listing <- Listings.get_listing!(id) do
+      socket
+      |> assign(:page_title, "View Listing")
+      |> assign(:stamp, Stamps.get_stamp_detail!(listing.stamp_id))
+    end
   end
 end
