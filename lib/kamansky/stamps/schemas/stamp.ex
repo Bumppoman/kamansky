@@ -89,7 +89,6 @@ defmodule Kamansky.Stamps.Stamp do
     thin_spot: boolean,
     toning: boolean,
     inserted_at: DateTime.t,
-    moved_to_stock_at: DateTime.t,
     front_photo_id: integer,
     rear_photo_id: integer
   }
@@ -118,7 +117,6 @@ defmodule Kamansky.Stamps.Stamp do
     field :thin_spot, :boolean, default: false
     field :toning, :boolean, default: false
     timestamps(updated_at: false)
-    field :moved_to_stock_at, :utc_datetime
 
     field :add_to, Ecto.Enum, values: [:collection, :stock], virtual: true
 
@@ -222,24 +220,20 @@ defmodule Kamansky.Stamps.Stamp do
 
   @spec history(Stamp.t) :: [String.t]
   def history(%Stamp{} = stamp) do
-    h =
-      if stamp.moved_to_stock_at != stamp.inserted_at do
-        [
-          "Added to collection on #{formatted_date(stamp.inserted_at)}",
-          (if stamp.status == :stock, do: "Moved to stock on #{formatted_date(stamp.moved_to_stock_at)}")
-        ]
-      else
-        ["Added to stock on #{formatted_date(stamp.moved_to_stock_at)}"]
-      end
-
-    #unless is_nil(stamp.listing) do
-    #  h = h ++ [
-    #    "Listed for sale on #{Calendar.strftime(stamp.listing.inserted_at, "%B %-d, %Y")}",
-    #    (if stamp.listing.sold, do: "Sold on #{Calendar.strftime(stamp.listing.sold_at, "%B %-d, %Y")}")
-    #  ]
-    #end
-
-    h
+    with(
+      h <- ["Purchased on #{formatted_date(stamp.inserted_at)}"],
+      h <-
+        if is_nil(stamp.listing) do
+          h
+        else
+          h ++ [
+            "Listed for sale on #{formatted_date(stamp.listing.inserted_at)}",
+            (if stamp.listing.status == :sold, do: "Sold on #{formatted_date(stamp.listing.order.ordered_at, "%B %-d, %Y")}")
+          ]
+        end
+    ) do
+      Enum.reject(h, &is_nil/1)
+    end
   end
 
   @spec letter_grade(%Stamp{grade: nil | integer}) :: String.t

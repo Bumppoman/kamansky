@@ -2,7 +2,6 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
   use Ecto.Schema
 
   import Ecto.Changeset
-  import Kamansky.Helpers
 
   alias __MODULE__
 
@@ -31,12 +30,8 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
   @doc false
   @spec changeset(StampReference.t, %{}) :: Ecto.Changeset.t
   def changeset(stamp_reference, attrs) do
-
-    # Workaround for Ecto.Enum (7/2021)
-    attrs = cast_enum_fields(attrs, ["issue_type"])
-
     stamp_reference
-    |> cast(attrs, [:color, :denomination, :issue_type, :scott_number, :title, :year_of_issue])
+    |> cast(attrs, [:color, :commemorative, :denomination, :issue_type, :scott_number, :title, :year_of_issue])
     |> validate_required([])
   end
 

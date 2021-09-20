@@ -114,10 +114,15 @@ defmodule Kamansky.Stamps do
   def get_stamp_detail!(id) do
     Stamp
     |> where(id: ^id)
+    |> join(:left, [s], l in assoc(s, :listing))
+    |> join(:left, [s, l], o in assoc(l, :order))
     |> join(:left, [s], sr in assoc(s, :stamp_reference))
     |> join(:left, [s], fp in assoc(s, :front_photo))
     |> join(:left, [s], rp in assoc(s, :rear_photo))
-    |> preload([s, sr, fp, rp], [stamp_reference: sr, front_photo: fp, rear_photo: rp])
+    |> preload(
+      [s, l, o, sr, fp, rp],
+      [listing: {l, [order: o]}, stamp_reference: sr, front_photo: fp, rear_photo: rp]
+    )
     |> Repo.one!()
   end
 
@@ -144,11 +149,11 @@ defmodule Kamansky.Stamps do
   end
 
   @spec move_stamp_to_stock(Stamp.t)
-    :: {:ok, %Stamp{status: :stock, moved_to_stock_at: DateTime.t}} | {:error, Ecto.Changeset.t}
+    :: {:ok, %Stamp{status: :stock}} | {:error, Ecto.Changeset.t}
   def move_stamp_to_stock(%Stamp{} = stamp) do
     stamp
     |> Stamp.changeset(%{})
-    |> Ecto.Changeset.change([status: :stock, moved_to_stock_at: DateTime.truncate(DateTime.utc_now(), :second)])
+    |> Ecto.Changeset.put_change(:status, :stock)
     |> Repo.update()
   end
 
