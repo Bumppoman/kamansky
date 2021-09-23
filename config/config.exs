@@ -20,7 +20,7 @@ config :kamansky, KamanskyWeb.Endpoint,
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.12.24",
+  version: "0.12.26",
   default: [
     args: ~w(js/app.js --bundle --target=es2020 --outdir=../priv/static/assets),
     cd: Path.expand("../assets", __DIR__),
@@ -29,7 +29,7 @@ config :esbuild,
 
 # Configure Dart Sass
 config :dart_sass,
-version: "1.38.2",
+version: "1.42.1",
 default: [
   args: ~w(css/app.scss ../priv/static/assets/app.css),
   cd: Path.expand("../assets", __DIR__)

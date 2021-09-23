@@ -16,7 +16,7 @@ defmodule Kamansky.Services.Hipstamp.Listing do
   def list(%Listing{stamp: stamp} = listing) do
     body = %{
       listing_type: :product,
-      name: String.slice(Stamp.sale_description(stamp), 0, 79),
+      name: binary_part(Stamp.sale_description(stamp), 0, 79),
       description: Stamp.sale_description(stamp) <> ".\n\n" <> "See photo for detail. Actual stamp shown.  Bumppoman Stamps does not use stock images on any listing...we wouldn't buy for our collection sight unseen so why should you?!\n\nAdditional stamps in the same order ship for 10¢ each, unless otherwise marked.  We strive for SAME or NEXT DAY shipping.",
       category_id: 12,
       private_id: stamp.inventory_key,
