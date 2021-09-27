@@ -100,7 +100,7 @@ defmodule Kamansky.Stamps.Stamp do
     field :purchase_fees, :decimal
     field :inventory_key, :string
     field :status, Ecto.Enum, values: [pending: 1, collection: 2, stock: 3, listed: 4, sold: 5]
-    field :format, Ecto.Enum, values: [single: 1, pair: 2, se_tenant: 3, souvenir_sheet: 4, block: 5, plate_block: 6, zip_block: 7, mail_early_block: 8], default: :single
+    field :format, Ecto.Enum, values: [single: 1, pair: 2, se_tenant: 3, souvenir_sheet: 4, block: 5, plate_block: 6, zip_block: 7, mail_early_block: 8, first_day_cover: 9], default: :single
     field :blind_perforation, :boolean, default: false
     field :crease, :boolean, default: false
     field :gum_disturbance, :boolean, default: false
@@ -182,6 +182,7 @@ defmodule Kamansky.Stamps.Stamp do
   def format_code(%Stamp{format: :plate_block}), do: "PB"
   def format_code(%Stamp{format: :zip_block}), do: "ZB"
   def format_code(%Stamp{format: :mail_early_block}), do: "MB"
+  def format_code(%Stamp{format: :first_day_cover}), do: "FDC"
 
   @spec formats :: [{String.t, atom}]
   def formats do
@@ -193,7 +194,8 @@ defmodule Kamansky.Stamps.Stamp do
       {"Block", :block},
       {"Plate block", :plate_block},
       {"ZIP block", :zip_block},
-      {"Mail Early block", :mail_early_block}
+      {"Mail Early block", :mail_early_block},
+      {"First day cover", :first_day_cover}
     ]
   end
 
