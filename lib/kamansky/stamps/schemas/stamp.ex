@@ -90,7 +90,8 @@ defmodule Kamansky.Stamps.Stamp do
     toning: boolean,
     inserted_at: DateTime.t,
     front_photo_id: integer,
-    rear_photo_id: integer
+    rear_photo_id: integer,
+    purchase_id: integer
   }
 
   schema "stamps" do
@@ -122,6 +123,7 @@ defmodule Kamansky.Stamps.Stamp do
 
     belongs_to :front_photo, Kamansky.Attachments.Attachment
     belongs_to :rear_photo, Kamansky.Attachments.Attachment
+    belongs_to :purchase, Kamansky.Operations.Purchases.Purchase
     belongs_to :stamp_reference,
       Kamansky.Stamps.StampReferences.StampReference,
       define_field: false,
