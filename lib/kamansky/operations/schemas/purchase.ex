@@ -32,4 +32,7 @@ defmodule Kamansky.Operations.Purchases.Purchase do
     [:date]
     |> Enum.at(column)
   end
+
+  @spec total_cost(t) :: Decimal.t
+  def total_cost(%Purchase{} = purchase), do: Decimal.add(purchase.cost, purchase.purchase_fees)
 end
