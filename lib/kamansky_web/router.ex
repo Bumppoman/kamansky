@@ -57,15 +57,15 @@ defmodule KamanskyWeb.Router do
       live "/reports", ReportLive.Index, :index
       live "/reports/overall", ReportLive.Show, :index
 
-      live "/stamp_references", StampReferenceLive.Index, :index
-      live "/stamp_references/new", StampReferenceLive.Index, :new
-      live "/stamp_references/:id/edit", StampReferenceLive.Index, :edit
-
       live "/stamps/collection", StampLive.Index, :collection
       live "/stamps/collection/replaceable", StampLive.Index, :collection_to_replace
       live "/stamps/collection/missing", StampReferenceLive.Index, :missing_from_collection
       live "/stamps/stock", StampLive.Index, :stock
       live "/stamps/new", StampLive.Index, :new
+      live "/stamps/references", StampReferenceLive.Index, :index
+      live "/stamps/references/new", StampReferenceLive.Index, :new
+      live "/stamps/references/:id/edit", StampReferenceLive.Index, :edit
+      live "/stamps/trends/sold", TrendLive.Index, :sold
       live "/stamps/:id", StampLive.Index, :show
       live "/stamps/:id/edit", StampLive.Index, :edit
       live "/stamps/:id/move-to-stock", StampLive.Index, :move_to_stock
