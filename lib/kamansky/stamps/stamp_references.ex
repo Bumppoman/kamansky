@@ -20,7 +20,11 @@ defmodule Kamansky.Stamps.StampReferences do
   def count_stamp_references_missing_from_collection, do: Repo.aggregate(missing_from_collection_query(), :count, :id)
 
   @spec count_stamp_references_with_sales :: integer
-  def count_stamp_references_with_sales, do: Repo.aggregate(with_sales_query(), :count, :id)
+  def count_stamp_references_with_sales do
+    with_sales_query()
+    |> distinct([sr], sr.id)
+    |> Repo.aggregate(:count, :id)
+  end
 
   @spec create_stamp_reference(map) :: {:ok, StampReference.t} | {:error, Ecto.Changeset.t}
   def create_stamp_reference(attrs) do
@@ -95,6 +99,7 @@ defmodule Kamansky.Stamps.StampReferences do
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
+  def sort(query, %{column: 1, direction: direction}), do: order_by(query, [sr, s, l], {^direction, count(l.id)})
 
   @spec update_stamp_reference(StampReference.t, map) :: {:ok, StampReference.t} | {:error, Ecto.Changeset.t}
   def update_stamp_reference(%StampReference{} = stamp_reference, attrs) do
@@ -110,8 +115,6 @@ defmodule Kamansky.Stamps.StampReferences do
   end
 
   defp with_sales_query do
-    StampReference
-    |> join(:left, [sr], s in Stamp, on: sr.scott_number == s.scott_number and s.status == :sold)
-    |> where([..., s], not is_nil(s.scott_number))
+    join(StampReference, :inner, [sr], s in Stamp, on: sr.scott_number == s.scott_number and s.status == :sold)
   end
 end
