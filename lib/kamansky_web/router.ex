@@ -65,11 +65,13 @@ defmodule KamanskyWeb.Router do
       live "/stamps/references", StampReferenceLive.Index, :index
       live "/stamps/references/new", StampReferenceLive.Index, :new
       live "/stamps/references/:id/edit", StampReferenceLive.Index, :edit
-      live "/stamps/trends/sold", TrendLive.Index, :sold
+      live "/stamps/trends/sold", TrendLive.Sold, :index
       live "/stamps/:id", StampLive.Index, :show
       live "/stamps/:id/edit", StampLive.Index, :edit
       live "/stamps/:id/move-to-stock", StampLive.Index, :move_to_stock
       live "/stamps/:id/sell", StampLive.Index, :sell
+
+      live "/trends", TrendLive.Index, :index
     end
   end
 

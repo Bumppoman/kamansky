@@ -100,6 +100,9 @@ defmodule Kamansky.Stamps.StampReferences do
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
   def sort(query, %{column: 1, direction: direction}), do: order_by(query, [sr, s, l], {^direction, count(l.id)})
+  def sort(query, %{column: 3, direction: direction}) do
+    order_by(query, [sr, s, l], {^direction, sum(l.sale_price - s.cost - s.purchase_fees)})
+  end
 
   @spec update_stamp_reference(StampReference.t, map) :: {:ok, StampReference.t} | {:error, Ecto.Changeset.t}
   def update_stamp_reference(%StampReference{} = stamp_reference, attrs) do

@@ -126,6 +126,12 @@ defmodule Kamansky.Stamps do
     |> Repo.one!()
   end
 
+  def list_sold_stamps_raw do
+    Stamp
+    |> where(status: :sold)
+    |> Repo.all()
+  end
+
   @spec list_stamps(atom, Paginate.params) :: [Stamp.t]
   def list_stamps(status, params) do
     Stamp

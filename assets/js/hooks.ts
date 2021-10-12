@@ -3,6 +3,7 @@ import { dataTableInit } from './datatable';
 import { disappearingSuccessMessage } from './utils';
 import { fileUpload } from './file_upload';
 import { modalHook } from './modal';
+import { hingeQuality } from './trends';
 
 export interface Hook {
   beforeUpdate: () => void;
@@ -20,5 +21,6 @@ export const Hooks = {
   dataTableInit,
   disappearingSuccessMessage,
   fileUpload,
+  hingeQuality,
   modalHook
 }

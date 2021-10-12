@@ -1,26 +1,19 @@
-<section class="section-wrapper">
-  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "trends-scott_number-kamansky-data-table",
-    headers:
-      [
-        "Scott Number",
-        "Total Sold",
-        "Median Sale Price",
-        "Total Profit"
-      ],
-    data_count: @data_count,
-    data_locator: @data_locator,
-    data_source: @data_source,
-    empty_message: "There are no stamps to display.",
-    options: [
-      go_to_record: Map.get(assigns, :go_to_record),
-      sort: %{column: 1, direction: :desc}
-    ]
-  do %>
-    <% stamp -> %>
-      <td><%= stamp.scott_number %></td>
-      <td><%= stamp.total_sold %></td>
-      <td><%= format_decimal_as_currency(stamp.median_sale_price) %></td>
-      <td><%= format_decimal_as_currency(stamp.total_profit) %></td>
-  <% end %>
-</section>
+<div>
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <h4 class="card-title">Hinged/Never Hinged</h4>
+          <p class="card-text">
+            <canvas 
+              id="trends-hinge-quality" 
+              phx-hook="hingeQuality" 
+              data-hinged={@hinged}
+              data-never-hinged={@never_hinged}
+            />
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

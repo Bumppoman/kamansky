@@ -68,6 +68,12 @@
                 class: "dropdown-item"
               %>
             </li>
+            <li>
+              <%= live_redirect "Trends",
+                to: Routes.trend_index_path(@socket, :index),
+                class: "dropdown-item"
+              %>
+            </li>
           </ul>
         </li>
       </ul>

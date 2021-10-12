@@ -222,6 +222,9 @@ defmodule Kamansky.Stamps.Stamp do
   def formatted_grade(%Stamp{grade: nil}), do: "---"
   def formatted_grade(%Stamp{grade: grade} = stamp), do: "#{letter_grade(stamp)} (#{grade})"
 
+  @spec hinged?(%Stamp{hinged: boolean}) :: boolean
+  def hinged?(%Stamp{hinged: hinged}), do: hinged
+
   @spec history(Stamp.t) :: [String.t]
   def history(%Stamp{} = stamp) do
     with(

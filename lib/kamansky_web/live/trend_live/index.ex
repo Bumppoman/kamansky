@@ -1,27 +1,23 @@
 defmodule KamanskyWeb.TrendLive.Index do
   use KamanskyWeb, :live_view
 
-  import Kamansky.Helpers
-
-  alias Kamansky.Stamps.StampReferences
+  alias Kamansky.Stamps
+  alias Kamansky.Stamps.Stamp
 
   @impl true
-  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
-    {
-      :noreply,
-      socket
-      |> apply_action(socket.assigns.live_action, params)
-      |> load_stamps()
-    }
-  end
-
-  defp apply_action(socket, :sold, params), do: assign(socket, :page_title, "Stamps Sold by Scott Number")
-
-  defp load_stamps(socket) do
-    socket
-    |> assign(:data_count, StampReferences.count_stamp_references_with_sales())
-    |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference_sale(options) end)
-    |> assign(:data_source, fn options -> StampReferences.list_stamp_references_with_sales(options) end)
+  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
+  def mount(_params, _session, socket) do
+    with stamps <- Stamps.list_sold_stamps_raw(),
+      total_sold_stamps <- Enum.count(stamps),
+      %{false: never_hinged, true: hinged} <- Enum.frequencies_by(stamps, &Stamp.hinged?/1)
+    do
+      {
+        :ok,
+        socket
+        |> assign(:hinged, (hinged / total_sold_stamps) * 100)
+        |> assign(:never_hinged, (never_hinged / total_sold_stamps) * 100)
+        |> assign(:page_title, "Sales Trends")
+      }
+    end
   end
 end
