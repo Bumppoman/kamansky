@@ -18,50 +18,50 @@ defmodule Kamansky.Stamps.Stamp do
     %{
       start: 40,
       finish: 69,
-      name: 'F',
-      long_name: 'Fine'
+      name: "F",
+      long_name: "Fine"
     },
     %{
       start: 70,
       finish: 74,
-      name: 'F/VF',
-      long_name: 'Fine/Very Fine'
+      name: "F/VF",
+      long_name: "Fine/Very Fine"
     },
     %{
       start: 75,
       finish: 79,
-      name: 'VF',
-      long_name: 'Very Fine'
+      name: "VF",
+      long_name: "Very Fine"
     },
     %{
       start: 80,
       finish: 84,
-      name: 'VF/XF',
-      long_name: 'Very Fine/Extra Fine'
+      name: "VF/XF",
+      long_name: "Very Fine/Extra Fine"
     },
     %{
       start: 85,
       finish: 89,
-      name: 'XF',
-      long_name: 'Extra Fine'
+      name: "XF",
+      long_name: "Extra Fine"
     },
     %{
       start: 90,
       finish: 94,
-      name: 'XF/Superb',
-      long_name: 'Extra Fine/Superb',
+      name: "XF/Superb",
+      long_name: "Extra Fine/Superb",
     },
     %{
       start: 95,
       finish: 97,
-      name: 'Superb',
-      long_name: 'Superb'
+      name: "Superb",
+      long_name: "Superb"
     },
     %{
       start: 98,
       finish: 100,
-      name: 'Gem',
-      long_name: 'Gem'
+      name: "Gem",
+      long_name: "Gem"
     }
   ]
 
