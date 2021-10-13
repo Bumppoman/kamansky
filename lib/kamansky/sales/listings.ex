@@ -140,18 +140,29 @@ defmodule Kamansky.Sales.Listings do
         total_sold <-
           Listing
           |> where(status: :sold)
-          |> Repo.aggregate(:count)
+          |> Repo.aggregate(:count),
+        era_average_listing_time <-
+          era_listings_query
+          |> join(:left, [l], o in assoc(l, :order))
+          |> select([l, s, ..., o], avg(fragment("CASE WHEN ? IS NOT NULL THEN ? ELSE ? END", l.order_id, o.ordered_at - l.inserted_at, ^DateTime.utc_now() - l.inserted_at)))
+          |> Repo.one()
       ) do
         {
           era.name,
           %{
-            total_sales_income: Repo.aggregate(era_sold_listings_query, :sum, :sale_price),
+            average_listing_time:
+              if era_average_listing_time.seconds > 43200 do
+                era_average_listing_time.days + 1
+              else
+                era_average_listing_time.days
+              end,
+            percentage_of_total_listings: round((Repo.aggregate(era_listings_query, :count) / total_listings) * 100),
+            percentage_of_total_sales: round((Repo.aggregate(era_sold_listings_query, :count) / total_sold) * 100),
             total_cost:
               era_sold_listings_query
               |> select([l, s], sum(s.cost + s.purchase_fees))
               |> Repo.one(),
-            percentage_of_total_listings: round((Repo.aggregate(era_listings_query, :count) / total_listings) * 100),
-            percentage_of_total_sales: round((Repo.aggregate(era_sold_listings_query, :count) / total_sold) * 100)
+            total_sales_income: Repo.aggregate(era_sold_listings_query, :sum, :sale_price)
           }
         }
       end
