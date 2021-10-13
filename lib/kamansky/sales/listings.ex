@@ -145,6 +145,10 @@ defmodule Kamansky.Sales.Listings do
           era.name,
           %{
             total_sales_income: Repo.aggregate(era_sold_listings_query, :sum, :sale_price),
+            total_cost:
+              era_sold_listings_query
+              |> select([l, s], sum(s.cost + s.purchase_fees))
+              |> Repo.one(),
             percentage_of_total_sales: round((Repo.aggregate(era_sold_listings_query, :count) / total_sold) * 100)
           }
         }
