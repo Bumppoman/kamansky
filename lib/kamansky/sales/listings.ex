@@ -107,6 +107,21 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.update()
   end
 
+  def median_price_data_for_sold_listings do
+    for class <- Stamps.Stamp.grade_classes() do
+      {
+        class.name,
+        Listing
+        |> join(:left, [l], s in assoc(l, :stamp))
+        |> where(status: :sold)
+        |> where([l, s], s.grade >= ^class.start and s.grade <= ^class.finish)
+        |> select([l, s], fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.sale_price))
+        |> Repo.one()
+      }
+    end
+    |> Enum.into(%{})
+  end
+
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t

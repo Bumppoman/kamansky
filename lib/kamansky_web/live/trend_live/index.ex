@@ -1,6 +1,9 @@
 defmodule KamanskyWeb.TrendLive.Index do
   use KamanskyWeb, :live_view
 
+  import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
+
+  alias Kamansky.Sales.Listings
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
 
@@ -17,6 +20,7 @@ defmodule KamanskyWeb.TrendLive.Index do
         socket
         |> assign(:hinged, (hinged / total_sold_stamps) * 100)
         |> assign(:letter_grade_data, letter_grade_data(sold_stamps_by_grade, total_sold_stamps))
+        |> assign(:median_sold_price_data, Listings.median_price_data_for_sold_listings())
         |> assign(:never_hinged, (never_hinged / total_sold_stamps) * 100)
         |> assign(:page_title, "Sales Trends")
       }
@@ -31,8 +35,8 @@ defmodule KamanskyWeb.TrendLive.Index do
       Map.get(sold_stamps_by_grade, "VF", 0),
       Map.get(sold_stamps_by_grade, "VF/XF", 0),
       Map.get(sold_stamps_by_grade, "XF", 0),
-      Map.get(sold_stamps_by_grade, "XF/S", 0),
-      Map.get(sold_stamps_by_grade, "S", 0),
+      Map.get(sold_stamps_by_grade, "XF/Superb", 0),
+      Map.get(sold_stamps_by_grade, "Superb", 0),
       Map.get(sold_stamps_by_grade, "Gem", 0),
     ]
     |> Enum.map_join(",", &(round((&1 / total_stamps) * 100)))
