@@ -69,20 +69,22 @@ defmodule Kamansky.Stamps.StampReferences do
 
   @spec list_stamp_references_with_sales(Paginate.params) :: [StampReference.t]
   def list_stamp_references_with_sales(params) do
-    with stamps <-
-      with_sales_query()
-      |> join(:left, [sr, s], l in assoc(s, :listing))
-      |> group_by([sr, s, l], sr.id)
-      |> select(
-        [sr, s, l],
-        %{
-          median_sale_price: fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.listing_price),
-          scott_number: sr.scott_number,
-          total_profit: sum(l.sale_price - s.cost - s.purchase_fees),
-          total_sold: count(l.id)
-        }
-      )
-    do
+    with(
+      stamps <-
+        with_sales_query()
+        |> join(:left, [sr, s], l in assoc(s, :listing))
+        |> group_by([sr, s, l], [sr.scott_number, l.id])
+        |> select(
+          [sr, s, l],
+          %{
+            conversion_percentage: (count(l.id) / over(count(l.id))) * 100,
+            median_sale_price: fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.listing_price),
+            scott_number: sr.scott_number,
+            total_profit: sum(l.sale_price - s.cost - s.purchase_fees),
+            total_sold: count(l.id)
+          }
+        )
+    ) do
       Paginate.list(StampReferences, stamps, params)
     end
   end
