@@ -1,6 +1,6 @@
 <div>
   <div class="row mt-4">
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="card h-100">
         <div class="card-body">
           <h4 class="card-title">Hinged/Never Hinged</h4>
@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="card h-100">
         <div class="card-body">
           <h4 class="card-title">By Grade</h4>
@@ -29,7 +29,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="card h-100">
         <div class="card-body">
           <h4 class="card-title">Median Price</h4>
@@ -40,6 +40,35 @@
                   <tr>
                     <td><%= class.name %></td>
                     <td><%= format_decimal_as_currency(Map.get(@median_sold_price_data, class.name, 0)) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h4 class="card-title">Sales by Era</h4>
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Era</th>
+                  <th>Sales ($)</th>
+                  <th>% of Total Sales</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%= for {era, data} <- @era_sold_listing_data do %>
+                  <tr>
+                    <td><%= era %></td>
+                    <td><%= format_decimal_as_currency(data.total_sales_income) %></td>
+                    <td><%= data.percentage_of_total_sales %></td>
                   </tr>
                 <% end %>
               </tbody>

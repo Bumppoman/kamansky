@@ -5,6 +5,49 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
 
   alias __MODULE__
 
+  @eras [
+    %{
+      start: 1847,
+      finish: 1899,
+      name: "19th Century"
+    },
+    %{
+      start: 1900,
+      finish: 1909,
+      name: "1900-1909"
+    },
+    %{
+      start: 1910,
+      finish: 1919,
+      name: "1910-1919"
+    },
+    %{
+      start: 1920,
+      finish: 1929,
+      name: "1920-1929"
+    },
+    %{
+      start: 1930,
+      finish: 1939,
+      name: "1930-1939"
+    },
+    %{
+      start: 1940,
+      finish: 1949,
+      name: "1940-1949"
+    },
+    %{
+      start: 1950,
+      finish: 1959,
+      name: "1950-1959"
+    },
+    %{
+      start: 1960,
+      finish: DateTime.utc_now().year,
+      name: "1960-present"
+    }
+  ]
+
   @type t :: Ecto.Schema.t | %StampReference{
     scott_number: String.t,
     denomination: Decimal.t,
@@ -45,6 +88,9 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
     [:scott_number]
     |> Enum.at(column)
   end
+
+  @spec eras :: [%{start: integer, finish: integer, name: String.t}]
+  def eras, do: @eras
 
   @spec formatted_denomination(StampReference.t) :: String.t
   def formatted_denomination(%StampReference{} = stamp_reference) do

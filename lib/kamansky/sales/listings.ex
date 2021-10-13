@@ -127,6 +127,31 @@ defmodule Kamansky.Sales.Listings do
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
   def search_query(query, search), do: where(query, [l, s], ilike(s.scott_number, ^"%#{search}%"))
 
+  def sold_listing_data_by_era do
+    for era <- Stamps.StampReferences.StampReference.eras() do
+      with(
+        era_sold_listings_query <-
+          Listing
+          |> join(:left, [l], s in assoc(l, :stamp))
+          |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
+          |> where(status: :sold)
+          |> where([l, s, sr], sr.year_of_issue >= ^era.start and sr.year_of_issue <= ^era.finish),
+        total_sold <-
+          Listing
+          |> where(status: :sold)
+          |> Repo.aggregate(:count)
+      ) do
+        {
+          era.name,
+          %{
+            total_sales_income: Repo.aggregate(era_sold_listings_query, :sum, :sale_price),
+            percentage_of_total_sales: round((Repo.aggregate(era_sold_listings_query, :count) / total_sold) * 100)
+          }
+        }
+      end
+    end
+  end
+
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}) do
