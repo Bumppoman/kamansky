@@ -18,8 +18,6 @@ defmodule KamanskyWeb.TrendLive.Sold do
 
   defp apply_action(socket, :index, params), do: assign(socket, :page_title, "Stamps Sold by Scott Number")
 
-  defp conversion_percentage(stamp), do: round((stamp.total_sold / stamp.total_listed) * 100)
-
   defp load_stamps(socket) do
     socket
     |> assign(:data_count, StampReferences.count_stamp_references_with_sales())

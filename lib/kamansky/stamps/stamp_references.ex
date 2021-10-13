@@ -78,22 +78,22 @@ defmodule Kamansky.Stamps.StampReferences do
         |> select(
           [sr, s, l],
           %{
-            median_sale_price: fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.listing_price),
-            scott_number: sr.scott_number,
-            total_listed:
+            conversion_percentage:
               fragment(
-                "SELECT COUNT(id) FROM stamps WHERE status IN (?, ?) AND scott_number = ?",
+                "((CAST(? AS FLOAT) / (SELECT COUNT(id) FROM stamps WHERE status IN (?, ?) AND scott_number = ?)) * 100) AS conversion_percentage",
+                count(l.id),
                 ^get_value_for_ecto_enum(Stamp, :status, :listed),
                 ^get_value_for_ecto_enum(Stamp, :status, :sold),
                 sr.scott_number
               ),
+            median_sale_price: fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.listing_price),
+            scott_number: sr.scott_number,
             total_profit: sum(l.sale_price - s.cost - s.purchase_fees),
             total_sold: count(l.id)
           }
         )
     ) do
-      Repo.all(stamps)
-      #Paginate.list(StampReferences, stamps, params)
+      Paginate.list(StampReferences, stamps, params)
     end
   end
 
@@ -110,7 +110,8 @@ defmodule Kamansky.Stamps.StampReferences do
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
   def sort(query, %{column: 1, direction: direction}), do: order_by(query, [sr, s, l], {^direction, count(l.id)})
-  def sort(query, %{column: 3, direction: direction}) do
+  def sort(query, %{column: 2, direction: direction}), do: order_by(query, {^direction, :conversion_percentage})
+  def sort(query, %{column: 4, direction: direction}) do
     order_by(query, [sr, s, l], {^direction, sum(l.sale_price - s.cost - s.purchase_fees)})
   end
 
