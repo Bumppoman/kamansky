@@ -62,6 +62,7 @@
                   <th>Sales ($)</th>
                   <th>Cost ($)</th>
                   <th>% of Total Sales</th>
+                  <th>% of Total Listings</th>
                 </tr>
               </thead>
               <tbody>
@@ -71,6 +72,7 @@
                     <td><%= format_decimal_as_currency(data.total_sales_income) %></td>
                     <td><%= format_decimal_as_currency(data.total_cost) %></td>
                     <td><%= data.percentage_of_total_sales %></td>
+                    <td><%= data.percentage_of_total_listings %></td>
                   </tr>
                 <% end %>
               </tbody>

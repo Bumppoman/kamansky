@@ -130,12 +130,13 @@ defmodule Kamansky.Sales.Listings do
   def sold_listing_data_by_era do
     for era <- Stamps.StampReferences.StampReference.eras() do
       with(
-        era_sold_listings_query <-
+        era_listings_query <-
           Listing
           |> join(:left, [l], s in assoc(l, :stamp))
           |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
-          |> where(status: :sold)
           |> where([l, s, sr], sr.year_of_issue >= ^era.start and sr.year_of_issue <= ^era.finish),
+        era_sold_listings_query <- where(era_listings_query, status: :sold),
+        total_listings <- Repo.aggregate(Listing, :count),
         total_sold <-
           Listing
           |> where(status: :sold)
@@ -149,6 +150,7 @@ defmodule Kamansky.Sales.Listings do
               era_sold_listings_query
               |> select([l, s], sum(s.cost + s.purchase_fees))
               |> Repo.one(),
+            percentage_of_total_listings: round((Repo.aggregate(era_listings_query, :count) / total_listings) * 100),
             percentage_of_total_sales: round((Repo.aggregate(era_sold_listings_query, :count) / total_sold) * 100)
           }
         }
