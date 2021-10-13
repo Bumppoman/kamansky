@@ -35,7 +35,7 @@ defmodule KamanskyWeb.TrendLive.Index do
       Map.get(sold_stamps_by_grade, "S", 0),
       Map.get(sold_stamps_by_grade, "Gem", 0),
     ]
-    |> Enum.map_join(",", &((&1 / total_stamps) * 100))
+    |> Enum.map_join(",", &(round((&1 / total_stamps) * 100)))
     |> then(&("[#{&1}]"))
   end
 end

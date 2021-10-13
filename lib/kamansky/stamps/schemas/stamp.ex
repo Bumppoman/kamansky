@@ -244,6 +244,7 @@ defmodule Kamansky.Stamps.Stamp do
   end
 
   @spec letter_grade(%Stamp{grade: nil | integer}) :: String.t
+  def letter_grade(%Stamp{grade: nil}), do: "---"
   def letter_grade(%Stamp{grade: grade}) do
     @grade_classes
     |> Enum.find(&(grade in &1.start..&1.finish))
