@@ -63,6 +63,7 @@
                   <th>Cost ($)</th>
                   <th>% of Total Sales</th>
                   <th>% of Total Listings</th>
+                  <th>Average Listing Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -73,6 +74,7 @@
                     <td><%= format_decimal_as_currency(data.total_cost) %></td>
                     <td><%= data.percentage_of_total_sales %></td>
                     <td><%= data.percentage_of_total_listings %></td>
+                    <td><%= data.average_listing_time %> days</td>
                   </tr>
                 <% end %>
               </tbody>

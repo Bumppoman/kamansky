@@ -151,7 +151,7 @@ defmodule Kamansky.Sales.Listings do
           era.name,
           %{
             average_listing_time:
-              if era_average_listing_time.seconds > 43200 do
+              if era_average_listing_time.secs > 43200 do
                 era_average_listing_time.days + 1
               else
                 era_average_listing_time.days
