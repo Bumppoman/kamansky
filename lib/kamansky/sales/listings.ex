@@ -159,7 +159,7 @@ defmodule Kamansky.Sales.Listings do
                 era_average_listing_time.days
               end,
             conversion_percentage: round((era_total_sold / era_total_listings) * 100),
-            percentage_of_total_listings: round(era_total_listings / total_listings) * 100),
+            percentage_of_total_listings: round((era_total_listings / total_listings) * 100),
             percentage_of_total_sales: round((era_total_sold / total_sold) * 100),
             total_cost:
               era_sold_listings_query
