@@ -2,6 +2,7 @@ defmodule Kamansky.Stamps.StampReferences do
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
+  import Kamansky.Helpers, only: [get_value_for_ecto_enum: 3]
 
   alias __MODULE__
   alias Kamansky.Repo
@@ -77,15 +78,22 @@ defmodule Kamansky.Stamps.StampReferences do
         |> select(
           [sr, s, l],
           %{
-            conversion_percentage: count(sr.id) / over(count(sr.id)),
             median_sale_price: fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.listing_price),
             scott_number: sr.scott_number,
+            total_listed:
+              fragment(
+                "SELECT COUNT(id) FROM stamps WHERE status IN (?, ?) AND scott_number = ?",
+                ^get_value_for_ecto_enum(Stamp, :status, :listed),
+                ^get_value_for_ecto_enum(Stamp, :status, :sold),
+                sr.scott_number
+              ),
             total_profit: sum(l.sale_price - s.cost - s.purchase_fees),
             total_sold: count(l.id)
           }
         )
     ) do
-      Paginate.list(StampReferences, stamps, params)
+      Repo.all(stamps)
+      #Paginate.list(StampReferences, stamps, params)
     end
   end
 

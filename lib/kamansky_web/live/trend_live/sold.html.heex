@@ -21,7 +21,7 @@
     <% stamp -> %>
       <td><%= stamp.scott_number %></td>
       <td><%= stamp.total_sold %></td>
-      <td><%= stamp.conversion_percentage %></td>
+      <td><%= conversion_percentage(stamp)  %></td>
       <td><%= format_decimal_as_currency(stamp.median_sale_price) %></td>
       <td><%= format_decimal_as_currency(stamp.total_profit) %></td>
   <% end %>
