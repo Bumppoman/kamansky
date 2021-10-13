@@ -136,13 +136,15 @@ defmodule Kamansky.Sales.Listings do
           |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
           |> where([l, s, sr], sr.year_of_issue >= ^era.start and sr.year_of_issue <= ^era.finish),
         era_sold_listings_query <- where(era_listings_query, status: :sold),
+        era_total_listings <- (Repo.aggregate(era_listings_query, :count),
         total_listings <- Repo.aggregate(Listing, :count),
+        era_total_sold <- Repo.aggregate(era_sold_listings_query, :count),
         total_sold <-
           Listing
           |> where(status: :sold)
           |> Repo.aggregate(:count),
         era_average_listing_time <-
-          era_listings_query
+          era_sold_listings_query
           |> join(:left, [l], o in assoc(l, :order))
           |> select([l, s, ..., o], avg(fragment("CASE WHEN ? IS NOT NULL THEN ? ELSE ? END", l.order_id, o.ordered_at - l.inserted_at, ^DateTime.utc_now() - l.inserted_at)))
           |> Repo.one()
@@ -156,8 +158,9 @@ defmodule Kamansky.Sales.Listings do
               else
                 era_average_listing_time.days
               end,
-            percentage_of_total_listings: round((Repo.aggregate(era_listings_query, :count) / total_listings) * 100),
-            percentage_of_total_sales: round((Repo.aggregate(era_sold_listings_query, :count) / total_sold) * 100),
+            conversion_percentage: round((era_total_sold / era_total_listings) * 100),
+            percentage_of_total_listings: round(era_total_listings / total_listings) * 100),
+            percentage_of_total_sales: round((era_total_sold / total_sold) * 100),
             total_cost:
               era_sold_listings_query
               |> select([l, s], sum(s.cost + s.purchase_fees))
