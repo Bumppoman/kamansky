@@ -2,6 +2,53 @@ import Chart from 'chart.js/auto';
 
 import { Hook } from './hooks';
 
+export const format = {
+  mounted () {
+    new Chart(
+      (this.el as HTMLCanvasElement).getContext('2d'),
+      {
+        type: 'pie',
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        },
+        data: {
+          labels: [
+            'Single', 
+            'Pair', 
+            'Se-tenant', 
+            'Souvenir sheet', 
+            'Block', 
+            'Plate Block', 
+            'ZIP Block', 
+            'Mail Early block', 
+            'First day cover'
+          ],
+          datasets: [
+            { 
+              data: JSON.parse(this.el.dataset.format as string),
+              backgroundColor: [
+                '#003f5c',
+                '#2d4a74',
+                '#575387',
+                '#825a91',
+                '#ac6093',
+                '#d1698c',
+                '#ed787e',
+                '#ff8e6e',
+                '#ffd8ca'
+              ]
+            },
+          ]
+        }
+      }
+    );
+  }
+} as Hook;
+
 export const grade = {
   mounted () {
     new Chart(

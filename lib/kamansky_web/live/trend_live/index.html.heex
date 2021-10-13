@@ -32,18 +32,13 @@
     <div class="col-md-4">
       <div class="card h-100">
         <div class="card-body">
-          <h4 class="card-title">Median Price</h4>
+          <h4 class="card-title">By Format</h4>
           <p class="card-text">
-            <table class="table">
-              <tbody>
-                <%= for class <- Stamp.grade_classes() do %>
-                  <tr>
-                    <td><%= class.name %></td>
-                    <td><%= format_decimal_as_currency(Map.get(@median_sold_price_data, class.name, 0)) %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
+            <canvas 
+              id="trends-format" 
+              phx-hook="format" 
+              data-format={@format_data}
+            />
           </p>
         </div>
       </div>
@@ -77,6 +72,25 @@
                     <td><%= data.percentage_of_total_listings %></td>
                     <td><%= data.conversion_percentage %></td>
                     <td><%= data.average_listing_time %> days</td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h4 class="card-title">Median Price</h4>
+          <p class="card-text">
+            <table class="table">
+              <tbody>
+                <%= for class <- Stamp.grade_classes() do %>
+                  <tr>
+                    <td><%= class.name %></td>
+                    <td><%= format_decimal_as_currency(Map.get(@median_sold_price_data, class.name, 0)) %></td>
                   </tr>
                 <% end %>
               </tbody>

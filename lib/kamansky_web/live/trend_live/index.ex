@@ -12,6 +12,7 @@ defmodule KamanskyWeb.TrendLive.Index do
   def mount(_params, _session, socket) do
     with stamps <- Stamps.list_sold_stamps_raw(),
       total_sold_stamps <- Enum.count(stamps),
+      sold_stamps_by_format <- Enum.frequencies_by(stamps, &Stamp.format_code/1),
       sold_stamps_by_grade <- Enum.frequencies_by(stamps, &Stamp.letter_grade/1),
       %{false: never_hinged, true: hinged} <- Enum.frequencies_by(stamps, &Stamp.hinged?/1)
     do
@@ -19,6 +20,7 @@ defmodule KamanskyWeb.TrendLive.Index do
         :ok,
         socket
         |> assign(:era_sold_listing_data, Listings.sold_listing_data_by_era())
+        |> assign(:format_data, format_data(sold_stamps_by_format, total_sold_stamps))
         |> assign(:hinged, (hinged / total_sold_stamps) * 100)
         |> assign(:letter_grade_data, letter_grade_data(sold_stamps_by_grade, total_sold_stamps))
         |> assign(:median_sold_price_data, Listings.median_price_data_for_sold_listings())
@@ -26,6 +28,22 @@ defmodule KamanskyWeb.TrendLive.Index do
         |> assign(:page_title, "Sales Trends")
       }
     end
+  end
+
+  defp format_data(sold_stamps_by_format, total_stamps) do
+    [
+      Map.get(sold_stamps_by_format, "", 0),
+      Map.get(sold_stamps_by_format, "P", 0),
+      Map.get(sold_stamps_by_format, "ST", 0),
+      Map.get(sold_stamps_by_format, "SS", 0),
+      Map.get(sold_stamps_by_format, "B", 0),
+      Map.get(sold_stamps_by_format, "PB", 0),
+      Map.get(sold_stamps_by_format, "ZB", 0),
+      Map.get(sold_stamps_by_format, "MB", 0),
+      Map.get(sold_stamps_by_format, "FDC", 0),
+    ]
+    |> Enum.map_join(",", &(round((&1 / total_stamps) * 100)))
+    |> then(&("[#{&1}]"))
   end
 
   defp letter_grade_data(sold_stamps_by_grade, total_stamps) do
