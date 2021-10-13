@@ -136,7 +136,7 @@ defmodule Kamansky.Sales.Listings do
           |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
           |> where([l, s, sr], sr.year_of_issue >= ^era.start and sr.year_of_issue <= ^era.finish),
         era_sold_listings_query <- where(era_listings_query, status: :sold),
-        era_total_listings <- (Repo.aggregate(era_listings_query, :count),
+        era_total_listings <- Repo.aggregate(era_listings_query, :count),
         total_listings <- Repo.aggregate(Listing, :count),
         era_total_sold <- Repo.aggregate(era_sold_listings_query, :count),
         total_sold <-
