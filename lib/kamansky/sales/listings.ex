@@ -152,15 +152,13 @@ defmodule Kamansky.Sales.Listings do
         {
           era.name,
           %{
-            #average_listing_time:
-            #  if era_average_listing_time.secs > 43200 do
-            #    era_average_listing_time.days + 1
-            #  else
-            #    era_average_listing_time.days
-            #  end,
-            #conversion_percentage: round((era_total_sold / era_total_listings) * 100),
-            average_listing_time: 0,
-            conversion_percentage: 0,
+            average_listing_time:
+              if era_average_listing_time.secs > 43200 do
+                era_average_listing_time.days + 1
+              else
+                era_average_listing_time.days
+              end,
+            conversion_percentage: round((era_total_sold / era_total_listings) * 100),
             percentage_of_total_listings: round((era_total_listings / total_listings) * 100),
             percentage_of_total_sales: round((era_total_sold / total_sold) * 100),
             total_cost:
