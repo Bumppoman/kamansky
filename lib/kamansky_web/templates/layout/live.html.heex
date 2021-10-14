@@ -1,13 +1,15 @@
 <header>
   <%= if @logged_in do %>
     <nav class="navbar navbar-expand-md navbar-light">
-      <ul class="navbar-nav mx-auto">
-        <li class="nav-item me-5">
-          <%= live_redirect "Dashboard",
-            to: Routes.dashboard_index_path(@socket, :index),
-            class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.DashboardLive.Index, do: [" active"], else: []))
-          %>
-        </li>
+      <div class="w-25 text-center ms-5 ps-5 py-2">
+        <%= live_redirect to: Routes.dashboard_index_path(@socket, :index), class: "navbar-brand" do %>
+          <img
+            src={Routes.static_path(@socket, "/images/bumppoman-stamps-logo.png")}
+            width="137"
+          />
+        <% end %>
+      </div>
+      <ul class="navbar-nav mx-auto ps-5">
         <li class="nav-item me-5">
           <%= live_redirect "Collection",
               to: Routes.stamp_index_path(@socket, :collection),
@@ -109,3 +111,6 @@
     </div>
   <% end %>
 </main>
+<footer>
+  <small>© 2021 Brendon Stanton and Bumppoman Industries.</small>
+</footer>

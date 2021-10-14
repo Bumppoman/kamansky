@@ -31,7 +31,8 @@
     options: [
       go_to_record: Map.get(assigns, :go_to_record),
       sort: 0
-    ]
+    ],
+    title: @page_title
   do %>
     <% purchase -> %>
       <td><%= formatted_date(purchase.date) %></td>

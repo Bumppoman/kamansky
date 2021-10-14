@@ -16,12 +16,12 @@ defmodule KamanskyWeb.TrendLive.Sold do
     }
   end
 
-  defp apply_action(socket, :index, params), do: assign(socket, :page_title, "Stamps Sold by Scott Number")
+  defp apply_action(socket, :index, _params), do: assign(socket, :page_title, "Stamps Sold by Scott Number")
 
   defp load_stamps(socket) do
     socket
     |> assign(:data_count, StampReferences.count_stamp_references_with_sales())
-    |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference_sale(options) end)
+    |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference_with_sales(options) end)
     |> assign(:data_source, fn options -> StampReferences.list_stamp_references_with_sales(options) end)
   end
 end

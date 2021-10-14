@@ -111,8 +111,8 @@ export const hingeQuality = {
                 this.el.dataset.hinged
               ],
               backgroundColor: [
-                '#264475',
-                '#e65245'
+                '#003f5c',
+                '#2d4a74'
               ]
             },
           ]

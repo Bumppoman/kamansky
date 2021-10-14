@@ -20,6 +20,9 @@
         %> items/page
       </label>
     </div>
+    <div class="kamansky-data-table-title">
+      <h3><%= @title %></h3>
+    </div>
     <div class="kamansky-data-table-search">
       <form phx-change="search" phx-target={@myself}>
         <input name="search" placeholder="Search..." value={@search} />

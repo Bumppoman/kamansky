@@ -26,7 +26,8 @@
     options: [
       go_to_record: Map.get(assigns, :go_to_record),
       sort: 0
-    ]
+    ],
+    title: @page_title
   do %>
     <% customer -> %>
       <td><%= live_redirect customer.name, to: Routes.customer_show_path(@socket, :show, customer) %></td>

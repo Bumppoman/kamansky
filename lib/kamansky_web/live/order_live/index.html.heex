@@ -41,7 +41,8 @@
     options: [
       go_to_record: Map.get(assigns, :go_to_record),
       sort: %{column: 1, direction: :desc}
-    ]
+    ],
+    title: @page_title
   do %>
     <% order -> %>
       <td>

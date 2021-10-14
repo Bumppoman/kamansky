@@ -14,7 +14,8 @@
     options: [
       per_page: 5,
       sort: %{column: 1, direction: :desc}
-    ]
+    ],
+    title: "Orders"
   do %>
     <% order -> %>
       <td><%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %></td>

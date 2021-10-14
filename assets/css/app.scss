@@ -12,6 +12,34 @@
 //  pointer-events: none;
 //}
 
+// Body
+body {
+  background-color: #e4eaec;
+  color: #37474f;
+  font-family: 'Roboto', sans-serif;
+}
+
+// Navbar
+.navbar {
+  background-color: #fff;
+}
+
+// Main content
+main {
+  background-color: #fff;
+  margin: 0.75rem auto 0;
+  padding: 2rem;
+  width: 90%;
+}
+
+// Footer
+footer {
+  font-size: 0.75rem;
+  font-weight: lighter;
+  margin: 0.5rem 0;
+  text-align: center
+}
+
 a[data-bs-toggle]:hover, a.photo-display-link:hover {
   cursor: pointer;
 }
@@ -19,11 +47,6 @@ a[data-bs-toggle]:hover, a.photo-display-link:hover {
 a.photo-display-link {
   color: inherit;
   text-decoration: none;
-}
-
-main {
-  margin: 0 auto;
-  width: 90%;
 }
 
 .choices, .choices__inner {
