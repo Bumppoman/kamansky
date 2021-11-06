@@ -92,7 +92,7 @@ defmodule Kamansky.Paginate do
         )
     ) do
       from(rq in subquery(record_query))
-      |> where(id: ^String.to_integer(options[:record_id]))
+      |> where(id: ^(if is_binary(options[:record_id]), do: String.to_integer(options[:record_id]), else: options[:record_id]))
       |> select([rq], rq.row_number)
       |> Repo.one()
     end

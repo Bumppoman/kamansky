@@ -8,17 +8,20 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
   @impl true
   @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(assigns, socket) do
-    {
-      :ok,
-      socket
-      |> assign(assigns)
-      |> assign(:matching_customers, [])
-      |> assign(:searched, false)
-      |> assign_new(:changeset, fn -> Customers.change_customer(assigns.customer) end)
-      |> assign_new(:order_step, fn -> 1 end)
-      |> assign_new(:submit, fn -> "submit_customer" end)
-      |> assign_new(:validate, fn -> "validate_customer" end)
-    }
+    with socket <- assign_new(socket, :customer, fn -> %Customer{} end) do
+      {
+        :ok,
+        socket
+        |> assign(assigns)
+        |> assign(:matching_customers, [])
+        |> assign(:searched, false)
+        |> assign_new(:button_text, fn -> "Next" end)
+        |> assign_new(:changeset, fn -> Customers.change_customer(socket.assigns.customer) end)
+        |> assign_new(:order_step, fn -> 1 end)
+        |> assign_new(:submit, fn -> "submit_customer" end)
+        |> assign_new(:validate, fn -> "validate_customer" end)
+      }
+    end
   end
 
   @impl true
@@ -57,11 +60,12 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
   def handle_event("submit_customer", %{"customer" => customer_params}, socket) do
     with {:ok, customer} <- Customers.insert_or_update_customer(socket.assigns.customer, customer_params),
       _map <- send(self(), {:update_new_order_step, %{step: 2, customer: customer}}),
-      order <- %Order{socket.assigns.order | customer: customer}
+      order <- %Order{customer: customer}
     do
       {
         :noreply,
         socket
+        |> assign(:button_text, "Create Order")
         |> assign(:changeset, Orders.change_new_order(order))
         |> assign(:order, order)
         |> assign(:order_step, 2)
@@ -84,8 +88,7 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
           |> push_redirect(to: Routes.order_index_path(socket, :pending, go_to_record: id))
         }
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
+      {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
 

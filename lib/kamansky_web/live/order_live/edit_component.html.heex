@@ -1,14 +1,14 @@
-<div class="form-wrapper">
+<div x-init="title = 'Update Order'">
   <.form
     let={f}
     for={@changeset}
-    id={@form_id}
+    id="edit-order-form"
     phx_target={@myself}
     phx_change="validate"
     phx_submit="submit"
   >
     <KamanskyWeb.CustomerLive.RawFormComponent.customer_info customer={@customer} />
-    <KamanskyWeb.OrderLive.RawFormComponent.order_form 
+    <KamanskyWeb.OrderLive.Components.order_form 
       f={f}
       changeset={@changeset}
     />

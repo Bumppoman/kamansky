@@ -1,29 +1,34 @@
-<section class="section-wrapper">
-  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "trends-scott_number-kamansky-data-table",
-    headers:
-      [
-        "Scott Number",
-        "Total Sold",
-        "Conversion %",
-        "Median Sale Price",
-        "Total Profit"
-      ],
-    data_count: @data_count,
-    data_locator: @data_locator,
-    data_source: @data_source,
-    empty_message: "There are no stamps to display.",
-    options: [
-      go_to_record: Map.get(assigns, :go_to_record),
-      sort: %{column: 1, direction: :desc}
-    ],
-    title: @page_title
-  do %>
-    <% stamp -> %>
-      <td><%= stamp.scott_number %></td>
-      <td><%= stamp.total_sold %></td>
-      <td><%= round(stamp.conversion_percentage) %></td>
-      <td><%= format_decimal_as_currency(stamp.median_sale_price) %></td>
-      <td><%= format_decimal_as_currency(stamp.total_profit) %></td>
-  <% end %>
+<section>
+  <.live_component module={KamanskyWeb.Components.DataTable}
+    id="trends-scott_number-kamansky-data-table"
+    let={stamp}
+    headers=
+      {
+        [
+          "Scott Number",
+          "Total Sold",
+          "Conversion %",
+          "Median Sale Price",
+          "Total Profit"
+        ]
+      }
+    data_count={@data_count}
+    data_locator={@data_locator}
+    data_source={@data_source}
+    empty_message="There are no stamps to display."
+    options=
+      {
+        [
+          go_to_record: Map.get(assigns, :go_to_record),
+          sort: %{column: 1, direction: :desc}
+        ]
+      }
+    title={@page_title}
+  >
+    <td><%= stamp.scott_number %></td>
+    <td><%= stamp.total_sold %></td>
+    <td><%= round(stamp.conversion_percentage) %></td>
+    <td><%= format_decimal_as_currency(stamp.median_sale_price) %></td>
+    <td><%= format_decimal_as_currency(stamp.total_profit) %></td>
+  </.live_component>
 </section>

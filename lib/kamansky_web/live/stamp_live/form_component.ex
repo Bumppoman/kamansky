@@ -21,14 +21,19 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   @impl true
   @spec update(%{required(:stamp) => Stamp.t, required(:status) => atom, optional(atom) => any}, Phoenix.LiveView.Socket.t)
     :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{stamp: stamp, status: status} = assigns, socket) do
-    {
-      :ok,
-      socket
-      |> assign(assigns)
-      |> assign(:changeset, Stamps.change_stamp(stamp, %{add_to: status}))
-      |> assign(:copy_in_collection, nil)
-    }
+  def update(%{trigger_params: %{"action" => action, "stamp-id" => stamp_id, "status" => status}} = assigns, socket) do
+    with stamp <- Stamps.get_or_initialize_stamp(stamp_id) do
+      {
+        :ok,
+        socket
+        |> assign(assigns)
+        |> assign(:action, action)
+        |> assign(:changeset, Stamps.change_stamp(stamp, %{add_to: String.to_existing_atom(status)}))
+        |> assign(:copy_in_collection, nil)
+        |> assign(:stamp, stamp)
+        |> assign(:title, (if action == "new", do: "Add New Stamp", else: "Edit Stamp"))
+      }
+    end
   end
 
   @impl true
@@ -49,7 +54,7 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     end
   end
 
-  def handle_event("submit", %{"stamp" => stamp_params}, socket), do: save_stamp(socket, socket.assigns.action, stamp_params)
+  def handle_event("submit", %{"stamp" => stamp_params}, socket), do: save_stamp(socket, stamp_params)
 
   @spec manage_photo(Phoenix.LiveView.Socket.t, atom) :: {:ok, Kamansky.Attachments.Attachment.t | nil}
   defp manage_photo(socket, photo_name) do
@@ -61,27 +66,22 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     end
   end
 
-  @spec save_stamp(Phoenix.LiveView.Socket.t, :edit | :new, map) :: {:noreply, Phoenix.LiveView.Socket.t}
-  defp save_stamp(socket, :edit, stamp_params) do
+  @spec save_stamp(Phoenix.LiveView.Socket.t, map) :: {:noreply, Phoenix.LiveView.Socket.t}
+  defp save_stamp(%Phoenix.LiveView.Socket{assigns: %{action: "edit"}} = socket, stamp_params) do
     with {:ok, front_photo} <- manage_photo(socket, :front_photo),
       {:ok, rear_photo} <- manage_photo(socket, :rear_photo)
     do
       case Stamps.update_stamp(socket.assigns.stamp, stamp_params, front_photo, rear_photo) do
-        {:ok, %{id: id}} ->
-          {
-            :noreply,
-            socket
-            |> put_flash(:info, "You have successfully updated this stamp.")
-            |> push_redirect(to: Routes.stamp_index_path(socket, socket.assigns.status, go_to_record: id))
-          }
+        {:ok, %Stamp{id: id}} ->
+          send self(), {:stamp_updated, id}
+          {:noreply, socket}
 
-        {:error, %Ecto.Changeset{} = changeset} ->
-          {:noreply, assign(socket, :changeset, changeset)}
+        {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, :changeset, changeset)}
       end
     end
   end
 
-  defp save_stamp(socket, :new, %{"add_to" => add_to} = stamp_params) do
+  defp save_stamp(%Phoenix.LiveView.Socket{assigns: %{action: "new"}} = socket, %{"add_to" => add_to} = stamp_params) do
     with {:ok, front_photo} <- manage_photo(socket, :front_photo),
       {:ok, rear_photo} <- manage_photo(socket, :rear_photo)
     do
@@ -89,16 +89,11 @@ defmodule KamanskyWeb.StampLive.FormComponent do
       |> Map.put("status", add_to)
       |> Stamps.create_stamp(front_photo, rear_photo)
       |> case do
-        {:ok, %Stamp{id: id, status: status}} ->
-          {
-            :noreply,
-            socket
-            |> put_flash(:info, "You have successfully added this stamp.")
-            |> push_redirect(to: Routes.stamp_index_path(socket, status, go_to_record: id))
-          }
+        {:ok, %Stamp{id: id}} ->
+          send self(), {:stamp_added, id}
+          {:noreply, socket}
 
-        {:error, %Ecto.Changeset{} = changeset} ->
-          {:noreply, assign(socket, changeset: changeset)}
+        {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
       end
     end
   end

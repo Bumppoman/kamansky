@@ -1,58 +1,64 @@
-<section class="section-wrapper">
-  <%= if live_flash(@flash, :info) do %>
-  <div
-    id="purchases-success-message"
-    class="disappearing-success-message"
-    phx-hook="disappearingSuccessMessage"
+<section>
+  <KamanskyWeb.Components.Page.page_header
+    buttons=
+      {
+        [
+          %{
+            options: %{
+              "phx-click": "open",
+              "phx-target": "#purchase-form-modal",
+              "phx-value-action": "new",
+              "phx-value-purchase-id": ""
+            },
+            title: "Add New Purchase"
+          }
+        ]
+      }
+    page_title="Purchases"
+  />
+  <.live_component module={KamanskyWeb.Components.DataTable}
+    id="purchases-kamansky-data-table"
+    let={purchase}
+    headers=
+      {
+        [
+          "Date",
+          "Description",
+          "Quantity",
+          "Total Cost",
+          %{text: "Actions", sort: :disabled},
+        ]
+      }
+    data_count={@data_count}
+    data_locator={@data_locator}
+    data_source={@data_source}
+    empty_message="There are no purchases to display."
+    options=
+      {
+        [
+          go_to_record: Map.get(assigns, :go_to_record),
+          sort: 0
+        ]
+      }
   >
-    <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
-  </div>
-  <% end %>
-  <div class="text-end mb-2">
-    <%= live_patch "Add New Purchase",
-      to: Routes.purchase_index_path(@socket, :new),
-      class: "btn btn-primary"
-    %>
-  </div>
-  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "purchases-kamansky-data-table",
-    headers:
-      [
-        "Date",
-        "Description",
-        "Quantity",
-        "Total Cost",
-        %{text: "Actions", sort: :disabled},
-      ],
-    data_count: @data_count,
-    data_locator: @data_locator,
-    data_source: @data_source,
-    empty_message: "There are no purchases to display.",
-    options: [
-      go_to_record: Map.get(assigns, :go_to_record),
-      sort: 0
-    ],
-    title: @page_title
-  do %>
-    <% purchase -> %>
-      <td><%= formatted_date(purchase.date) %></td>
-      <td><%= purchase.description %></td>
-      <td><%= purchase.quantity %></td>
-      <td><%= format_decimal_as_currency(Purchase.total_cost(purchase)) %></td>
-      <td>
-        <%= live_patch to: "#", class: "action-icon" do %>
-          <i class="material-icons">edit</i>
-        <% end %>
-      </td>
-  <% end %>
+    <td><%= formatted_date(purchase.date) %></td>
+    <td><%= purchase.description %></td>
+    <td><%= purchase.quantity %></td>
+    <td><%= format_decimal_as_currency(Purchase.total_cost(purchase)) %></td>
+    <td>
+      <a
+        class="action-icon"
+        phx-click="open"
+        phx-target="#purchase-form-modal"
+        phx-value-action="edit"
+        phx-value-purchase-id={purchase.id}
+      >
+        <KamanskyWeb.Components.Icons.edit />
+      </a>
+    </td>
+  </.live_component>
 </section>
-<%= if @live_action in [:new, :edit] do %>
-  <%= live_modal KamanskyWeb.PurchaseLive.FormComponent,
-    action: @live_action,
-    form_id: "purchase-form",
-    id: "purchase-form-modal",
-    purchase: @purchase,
-    title: (if @live_action == :new, do: "Add New Purchase", else: "Edit Purchase"),
-    return_to: Routes.purchase_index_path(@socket, :index)
-  %>
-<% end %>
+<%= live_modal KamanskyWeb.PurchaseLive.FormComponent,
+  id: "purchase-form-modal",
+  form_id: "purchase-form"
+%>

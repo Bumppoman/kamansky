@@ -12,28 +12,30 @@ defmodule KamanskyWeb.ExpenseLive.Index do
     {
       :ok,
       socket
-      |> assign(:data_count, Expenses.count_expenses())
+      |> assign(:data_count, fn -> Expenses.count_expenses() end)
       |> assign(:data_locator, fn options -> Expenses.find_row_number_for_expense(options) end)
       |> assign(:data_source, fn options -> Expenses.list_expenses(options) end)
     }
   end
 
   @impl true
-  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
+  @spec handle_info({:expense_added | :expense_updated, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:expense_added, expense_id}, socket), do: update_datatable(socket, "You have successfully added this expense.", expense_id)
+  def handle_info({:expense_updated, expense_id}, socket), do: update_datatable(socket, "You have successfully updated this expense.", expense_id)
 
-  @spec apply_action(Phoenix.LiveView.Socket.t, :edit | :index | :new, map) :: Phoenix.LiveView.Socket.t
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:expense, Expenses.get_expense!(id))
-    |> assign(:page_title, "Add New Expense")
-  end
-  defp apply_action(socket, :index, _params), do: assign(socket, :page_title, "Expenses")
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:expense, %Expense{})
-    |> assign(:page_title, "Add New Expense")
+  @impl true
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Expenses")}
+
+  @spec update_datatable(Phoenix.LiveView.Socket.t, String.t, pos_integer) :: {:noreply, Phoenix.LiveView.Socket.t}
+  defp update_datatable(socket, message, expense_id) do
+    send_update KamanskyWeb.Components.DataTable, id: "expense-kamansky-data-table", options: [go_to_record: expense_id]
+
+    {
+      :noreply,
+      socket
+      |> push_event("kamansky:closeModal", %{})
+      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
+    }
   end
 end

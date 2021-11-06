@@ -1,64 +1,53 @@
-<section class="section-wrapper">
-  <%= if live_flash(@flash, :info) do %>
-  <div
-    id="listings-success-message"
-    class="disappearing-success-message"
-    phx-hook="disappearingSuccessMessage"
-  >
-    <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
-  </div>
-  <% end %>
-  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "sold-listings-kamansky-data-table",
-    headers:
+<section>
+  <KamanskyWeb.Components.Page.page_header page_title={@page_title} />
+  <.live_component module={KamanskyWeb.Components.DataTable}
+    id="sold-listings-kamansky-data-table"
+    let={listing}
+    data_count={@data_count}
+    data_locator={@data_locator}
+    data_source={@data_source}
+    empty_message="There are no listings to display."
+    headers=
+    {
       [
         "Scott Number",
         "Date of Sale",
         "Sale Price",
         "Stamp Cost",
         "Net Profit/Loss"
-      ],
-    data_count: @data_count,
-    data_locator: @data_locator,
-    data_source: @data_source,
-    empty_message: "There are no listings to display.",
-    options: [
-      go_to_record: Map.get(assigns, :go_to_record),
-      sort: %{action: :sold, direction: :desc, column: 1}
-    ],
-    parent_action: :sold,
-    title: @page_title
-  do %>
-    <% listing -> %>
-      <td>
-        <%= live_patch listing.stamp.scott_number,
-          to: Routes.listing_sold_path(@socket, :show, listing)
-        %>
-      </td>
-      <td><%= formatted_date(listing.order.ordered_at) %></td>
-      <td class="text-success"><%= format_decimal_as_currency(listing.sale_price) %></td>
-      <td class={if Decimal.eq?(Stamp.total_cost(listing.stamp), 0), do: "", else: "text-danger"}>
-        <%= format_decimal_as_currency(Stamp.total_cost(listing.stamp)) %>
-      </td>
-      <td class={if Decimal.gt?(Listing.net_profit(listing), 0), do: "text-success", else: "text-danger"}>
-        <%= format_decimal_as_currency(Listing.net_profit(listing)) %>
-      </td>
-  <% end %>
-  <ul class="nav nav-pills justify-content-center">
-    <li class="nav-item">
-      <%= live_patch "Active", to: Routes.listing_active_path(@socket, :index), class: "nav-link" %>
-    </li>
-    <li class="nav-item">
-      <%= live_patch "Sold", to: Routes.listing_sold_path(@socket, :index), class: "nav-link active" %>
-    </li>
-  </ul>
+      ]
+    }
+    options=
+    {
+      [
+        go_to_record: Map.get(assigns, :go_to_record),
+        sort: %{action: :sold, direction: :desc, column: 1}
+      ]
+    }
+    title={@page_title}
+  >
+    <td>
+      <a
+        class="action-icon"
+        phx-click="open"
+        phx-target="#stamp-detail-modal"
+        phx-value-stamp-id={listing.stamp.id}
+      >
+        <%= listing.stamp.scott_number %>
+      </a>
+    </td>
+    <td><%= formatted_date(listing.order.ordered_at) %></td>
+    <td class="text-green-600"><%= format_decimal_as_currency(listing.sale_price) %></td>
+    <td class={if Decimal.eq?(Stamp.total_cost(listing.stamp), 0), do: "", else: "text-red-600"}>
+      <%= format_decimal_as_currency(Stamp.total_cost(listing.stamp)) %>
+    </td>
+    <td class={if Decimal.gt?(Listing.net_profit(listing), 0), do: "text-green-600", else: "text-red-600"}>
+      <%= format_decimal_as_currency(Listing.net_profit(listing)) %>
+    </td>
+  </.live_component>
+  <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
 </section>
-<%= if @live_action == :show do %>
-  <%= live_modal KamanskyWeb.StampLive.DetailComponent,
-    footer: false,
-    id: "stamp-detail-modal",
-    stamp: @stamp,
-    title: "View Stamp",
-    return_to: Routes.listing_sold_path(@socket, :index)
-  %>
-<% end %>
+<%= live_modal KamanskyWeb.StampLive.DetailComponent,
+  id: "stamp-detail-modal",
+  footer: false 
+%>

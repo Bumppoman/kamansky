@@ -28,6 +28,10 @@ defmodule Kamansky.Operations.Expenses do
   @spec get_expense!(pos_integer) :: Expense.t
   def get_expense!(id), do: Repo.get!(Expense, id)
 
+  @spec get_or_initialize_expense(String.t) :: Expense.t
+  def get_or_initialize_expense(""), do: %Expense{}
+  def get_or_initialize_expense(id), do: get_expense!(String.to_integer(id))
+
   @spec list_expenses(Paginate.params) :: [Expense.t]
   def list_expenses(params), do: Paginate.list(Expenses, Expense, params)
 

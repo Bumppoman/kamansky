@@ -1,56 +1,58 @@
-<div class="mt-4">
-  <h2>Order #<%= Order.order_number(@order) %></h2>
-  <table class="table">
-    <thead>
-      <tr>
-        <th colspan="2">Stamp</th>
+<div class="mt-5">
+  <h2 class="mb-2">Order #<%= Order.order_number(@order) %></h2>
+  <table>
+    <thead class="border-b-2 border-black">
+      <tr class="text-left">
+        <th colspan="2" class="pb-2 pl-4">Stamp</th>
         <th>Price</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="border-b-2 border-black">
       <%= for listing <- @order.listings do %>
-        <tr>
-          <td>
+        <tr class="align-top border-b">
+          <td class="pl-4 py-2">
             <%= if listing.stamp.front_photo do %>
               <img
                 src={Attachment.path(listing.stamp.front_photo)}
-                height="100"
-                class="me-4"
+                class="h-24 max-w-max mr-6"
               />
             <% else %>
               <img
                 src={Routes.static_path(@socket, "/images/blank-stamp.png")}
-                height="100"
-                class="me-4"
+                class="h-24 max-w-max mr-6"
               />
             <% end %>
           </td>
-          <td style="width: 92%;">
+          <td class="py-2 w-[92%]">
             <%= StampReference.description(listing.stamp.stamp_reference) %><br />
             <small>Item #<%= listing.stamp.inventory_key %></small>
           </td>
-          <td style="width: 8%;"><%= format_decimal_as_currency(listing.sale_price) %></td>
+          <td class="py-2 w-[8%]"><%= format_decimal_as_currency(listing.sale_price) %></td>
         </tr>
       <% end %>
     </tbody>
     <tfoot>
-      <tr>
-        <td colspan="2" class="text-end pe-5">Subtotal</td>
+      <tr class="border-b">
+        <td colspan="2" class="pr-8 py-2 text-right">Subtotal</td>
         <td><%= format_decimal_as_currency(@order.item_price) %></td>
       </tr>
-      <tr>
-        <td colspan="2" class="text-end pe-5 border-bottom border-dark">Shipping</td>
-        <td class="border-bottom border-dark"><%= format_decimal_as_currency(@order.shipping_price) %></td>
+      <tr class="border-b border-black">
+        <td colspan="2" class="pr-8 py-2 text-right">Shipping</td>
+        <td class="border-b border-black"><%= format_decimal_as_currency(@order.shipping_price) %></td>
       </tr>
-      <tr>
-        <td colspan="2" class="text-end pe-5">Total</td>
+      <tr class="border-b">
+        <td colspan="2" class="pr-8 py-2 text-right">Total</td>
         <td><%= format_decimal_as_currency(Order.total_paid(@order)) %></td>
+      </tr>
+      <tr class="border-b">
+        <td colspan="2" class="pr-8 py-2 text-right">Total Items</td>
+        <td><%= Order.total_items(@order) %></td>
       </tr>
     </tfoot>
   </table>
-  <section>
-    <div class="row">
-      <div class="col">
+  <section class="mt-3">
+    <div class="grid grid-cols-2">
+      <div>
         <div>
           Ordered by:<br />
           <%= @order.customer.name %><br />
@@ -59,40 +61,40 @@
           <%= if @order.customer.country, do: raw("#{@order.customer.country}<br />") %>
           <%= @order.customer.email %>
         </div>
-        <div class="mt-4">
+        <div class="mt-6">
           Ordered through:<br />
           <%= Order.platform(@order) %> (order ID: <%= Order.platform_id(@order) %>)
         </div>
       </div>
-      <div class="col">
-        <table class="table">
+      <div>
+        <table class="w-full">
           <thead>
-            <tr>
-              <th colspan="2">Metrics</th>
+            <tr class="border-b-2 border-black">
+              <th colspan="2" class="pl-2 py-2 text-left">Metrics</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Price paid</td>
+            <tr class="border-b">
+              <td class="pl-2 py-2">Price paid</td>
               <td><%= format_decimal_as_currency(Order.total_paid(@order)) %></td>
             </tr>
-            <tr>
-              <td>Stamp cost</td>
+            <tr class="border-b">
+              <td class="pl-2 py-2">Stamp cost</td>
               <td><%= format_decimal_as_currency(Order.total_stamp_cost(@order)) %></td>
             </tr>
-            <tr>
-              <td>Selling fees</td>
+            <tr class="border-b">
+              <td class="pl-2 py-2">Selling fees</td>
               <td><%= format_decimal_as_currency(@order.selling_fees) %></td>
             </tr>
             <tr>
-              <td>Shipping cost</td>
+              <td class="pl-2 py-2">Shipping cost</td>
               <td><%= format_decimal_as_currency(@order.shipping_cost) %></td>
             </tr>
           </tbody>
-          <tfoot>
-            <tr class="fw-bold">
-              <td>Net profit/loss</td>
-              <td class={if Decimal.gt?(Order.net_profit(@order), Decimal.new(0)), do: "text-success", else: "text-danger"}>
+          <tfoot class="border-t-2 border-black">
+            <tr class="border-b font-bold">
+              <td class="pl-2 py-2">Net profit/loss</td>
+              <td class={if Decimal.gt?(Order.net_profit(@order), Decimal.new(0)), do: "text-green-600", else: "text-red-600"}>
                 <%= format_decimal_as_currency(Order.net_profit(@order)) %>
               </td>
             </tr>

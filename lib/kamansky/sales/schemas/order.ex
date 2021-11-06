@@ -133,6 +133,9 @@ defmodule Kamansky.Sales.Orders.Order do
     |> Decimal.add(Order.total_stamp_cost(order))
   end
 
+  @spec total_items(Order.t) :: pos_integer()
+  def total_items(%Order{listings: listings}), do: Enum.count(listings)
+
   @spec total_paid(Order.t) :: Decimal.t
   def total_paid(%Order{item_price: item_price, shipping_price: shipping_price}), do: Decimal.add(item_price, shipping_price)
 

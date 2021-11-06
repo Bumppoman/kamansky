@@ -1,136 +1,123 @@
-<section class="section-wrapper">
-  <%= if live_flash(@flash, :info) do %>
-    <div
-      id="stamp-success-message"
-      class="disappearing-success-message"
-      phx-hook="disappearingSuccessMessage"
-    >
-      <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
-    </div>
-  <% end %>
-  <%= if show_topbar(assigns) do %>
-    <div class="row mb-2">
-      <div class="col-md-6">
-      <%= live_patch "Load New Orders",
-        to: Routes.order_index_path(@socket, :load),
-        class: "btn btn-primary"
-      %>
-      </div>
-      <div class="col-md-6 text-end">
-        <%= live_patch "Create Order",
-          to: Routes.order_index_path(@socket, :new),
-          class: "btn btn-primary"
-        %>
-      </div>
-    </div>
-  <% end %>
-  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "orders-kamansky-data-table",
-    headers:
+<section>
+  <KamanskyWeb.Components.Page.page_header
+    buttons={
+      [
+        %{
+          color: :gray,
+          display: @live_action == :pending,
+          options: %{
+            "phx-click": "load_new_orders"
+          },
+          title: "Load New Orders"
+        },
+        %{
+          display: @live_action == :pending,
+          options: %{
+            "phx-click": "open",
+            "phx-target": "#new-order-form-modal"
+          },
+          title: "Create Order"
+        }
+      ]
+    }
+    page_title={@page_title}
+  />
+  <.live_component module={KamanskyWeb.Components.DataTable}
+    headers={
       [
         "Order Number",
         "Date",
         "Total",
         "Net Profit/Loss",
         "Actions"
-      ],
-    data_count: @data_count,
-    data_locator: @data_locator,
-    data_source: @data_source,
-    empty_message: "There are no orders to display.",
-    options: [
+      ]}
+    id="orders-kamansky-data-table"
+    let={order}
+    data_count={@data_count}
+    data_locator={@data_locator}
+    data_source={@data_source}
+    empty_message="There are no orders to display."
+    options={[
       go_to_record: Map.get(assigns, :go_to_record),
       sort: %{column: 1, direction: :desc}
-    ],
-    title: @page_title
-  do %>
-    <% order -> %>
-      <td>
-        <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
-      </td>
-      <td><%= formatted_date(order.ordered_at) %></td>
-      <td><%= format_decimal_as_currency(Order.total_paid(order)) %></td>
-      <td class={if Decimal.gt?(Order.net_profit(order), 0), do: "text-success", else: "text-danger"}>
-        <%= format_decimal_as_currency(Order.net_profit(order)) %>
-      </td>
-      <td>
-        <%= unless Order.completed?(order) do %>
-          <%= live_patch to: Routes.order_index_path(@socket, :edit, order), class: "action-icon" do %>
-            <i class="material-icons">edit</i>
-          <% end %>
-        <% end %>
-        <%= cond do %>
-          <% Order.pending?(order) -> %>
-            <%= live_patch to: Routes.order_index_path(@socket, :mark_processed, order), class: "action-icon" do %>
-              <i class="material-icons">precision_manufacturing</i>
-            <% end %>
-          <% Order.processed?(order) -> %>
-            <%= live_patch to: Routes.order_index_path(@socket, :mark_shipped, order), class: "action-icon" do %>
-              <i class="material-icons">local_shipping</i>
-            <% end %>
-          <% Order.shipped?(order) -> %>
-            <%= live_patch to: Routes.order_index_path(@socket, :mark_completed, order), class: "action-icon" do %>
-              <i class="material-icons">done</i>
-            <% end %>
-          <% true -> %>
-        <% end %>
-      </td>
-  <% end %>
-  <ul class="nav nav-pills justify-content-center">
-    <li class="nav-item">
-      <%= live_redirect "Pending",
-        to: Routes.order_index_path(@socket, :pending),
-        class: ["nav-link"] ++ (if active_status(assigns) == :pending, do: [" active"], else: [])
-      %>
-    </li>
-    <li class="nav-item">
-      <%= live_redirect "Processed",
-        to: Routes.order_index_path(@socket, :processed),
-        class: ["nav-link"] ++ (if active_status(assigns) == :processed, do: [" active"], else: [])
-      %>
-    </li>
-    <li class="nav-item">
-      <%= live_redirect "Shipped",
-        to: Routes.order_index_path(@socket, :shipped),
-        class: ["nav-link"] ++ (if active_status(assigns) == :shipped, do: [" active"], else: [])
-      %>
-    </li>
-    <li class="nav-item">
-      <%= live_redirect "Completed",
-        to: Routes.order_index_path(@socket, :completed),
-        class: ["nav-link"] ++ (if active_status(assigns) == :completed, do: [" active"], else: [])
-      %>
-    </li>
-  </ul>
+    ]}
+    title={@page_title}
+  >
+    <td>
+      <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
+    </td>
+    <td><%= formatted_date(order.ordered_at) %></td>
+    <td><%= format_decimal_as_currency(Order.total_paid(order)) %></td>
+    <td class={if Decimal.gt?(Order.net_profit(order), 0), do: "text-green-600", else: "text-red-600"}>
+      <%= format_decimal_as_currency(Order.net_profit(order)) %>
+    </td>
+    <td>
+      <%= unless Order.completed?(order) do %>
+        <a
+          class="action-icon"
+          title="Edit"
+          phx-click="open"
+          phx-target="#edit-order-form-modal"
+          phx-value-order-id={order.id}
+        >
+          <KamanskyWeb.Components.Icons.edit />
+        </a>
+      <% end %>
+      <%= cond do %>
+        <% Order.pending?(order) -> %>
+          <KamanskyWeb.Components.Page.link_with_confirmation
+            action="mark_processed"
+            content="Are you sure you want to mark this order as processed?"
+            title="Mark Processed"
+            values={[{"order-id", order.id}]}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+          </KamanskyWeb.Components.Page.link_with_confirmation>
+        <% Order.processed?(order) -> %>
+          <KamanskyWeb.Components.Page.link_with_confirmation
+            action="mark_shipped"
+            content="Are you sure you want to mark this order as shipped?"
+            title="Mark Shipped"
+            values={[{"order-id", order.id}]}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              class="h-5 w-5" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                stroke-width="2" 
+                d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" 
+              />
+            </svg>
+          </KamanskyWeb.Components.Page.link_with_confirmation>
+        <% Order.shipped?(order) -> %>
+          <KamanskyWeb.Components.Page.link_with_confirmation
+            action="mark_completed"
+            content="Are you sure you want to mark this order as completed?"
+            title="Mark Completed"
+            values={[{"order-id", order.id}]}
+          >
+            <KamanskyWeb.Components.Icons.check_circle />
+          </KamanskyWeb.Components.Page.link_with_confirmation>
+        <% true -> %>
+      <% end %>
+    </td>
+  </.live_component>
+  <KamanskyWeb.OrderLive.Components.bottom_tabs socket={@socket} live_action={@live_action} />
 </section>
-<%= if @live_action == :edit do %>
-  <%= live_modal KamanskyWeb.OrderLive.EditComponent,
-    action: @live_action,
-    form_id: "order-form",
-    id: "order-form-modal",
-    order: @order,
-    title: "Update Order",
-    return_to: Routes.order_index_path(@socket, @order.status)
-  %>
-<% end %>
-<%= if @live_action == :new do %>
-  <%= live_modal KamanskyWeb.OrderLive.NewComponent,
-    action: @live_action,
-    button_text: @button_text,
-    customer: @customer,
-    form_id: "customer-form",
-    id: "new-order-form-modal",
-    order: @order,
-    title: "Create Order",
-    return_to: Routes.order_index_path(@socket, @order.status)
-  %>
-<% end %>
-<%= if @live_action in [:mark_completed, :mark_processed, :mark_shipped] do %>
-  <%= live_confirmation_modal(
-    message: "Are you sure you want to mark this order as #{@marking_action}?",
-    return_to: Routes.order_index_path(@socket, @order.status),
-    success: @live_action,
-    title: @page_title,
-    type: :confirmation_large
-  ) %>
-<% end %>
+<%= live_modal KamanskyWeb.OrderLive.NewComponent,
+  id: "new-order-form-modal",
+  form_id: "new-order-form"
+%>
+<%= live_modal KamanskyWeb.OrderLive.EditComponent,
+  id: "edit-order-form-modal",
+  form_id: "edit-order-form"
+%>

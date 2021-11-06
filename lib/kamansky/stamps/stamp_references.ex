@@ -60,6 +60,10 @@ defmodule Kamansky.Stamps.StampReferences do
   @spec get_stamp_reference!(integer) :: StampReference.t
   def get_stamp_reference!(id), do: Repo.get!(StampReference, id)
 
+  @spec get_or_initialize_stamp_reference(String.t) :: StampReference.t
+  def get_or_initialize_stamp_reference(""), do: %StampReference{}
+  def get_or_initialize_stamp_reference(id), do: get_stamp_reference!(String.to_integer(id))
+
   @spec list_stamp_references(Paginate.params) :: [StampReference.t]
   def list_stamp_references(params), do: Paginate.list(StampReferences, StampReference, params)
 

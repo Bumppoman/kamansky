@@ -61,7 +61,7 @@ defmodule Kamansky.Sales.Customers do
         Customer
         |> from(as: :customer)
         |> join(:left, [c], o in assoc(c, :orders))
-        |> join(:inner_lateral, [c], lo in subquery(most_recent_order))
+        |> join(:left_lateral, [c], lo in subquery(most_recent_order))
         |> group_by([c, o, lo], [c.id, lo.ordered_at])
         |> select_merge(
           [c, o, lo],

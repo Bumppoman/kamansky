@@ -1,24 +1,24 @@
-<div class="form-wrapper">
+<div x-init={"buttonText = '#{@button_text}'; title = 'Create Order'"}>
   <.form
     let={f}
     for={@changeset}
-    id="customer-form"
+    id="new-order-form"
     phx_target={@myself}
     phx_change={@validate}
     phx_submit={@submit}
   >
-    <div class="row">
+    <div class="grid grid-cols-2">
       <%= if @order_step == 1 do %>
-        <div class="col-md-6 form-group required">
-          <%= label f, :existing, "Customer", class: "form-control-label" %>
-          <div>
-            <div class="form-check form-check-inline">
-              <%= radio_button f, :existing, true, class: "form-check-input" %>
-              <label class="form-check-label">Existing</label>
+        <div class="flex flex-col form-group required">
+          <%= label f, :existing, "Customer", class: "w-full" %>
+          <div class="align-middle flex-grow grid grid-cols-2 mt-2">
+            <div class="flex items-center">
+              <%= radio_button f, :existing, true, class: "align-top" %>
+            <label for={input_id f, :existing, true}>Existing</label>
             </div>
-            <div class="form-check form-check-inline">
-              <%= radio_button f, :existing, false, class: "form-check-input" %>
-              <label class="form-check-label">New</label>
+            <div class="flex items-center">
+              <%= radio_button f, :existing, false, class: "align-top" %>
+              <label for={input_id f, :existing, false}>New</label>
             </div>
           </div>
         </div>
@@ -35,7 +35,7 @@
         target={@myself}
       />
     <% else %>
-      <KamanskyWeb.OrderLive.RawFormComponent.order_form 
+      <KamanskyWeb.OrderLive.Components.order_form 
         f={f}
         changeset={@changeset}
       />

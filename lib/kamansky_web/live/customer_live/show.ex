@@ -14,7 +14,7 @@ defmodule KamanskyWeb.CustomerLive.Show do
         :ok,
         socket
         |> assign(:customer, customer)
-        |> assign(:order_count, Orders.count_orders_for_customer(customer.id))
+        |> assign(:order_count, fn -> Orders.count_orders_for_customer(customer.id) end)
         |> assign(:order_source, fn options -> Orders.list_orders_for_customer(customer.id, options) end)
         |> assign(:page_title, "Information for #{customer.name}")
       }

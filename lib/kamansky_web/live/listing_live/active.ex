@@ -3,8 +3,7 @@ defmodule KamanskyWeb.ListingLive.Active do
 
   import Kamansky.Helpers
 
-  alias Kamansky.Sales.{Listings, Orders}
-  alias Kamansky.Stamps
+  alias Kamansky.Sales.Listings
   alias Kamansky.Stamps.Stamp
 
   @impl true
@@ -13,39 +12,27 @@ defmodule KamanskyWeb.ListingLive.Active do
     {
       :ok,
       socket
-      |> assign(:data_count, Listings.count_listings(:active))
+      |> assign(:data_count, fn -> Listings.count_listings(:active) end)
       |> assign(:data_locator, fn options -> Listings.find_row_number_for_listing(:active, options) end)
       |> assign(:data_source, fn options -> Listings.list_listings(:active, options) end)
     }
   end
 
   @impl true
+  @spec handle_info({:listing_added_to_order, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:listing_added_to_order, listing_id}, socket) do
+    send_update KamanskyWeb.Components.DataTable, id: "listings-kamansky-data-table", options: [go_to_record: listing_id]
+    {:noreply, put_flash(socket, :info, %{message: "You have successfully added this listing to an order.", timestamp: Time.utc_now()})}
+  end
+
+  @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(params, _uri, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  @spec apply_action(Phoenix.LiveView.Socket.t, :add_to_order | :index | :show, map) :: Phoenix.LiveView.Socket.t
-  defp apply_action(socket, :index, params) do
-    socket
-    |> assign(:go_to_record, Map.get(params, "go_to_record"))
-    |> assign(:page_title, "Listings")
-  end
-
-
-  defp apply_action(socket, :add_to_order, %{"id" => id}) do
-    socket
-    |> assign(:go_to_record, id)
-    |> assign(:listing, Listings.get_listing!(id))
-    |> assign(:page_title, "Add Listing to Order")
-    |> assign(:pending_orders, Orders.list_pending_orders_to_add_listing())
-  end
-
-  defp apply_action(socket, :show, %{"id" => id}) do
-    with listing <- Listings.get_listing!(id) do
+    {
+      :noreply,
       socket
-      |> assign(:page_title, "View Listing")
-      |> assign(:stamp, Stamps.get_stamp_detail!(listing.stamp_id))
-    end
+      |> assign(:go_to_record, Map.get(params, "go_to_record"))
+      |> assign(:page_title, "Listings")
+    }
   end
 end

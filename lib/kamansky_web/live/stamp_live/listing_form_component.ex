@@ -11,16 +11,17 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
 
   @impl true
   @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(assigns, socket) do
-    with listing <- %Listing{},
-      changeset <- Listings.change_listing(listing)
+  def update(%{trigger_params: %{"stamp-id" => stamp_id}} = assigns, socket) do
+    with stamp <- Stamps.get_stamp!(stamp_id),
+      listing <- %Listing{}
     do
       {
         :ok,
         socket
         |> assign(assigns)
-        |> assign(:changeset, changeset)
+        |> assign(:changeset, Listings.change_listing(listing))
         |> assign(:listing, listing)
+        |> assign(:stamp, stamp)
       }
     end
   end
@@ -46,8 +47,9 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
           {
             :noreply,
             socket
-              |> put_flash(:info, "You have successfully listed this stamp for sale (inventory key: ##{inventory_key}).")
-              |> push_redirect(to: Routes.listing_active_path(socket, :index, go_to_record: listing_id))
+            |> push_event("kamansky:closeModal", %{})
+            |> put_flash(:info, %{message: "You have successfully listed this stamp for sale (inventory key: ##{inventory_key}).", timestamp: Time.utc_now()})
+            |> push_redirect(to: Routes.listing_active_path(socket, :index, go_to_record: listing_id))
           }
         end
     end

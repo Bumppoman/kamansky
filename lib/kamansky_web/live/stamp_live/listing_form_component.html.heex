@@ -1,4 +1,4 @@
-<div class="form-wrapper">
+<div x-init="title = 'List Stamp for Sale'">
   <.form
     let={f}
     for={@changeset}
@@ -7,44 +7,43 @@
     phx_change="validate"
     phx_submit="submit"
   >
-    <div class="row">
-      <div class="col-md-3 form-group">
-        <label class="form-control-label">Scott Number</label>
+    <div class="grid grid-cols-4">
+      <div class="form-group">
+        <label>Scott Number</label>
         <p><%= @stamp.scott_number %></p>
       </div>
-      <div class="col-md-3 form-group">
-        <label class="form-control-label">Grade</label>
+      <div class="form-group">
+        <label>Grade</label>
         <p><%= Stamp.formatted_grade(@stamp) %></p>
       </div>
-      <div class="col-md-3 form-group">
-        <label class="form-control-label">Price Paid</label>
+      <div class="form-group">
+        <label>Price Paid</label>
         <p><%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %></p>
       </div>
-      <div class="col-md-3 form-group">
-        <label class="form-control-label">Median Listing Price</label>
+      <div class="form-group">
+        <label>Median Listing Price</label>
         <p><%= format_decimal_as_currency(Listings.get_median_listing_price_for_scott_number(@stamp.scott_number)) %></p>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-6 form-group required">
-        <%= label f, :listing_price, "Price", class: "form-control-label" %>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="material-icons">attach_money</i>
-            </span>
+    <div class="grid grid-cols-2">
+      <div class="form-group required">
+        <%= label f, :listing_price, "Listing Price" %>
+        <div class="form-input">
+          <div class="form-input-prepend">
+            <span>$</span>
           </div>
-          <%= text_input f, :listing_price, class: "form-control" %>
+          <%= text_input f, :listing_price %>
         </div>
       </div>
-      <div class="col-md-6 form-group required">
-        <label class="form-control-label">List On</label>
-        <div class="form-check">
-          <%= checkbox f,
-            :hipstamp,
-            class: "form-check-input"
-          %>
-          <label class="form-check-label">Hipstamp</label>
+      <div class="flex flex-col form-group required">
+        <label>List On</label>
+        <div class="flex flex-grow items-center">
+          <div>
+            <%= checkbox f, :hipstamp %>
+          </div>
+          <div class="ml-3">
+            <label>Hipstamp</label>
+          </div>
         </div>
       </div>
     </div>

@@ -7,21 +7,14 @@ defmodule KamanskyWeb.TrendLive.Sold do
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
+  def handle_params(_params, _uri, socket) do
     {
       :noreply,
       socket
-      |> apply_action(socket.assigns.live_action, params)
-      |> load_stamps()
+      |> assign(:page_title, "Stamps Sold by Scott Number")
+      |> assign(:data_count, &StampReferences.count_stamp_references_with_sales/0)
+      |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference_with_sales(options) end)
+      |> assign(:data_source, fn options -> StampReferences.list_stamp_references_with_sales(options) end)
     }
-  end
-
-  defp apply_action(socket, :index, _params), do: assign(socket, :page_title, "Stamps Sold by Scott Number")
-
-  defp load_stamps(socket) do
-    socket
-    |> assign(:data_count, StampReferences.count_stamp_references_with_sales())
-    |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference_with_sales(options) end)
-    |> assign(:data_source, fn options -> StampReferences.list_stamp_references_with_sales(options) end)
   end
 end

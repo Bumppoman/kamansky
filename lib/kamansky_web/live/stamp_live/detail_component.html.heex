@@ -1,5 +1,5 @@
-<div class="d-flex">
-  <div class="me-5">
+<div class="flex" x-init="title = 'View Stamp'">
+  <div class="mr-8">
     <div>
       <img
         height="200"
@@ -9,7 +9,7 @@
         <div class="text-center mt-2">
           <a
             href="#"
-            class={["photo-display-link"] ++ (if elem(@current_photo, 0) != :rear, do: [" fw-bold"], else: [])}
+            class={"photo-display-link" <> (if elem(@current_photo, 0) != :rear, do: " font-bold", else: "")}
             phx-click="change_photo"
             phx-target={@myself}
             phx-value-display="front"
@@ -17,7 +17,7 @@
           |
           <a
             href="#"
-            class={["photo-display-link"] ++ (if elem(@current_photo, 0) == :rear, do: [" fw-bold"], else: [])}
+            class={"photo-display-link" <> (if elem(@current_photo, 0) == :rear, do: " font-bold", else: "")}
             phx-click="change_photo"
             phx-target={@myself}
             phx-value-display="rear"
@@ -26,28 +26,28 @@
       <% end %>
     </div>
   </div>
-  <div>
-    <h4><%= StampReference.description(@stamp.stamp_reference) %></h4>
-    <table class="table">
+  <div class="flex-grow">
+    <h4 class="text-2xl"><%= StampReference.description(@stamp.stamp_reference) %></h4>
+    <table class="mt-4 w-full">
       <tbody>
-        <tr>
-          <th>Grade</th>
+        <tr class="border-b">
+          <th class="p-2 text-left">Grade</th>
           <td><%= Stamp.formatted_grade(@stamp) %></td>
         </tr>
-        <tr>
-          <th>Cost</th>
+        <tr class="border-b">
+          <th class="p-2 text-left">Cost</th>
           <td>
             <%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %>
             (<%= format_decimal_as_currency(@stamp.cost) %> stamp/<%= format_decimal_as_currency(@stamp.purchase_fees) %> fees)
           </td>
         </tr>
-        <tr>
-          <th>History</th>
+        <tr class="border-b">
+          <th class="p-2 text-left">History</th>
           <td><%= raw formatted_history(@stamp) %></td>
         </tr>
         <%= if @stamp.inventory_key do %>
-          <tr>
-            <th>Inventory Key</th>
+          <tr class="border-b">
+            <th class="p-2 text-left">Inventory Key</th>
             <td><%= @stamp.inventory_key %></td>
           </tr>
         <% end %>

@@ -1,58 +1,63 @@
-<section class="section-wrapper">
-  <%= if live_flash(@flash, :info) do %>
-  <div
-    id="expenses-success-message"
-    class="disappearing-success-message"
-    phx-hook="disappearingSuccessMessage"
-  >
-    <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
-  </div>
-  <% end %>
-  <div class="text-end mb-2">
-    <%= live_patch "Add New Expense",
-      to: Routes.expense_index_path(@socket, :new),
-      class: "btn btn-primary"
-    %>
-  </div>
-  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "expenses-kamansky-data-table",
-    headers:
+<section>
+  <KamanskyWeb.Components.Page.page_header
+    buttons={
+      [
+        %{
+          options: %{
+            "phx-click": "open",
+            "phx-target": "#expense-form-modal",
+            "phx-value-action": "new",
+            "phx-value-expense-id": ""
+          },
+          title: "Add New Expense"
+        }
+      ]
+    }
+    page_title="Expenses"
+  />
+  <.live_component module={KamanskyWeb.Components.DataTable}
+    id="expenses-kamansky-data-table"
+    let={expense}
+    headers=
+    {
       [
         "Date",
         "Description",
         "Category",
         "Amount",
         %{text: "Actions", sort: :disabled},
-      ],
-    data_count: @data_count,
-    data_locator: @data_locator,
-    data_source: @data_source,
-    empty_message: "There are no expenses to display.",
-    options: [
-      go_to_record: Map.get(assigns, :go_to_record),
-      sort: 0
-    ],
-    title: @page_title
-  do %>
-    <% expense -> %>
-      <td><%= formatted_date(expense.date) %></td>
-      <td><%= expense.description %></td>
-      <td><%= Expense.formatted_category(expense) %></td>
-      <td><%= format_decimal_as_currency(expense.amount) %></td>
-      <td>
-        <%= live_patch to: "#", class: "action-icon" do %>
-          <i class="material-icons">edit</i>
-        <% end %>
-      </td>
-  <% end %>
+      ]
+    }
+    data_count={@data_count}
+    data_locator={@data_locator}
+    data_source={@data_source}
+    empty_message="There are no expenses to display."
+    options={
+      [
+        go_to_record: Map.get(assigns, :go_to_record),
+        sort: 0
+      ]
+    }
+    title={@page_title}
+  >
+    <td><%= formatted_date(expense.date) %></td>
+    <td><%= expense.description %></td>
+    <td><%= Expense.formatted_category(expense) %></td>
+    <td><%= format_decimal_as_currency(expense.amount) %></td>
+    <td>
+      <a
+        class="action-icon"
+        phx-click="open"
+        phx-target="#expense-form-modal"
+        phx-value-action="edit"
+        phx-value-expense-id={expense.id}
+      >
+        <KamanskyWeb.Components.Icons.edit />
+      </a>
+    </td>
+  </.live_component>
 </section>
-<%= if @live_action in [:new, :edit] do %>
-  <%= live_modal KamanskyWeb.ExpenseLive.FormComponent,
-    action: @live_action,
-    form_id: "expense-form",
-    id: "expense-form-modal",
-    expense: @expense,
-    title: (if @live_action == :new, do: "Add New Expense", else: "Edit Expense"),
-    return_to: Routes.expense_index_path(@socket, :index)
-  %>
-<% end %>
+<%= live_modal KamanskyWeb.ExpenseLive.FormComponent,
+  id: "expense-form-modal",
+  form_id: "expense-form"
+%>

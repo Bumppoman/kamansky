@@ -1,4 +1,4 @@
-<div class="form-wrapper">
+<div x-init={"title = '#{@title}'"}>
   <.form
     let={f}
     for={@changeset}
@@ -7,67 +7,44 @@
     phx_change="validate"
     phx_submit="submit"
   >
-    <div class="row">
-      <div class="col-md-8 form-group required">
-        <%= label f,
-          :description,
-          class: "form-control-label"
-        %>
-        <%= text_input f,
-          :description,
-          class: "form-control"
-        %>
+    <div class="grid grid-cols-3">
+      <div class="col-span-2 form-group required">
+        <%= label f, :description %>
+        <div class="form-input">
+          <%= text_input f, :description %>
+        </div>
       </div>
-      <div class="col-md-4 form-group required">
-        <%= label f,
-          :date,
-          class: "form-control-label"
-        %>
-        <%= date_input f,
-          :date,
-          class: "form-control"
-        %>
+      <div class="form-group required">
+        <%= label f, :date %>
+        <div class="form-input">
+          <%= date_input f, :date, class: "max-h-[38px]" %>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-4 form-group required">
-        <%= label f,
-          :cost,
-          class: "form-control-label"
-        %>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="material-icons">attach_money</i>
-            </span>
+    <div class="grid grid-cols-3">
+      <div class="form-group required">
+        <%= label f, :cost %>
+        <div class="form-input">
+          <div class="form-input-prepend">
+            <span>$</span>
           </div>
-          <%= text_input f, :cost, class: "form-control" %>
+          <%= text_input f, :cost %>
         </div>
       </div>
-      <div class="col-md-4 form-group required">
-        <%= label f,
-          :purchase_fees,
-          "Purchase Fees",
-          class: "form-control-label"
-        %>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="material-icons">attach_money</i>
-            </span>
+      <div class="form-group required">
+        <%= label f, :purchase_fees, "Purchase Fees" %>
+        <div class="form-input">
+          <div class="form-input-prepend">
+            <span>$</span>
           </div>
-          <%= text_input f, :purchase_fees, class: "form-control" %>
+          <%= text_input f, :purchase_fees %>
         </div>
       </div>
-      <div class="col-md-4 form-group required">
-        <%= label f,
-          :quantity,
-          class: "form-control-label"
-        %>
-        <%= number_input f,
-          :quantity,
-          class: "form-control"
-        %>
+      <div class="form-group required">
+        <%= label f, :quantity %>
+        <div class="form-input">
+          <%= number_input f, :quantity %>
+        </div>
       </div>
     </div>
   </.form>

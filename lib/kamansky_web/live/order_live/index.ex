@@ -10,59 +10,43 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_event("mark_completed", _value, socket) do
-    with order <- socket.assigns.order do
+  def handle_event("load_new_orders", _value, socket) do
+    with :ok <- Hipstamp.Order.load_new_orders, do: {:noreply, socket}
+  end
+
+  def handle_event("mark_completed", %{"order-id" => order_id}, socket) do
+    with order <- Orders.get_order!(order_id) do
       case Orders.mark_order_as_completed(order) do
-        {:ok, _order} ->
-          {
-            :noreply,
-            socket
-            |> put_flash(:info, "You have successfully marked this order as completed.")
-            |> push_redirect(to: Routes.order_index_path(socket, order.status))
-          }
-
-        {:error, %Ecto.Changeset{} = changeset} ->
-          {:noreply, assign(socket, changeset: changeset)}
+        {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as completed.")
+        {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
       end
     end
   end
 
-  def handle_event("mark_processed", _value, socket) do
-    with order <- socket.assigns.order do
+  def handle_event("mark_processed", %{"order-id" => order_id}, socket) do
+    with order <- Orders.get_order!(order_id) do
       case Orders.mark_order_as_processed(order) do
-        {:ok, _order} ->
-          {
-            :noreply,
-            socket
-            |> put_flash(:info, "You have successfully marked this order as processed.")
-            |> push_redirect(to: Routes.order_index_path(socket, order.status))
-          }
-
-        {:error, %Ecto.Changeset{} = changeset} ->
-          {:noreply, assign(socket, changeset: changeset)}
+        {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as processsed.")
+        {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
       end
     end
   end
 
-  def handle_event("mark_shipped", _value, socket) do
-    with order <- socket.assigns.order do
-      case order do
-        o when not is_nil(o.hipstamp_id) -> Hipstamp.Order.mark_shipped(order)
-        _ -> Orders.mark_order_as_shipped(order)
-      end
-
-      {
-        :noreply,
-        socket
-        |> put_flash(:info, "You have successfully marked this order as shipped.")
-        |> push_redirect(to: Routes.order_index_path(socket, order.status))
-      }
+  def handle_event("mark_shipped", %{"order-id" => order_id}, socket) do
+    with(
+      order <- Orders.get_order!(order_id),
+      {:ok, _order} <-
+        case order do
+          o when not is_nil(o.hipstamp_id) -> Hipstamp.Order.mark_shipped(order)
+          _ -> Orders.mark_order_as_shipped(order)
+        end
+    ) do
+      order_successfully_advanced(socket, "You have successfully marked this order as shipped.")
     end
   end
 
   @impl true
-  @spec handle_info({:update_new_order_step, %{step: pos_integer, customer: Customer.t}}, Phoenix.LiveView.Socket.t)
-    :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_info({:update_new_order_step, %{step: pos_integer, customer: Customer.t}}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:update_new_order_step, %{step: 2, customer: customer}}, socket) do
     {
       :noreply,
@@ -74,80 +58,13 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket), do: {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-
-  @spec active_status(map) :: atom
-  def active_status(%{order: %Order{status: status}}), do: status
-  def active_status(%{live_action: live_action}) do
-    if live_action in Ecto.Enum.values(Order, :status), do: live_action, else: :pending
-  end
-
-  @spec show_topbar(map) :: boolean
-  def show_topbar(%{live_action: live_action}) when live_action in [:new, :pending], do: true
-  def show_topbar(%{order: %Order{status: :pending}}), do: true
-  def show_topbar(_), do: false
-
-  @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    with order <- Orders.get_order_with_customer!(id) do
+  def handle_params(_params, _uri, socket) do
+    {
+      :noreply,
       socket
-      |> assign(:page_title, "Update Order")
-      |> assign(:order, order)
-      |> load_orders(order.status)
-    end
-  end
-
-  defp apply_action(socket, :load, _params) do
-    with :ok <- Hipstamp.Order.load_new_orders do
-      push_redirect(socket, to: Routes.order_index_path(socket, :pending))
-    end
-  end
-
-  defp apply_action(socket, :mark_completed, %{"id" => id}) do
-    with order <- Orders.get_order!(id) do
-      socket
-      |> assign(:page_title, "Mark Order as Completed")
-      |> assign(:order, order)
-      |> assign(:marking_action, "completed")
-      |> load_orders(order.status)
-    end
-  end
-
-  defp apply_action(socket, :mark_processed, %{"id" => id}) do
-    with order <- Orders.get_order!(id) do
-      socket
-      |> assign(:page_title, "Mark Order as Processed")
-      |> assign(:order, order)
-      |> assign(:marking_action, "processed")
-      |> load_orders(order.status)
-    end
-  end
-
-  defp apply_action(socket, :mark_shipped, %{"id" => id}) do
-    with order <- Orders.get_order!(id) do
-      socket
-      |> assign(:page_title, "Mark Order as Shipped")
-      |> assign(:order, order)
-      |> assign(:marking_action, "shipped")
-      |> load_orders(order.status)
-    end
-  end
-
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:button_text, "Next")
-    |> assign(:customer, %Customer{})
-    |> assign(:order, %Order{customer: %Customer{}})
-    |> assign(:page_title, "Create Order")
-    |> load_orders(:pending)
-  end
-
-  defp apply_action(socket, :show, _params), do: socket
-
-  defp apply_action(socket, action, _params) do
-    socket
-    |> assign(:page_title, String.capitalize(Atom.to_string(action)) <> " Orders")
-    |> load_orders(action)
+      |> assign(:page_title, String.capitalize(Atom.to_string(socket.assigns.live_action)) <> " Orders")
+      |> load_orders(socket.assigns.live_action)
+    }
   end
 
   @spec load_orders(Phoenix.LiveView.Socket.t, map | atom) :: Phoenix.LiveView.Socket.t
@@ -155,8 +72,20 @@ defmodule KamanskyWeb.OrderLive.Index do
   defp load_orders(socket, %{}), do: load_orders(socket, socket.assigns.live_action)
   defp load_orders(socket, status) when status in [:pending, :finalized, :processed, :shipped, :completed] do
     socket
-    |> assign(:data_count, Orders.count_orders(status: status))
+    |> assign(:data_count, fn -> Orders.count_orders(status: status) end)
     |> assign(:data_locator, fn options -> Orders.find_row_number_for_order(status, options) end)
     |> assign(:data_source, fn options -> Orders.list_orders(:display, status, options) end)
+  end
+
+  @spec order_successfully_advanced(Phoenix.LiveView.Socket.t, String.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  defp order_successfully_advanced(socket, message) do
+    send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: []
+
+    {
+      :noreply,
+      socket
+      |> push_event("kamansky:closeConfirmationModal", %{})
+      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
+    }
   end
 end

@@ -14,7 +14,7 @@ defmodule KamanskyWeb.ListingLive.Sold do
     {
       :ok,
       socket
-      |> assign(:data_count, Listings.count_listings(:sold))
+      |> assign(:data_count, fn -> Listings.count_listings(:sold) end)
       |> assign(:data_locator, fn options -> Listings.find_row_number_for_listing(:sold, options) end)
       |> assign(:data_source, fn options -> Listings.list_sold_listings(options) end)
     }

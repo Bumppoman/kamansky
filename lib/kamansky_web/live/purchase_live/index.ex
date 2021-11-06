@@ -12,26 +12,30 @@ defmodule KamanskyWeb.PurchaseLive.Index do
     {
       :ok,
       socket
-      |> assign(:data_count, Purchases.count_purchases())
+      |> assign(:data_count, &Purchases.count_purchases/0)
       |> assign(:data_locator, fn options -> Purchases.find_row_number_for_purchase(options) end)
       |> assign(:data_source, fn options -> Purchases.list_purchases(options) end)
     }
   end
 
   @impl true
-  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket), do: {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  @spec handle_info({:purchase_added | :purchase_updated, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:purchase_added, purchase_id}, socket), do: update_datatable(socket, "You have successfully added this purchase.", purchase_id)
+  def handle_info({:purchase_updated, purchase_id}, socket), do: update_datatable(socket, "You have successfully updated this purchase.", purchase_id)
 
-  @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:purchase, Purchases.get_purchase!(id))
-    |> assign(:page_title, "Add New Purchase")
-  end
-  defp apply_action(socket, :index, _params), do: assign(socket, :page_title, "Purchases")
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:purchase, %Purchase{})
-    |> assign(:page_title, "Add New Purchase")
+  @impl true
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Purchases")}
+
+  @spec update_datatable(Phoenix.LiveView.Socket.t, String.t, pos_integer) :: {:noreply, Phoenix.LiveView.Socket.t}
+  defp update_datatable(socket, message, purchase_id) do
+    send_update KamanskyWeb.Components.DataTable, id: "purchases-kamansky-data-table", options: [go_to_record: purchase_id]
+
+    {
+      :noreply,
+      socket
+      |> push_event("kamansky:closeModal", %{})
+      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
+    }
   end
 end

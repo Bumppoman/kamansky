@@ -6,28 +6,20 @@ defmodule KamanskyWeb.StampLive.CollectionComponents do
   @spec types_footer(map) :: Phoenix.LiveView.Rendered.t
   def types_footer(assigns) do
     ~H"""
-    <ul class="nav nav-pills justify-content-center">
-      <li class="nav-item">
-        <%= live_redirect "In Collection",
-          to: Routes.stamp_index_path(@socket, :collection),
-          class: ["nav-link"] ++ (if @live_action == :collection || @parent_index == :collection, do: [" active"], else: [])
-        %>
-      </li>
-      <li class="nav-item">
-        <%= live_redirect "Below XF",
-          to: Routes.stamp_index_path(@socket, :collection_to_replace),
-          class: ["nav-link"] ++ (
-            if @live_action == :collection_to_replace || @parent_index == :collection_to_replace, do: [" active"], else: []
-          )
-        %>
-      </li>
-      <li class="nav-item">
-        <%= live_redirect "Missing",
-          to: Routes.stamp_reference_index_path(@socket, :missing_from_collection),
-          class: ["nav-link"] ++ (if @live_action == :missing_from_collection, do: [" active"], else: [])
-        %>
-      </li>
-    </ul>
+    <nav class="flex font-medium justify-center leading-6 mt-4">
+      <%= live_redirect "In Collection",
+        to: Routes.stamp_index_path(@socket, :collection),
+        class: "block mr-3 px-4 py-2 text-gray-500" <> (if @live_action == :collection, do: " bg-blue-100 rounded-md text-blue-600", else: " text-opacity-70")
+      %>
+      <%= live_redirect "Below XF",
+        to: Routes.stamp_index_path(@socket, :collection_to_replace),
+        class: "block mr-3 px-4 py-2 text-gray-500" <> (if @live_action == :collection_to_replace, do: " bg-blue-100 rounded-md text-blue-600", else: " text-opacity-70")
+      %>
+      <%= live_redirect "Missing",
+        to: Routes.stamp_reference_index_path(@socket, :missing_from_collection),
+        class: "block mr-3 px-4 py-2 text-gray-500" <> (if @live_action == :missing_from_collection, do: " bg-blue-100 rounded-md text-blue-600", else: " text-opacity-70")
+      %>
+    </nav>
     """
   end
 end

@@ -1,17 +1,18 @@
-<div class="kamansky-data-table">
-  <div class="table-responsive">
-    <table class="table">
-      <thead>
+<div>
+  <KamanskyWeb.Components.Page.page_header page_title="Reports" />
+  <div class="kamansky-data-table mt-4">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
         <tr>
-          <th>Month</th>
-          <th>Gross Sales</th>
-          <th>Expenses</th>
-          <th>Net Profit/Loss</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gross Sales</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expenses</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Profit/Loss</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <th colspan="4"><%= @year %></th>
+          <th colspan="4" class="bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= @year %></th>
         </tr>
         <%= for {month, data} <- @reports, month != :totals do %>
           <tr>

@@ -1,84 +1,187 @@
-<header>
+<header class="bg-white">
   <%= if @logged_in do %>
-    <nav class="navbar navbar-expand-md navbar-light">
-      <div class="w-25 text-center ms-5 ps-5 py-2">
-        <%= live_redirect to: Routes.dashboard_index_path(@socket, :index), class: "navbar-brand" do %>
-          <img
-            src={Routes.static_path(@socket, "/images/bumppoman-stamps-logo.png")}
-            width="137"
-          />
-        <% end %>
+    <nav class="bg-gray-800">
+      <div class="max-w-7xl mx-auto pr-2 sm:pr-6 lg:pr-8">
+        <div class="relative flex items-center justify-between h-16">
+          <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+            <!-- Mobile menu button-->
+            <button 
+              type="button" 
+              class="
+                inline-flex 
+                items-center 
+                justify-center 
+                p-2 
+                rounded-md 
+                text-gray-400 
+                hover:text-white 
+                hover:bg-gray-700 
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-inset 
+                focus:ring-white" 
+              aria-controls="mobile-menu" 
+              aria-expanded="false"
+            >
+              <span class="sr-only">Open main menu</span>
+              <!--
+                Icon when menu is closed.
+
+                Heroicon name: outline/menu
+
+                Menu open: "hidden", Menu closed: "block"
+              -->
+              <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              <!--
+                Icon when menu is open.
+
+                Heroicon name: outline/x
+
+                Menu open: "block", Menu closed: "hidden"
+              -->
+              <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+            <div class="flex-shrink-0 flex items-center px-5">
+              <%= live_redirect to: Routes.dashboard_index_path(@socket, :index) do %>
+                <img 
+                  class="hidden lg:block h-8 w-auto" 
+                  src={Routes.static_path(@socket, "/images/bumppoman-stamps-logo-white.svg")} 
+                  alt="Bumppoman Stamps"
+                />
+              <% end %>
+            </div>
+            <div class="hidden sm:block sm:ml-6">
+              <div class="flex space-x-4">
+                <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                <%= for link <- live_navbar_links(@socket, @live_action) do %>
+                  <%= live_redirect link.title,
+                    to: link.to,
+                    class: (
+                      ["font-medium px-3 py-2 rounded-md text-sm"] ++ (
+                        if link.active do
+                          ["bg-gray-900 text-white"]
+                        else 
+                          ["text-gray-300 hover:bg-gray-700 hover:text-white"]
+                        end
+                      )
+                    )
+                  %>
+                <% end %>
+                <div 
+                  class="inline-block relative text-left"
+                  x-data="{adminDropdown: false}" 
+                  @click.away="adminDropdown = false"
+                >
+                  <div>
+                    <button 
+                      type="button" 
+                      class="
+                        font-medium
+                        inline-flex 
+                        justify-center 
+                        px-4 
+                        py-2
+                        rounded-md
+                        shadow-sm
+                        text-gray-300
+                        text-sm
+                        w-full
+                        hover:bg-gray-700 
+                        hover:text-white
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-offset-2 
+                        focus:ring-offset-gray-100 
+                        focus:ring-indigo-500" 
+                      id="menu-button" 
+                      aria-expanded="true" 
+                      aria-haspopup="true"
+                      @click="adminDropdown = !adminDropdown"
+                    >
+                      Admin
+                      <!-- Heroicon name: solid/chevron-down -->
+                      <svg 
+                        class="-mr-1 ml-2 h-5 w-5" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor" 
+                        aria-hidden="true"
+                      >
+                        <path 
+                          fill-rule="evenodd" 
+                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                          clip-rule="evenodd" 
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!--
+                    Dropdown menu, show/hide based on menu state.
+
+                    Entering: "transition ease-out duration-100"
+                      From: "transform opacity-0 scale-95"
+                      To: "transform opacity-100 scale-100"
+                    Leaving: "transition ease-in duration-75"
+                      From: "transform opacity-100 scale-100"
+                      To: "transform opacity-0 scale-95"
+                  -->
+                  <div 
+                    class="
+                      absolute
+                      bg-white
+                      mt-2 
+                      origin-top-left
+                      left-0
+                      ring-1
+                      ring-black
+                      ring-opacity-5
+                      rounded-md
+                      shadow-lg
+                      w-56 
+                      focus:outline-none" 
+                    role="menu" 
+                    aria-orientation="vertical" 
+                    aria-labelledby="menu-button" 
+                    tabindex="-1" 
+                    x-show="adminDropdown"
+                  >
+                    <div class="py-1" role="none">
+                      <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+                      <%= for link <- live_navbar_admin_links(@socket, @live_action) do %>
+                        <%= live_redirect link.title, 
+                          to: link.to, 
+                          class: "block px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 hover:text-gray-900"
+                        %>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <ul class="navbar-nav mx-auto ps-5">
-        <li class="nav-item me-5">
-          <%= live_redirect "Collection",
-              to: Routes.stamp_index_path(@socket, :collection),
-              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.StampLive.Index && @live_action == :collection, do: [" active"], else: []))
-          %>
-        </li>
-        <li class="nav-item me-5">
-          <%= live_redirect "Stock",
-              to: Routes.stamp_index_path(@socket, :stock),
-              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.StampLive.Index && @live_action == :stock, do: [" active"], else: []))
-          %>
-        </li>
-        <li class="nav-item me-5">
-          <%= live_redirect "Listings",
-              to: Routes.listing_active_path(@socket, :index),
-              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.ListingLive.Active or @socket.view == KamanskyWeb.ListingLive.Sold, do: [" active"], else: []))
-          %>
-        </li>
-        <li class="nav-item me-5">
-          <%= live_redirect "Orders",
-              to: Routes.order_index_path(@socket, :pending),
-              class: (["nav-link"] ++ (if @socket.view == KamanskyWeb.OrderLive.Index, do: [" active"], else: []))
-          %>
-        </li>
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            data-bs-toggle="dropdown"
-          >Admin</a>
-          <ul class="dropdown-menu">
-            <li>
-              <%= live_redirect "Customers",
-                to: Routes.customer_index_path(@socket, :index),
-                class: "dropdown-item"
-              %>
-            </li>
-            <li>
-              <%= live_redirect "Expenses",
-                to: Routes.expense_index_path(@socket, :index),
-                class: "dropdown-item"
-              %>
-            </li>
-            <li>
-              <%= live_redirect "Purchases",
-                to: Routes.purchase_index_path(@socket, :index),
-                class: "dropdown-item"
-              %>
-            </li>
-            <li>
-              <%= live_redirect "Reports",
-                to: Routes.report_index_path(@socket, :index),
-                class: "dropdown-item"
-              %>
-            </li>
-            <li>
-              <%= live_redirect "Stamp References",
-                to: Routes.stamp_reference_index_path(@socket, :index),
-                class: "dropdown-item"
-              %>
-            </li>
-            <li>
-              <%= live_redirect "Trends",
-                to: Routes.trend_index_path(@socket, :index),
-                class: "dropdown-item"
-              %>
-            </li>
-          </ul>
-        </li>
-      </ul>
+
+      <!-- Mobile menu, show/hide based on menu state. -->
+      <div class="sm:hidden" id="mobile-menu">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+          <a href="#" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</a>
+
+          <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Team</a>
+
+          <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Projects</a>
+
+          <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Calendar</a>
+        </div>
+      </div>
     </nav>
   <% else %>
     <.form
@@ -101,8 +204,50 @@
     </.form>
   <% end %>
 </header>
-<main role="main">
+<main role="main" class="bg-white mx-auto my-3 p-8 w-11/12">
   <%= if @logged_in do %>
+    <%= if live_flash(@flash, :info) do %>
+      <div
+        id="kamansky-success-message"
+        class="bg-green-50 flex items-center mx-auto px-4 py-4 w-9/12"
+        phx-hook="successMessage"
+        phx-value-timestamp={live_flash(@flash, :info).timestamp}
+        x-data="{show: true}"
+        x-init="setTimeout(() => show = false, 3000)"
+        x-show="show"
+        x-transition:enter="transition-all ease-out duration-500"
+        x-transition:enter-start="max-h-0 py-0"
+        x-transition:enter-end="max-h-14 py-4"
+        x-transition:leave="transition-all ease-in duration-500" 
+        x-transition:leave-start="max-h-14 py-4" 
+        x-transition:leave-end="max-h-0 py-0"
+        @kamansky:success-message-updated.camel="show = true; setTimeout(() => show = false, 3000)"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          class="h-4 mr-4 text-green-400 w-4" 
+          viewBox="0 0 20 20" 
+          fill="currentColor" 
+          x-show="show" 
+          x-transition:leave="transition-all ease-in duration-500" 
+          x-transition:leave-start="max-h-4 scale-y-100" 
+          x-transition:leave-end="max-h-0 scale-y-0"
+        >
+          <path 
+            fill-rule="evenodd" 
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" 
+            clip-rule="evenodd" 
+          />
+        </svg>
+        <div 
+          class="inline-block text-green-700" 
+          x-show="show" 
+          x-transition:leave="transition-all ease-in duration-500" 
+          x-transition:leave-start="max-h-14 scale-y-100" 
+          x-transition:leave-end="max-h-0 scale-y-0"
+        ><%= live_flash(@flash, :info).message %></div>
+      </div>
+  <% end %>
     <%= @inner_content %>
   <% else %>
     <div>
@@ -110,7 +255,8 @@
       <p>Please log in.</p>
     </div>
   <% end %>
+  <KamanskyWeb.Components.Page.confirm />
 </main>
-<footer>
-  <small>© 2021 Brendon Stanton and Bumppoman Industries.</small>
+<footer class="font-extralight text-center text-xs">
+  © 2021 Brendon Stanton and Bumppoman Industries.
 </footer>

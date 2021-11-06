@@ -1,110 +1,105 @@
-<section class="section-wrapper">
-  <%= if live_flash(@flash, :info) do %>
-    <div
-      id="stamp-success-message"
-      class="disappearing-success-message"
-      phx-hook="disappearingSuccessMessage"
-    >
-      <div class="alert alert-success"><%= live_flash(@flash, :info) %></div>
-    </div>
-  <% end %>
-  <div class="text-end mb-2">
-    <%= live_patch "Add New Stamp",
-      to: Routes.stamp_index_path(@socket, :new, status: @live_action),
-      class: "btn btn-primary"
-    %>
-  </div>
-  <%= live_component KamanskyWeb.ComponentLive.TableComponent,
-    id: "stamps-kamansky-data-table",
-    headers:
+<section>
+  <KamanskyWeb.Components.Page.page_header
+    buttons={
+      [
+        %{
+          options: %{
+            "phx-click": "open",
+            "phx-target": "#stamp-form-modal",
+            "phx-value-action": "new",
+            "phx-value-stamp-id": "",
+            "phx-value-status": @live_action
+          },
+          title: "Add New Stamp"
+        }
+      ]
+    }
+    page_title={@page_title}
+  />
+  <.live_component module={KamanskyWeb.Components.DataTable}
+    id="stamps-kamansky-data-table"
+    let={stamp}
+    data_count={@data_count}
+    data_locator={@data_locator}
+    data_source={@data_source}
+    empty_message="There are no stamps to display."
+    headers={
       [
         "Scott Number",
         "Grade",
         "Price Paid",
         %{text: "Flaws", sort: :disabled},
         %{text: "Actions", sort: :disabled},
-      ],
-    data_count: @data_count,
-    data_locator: @data_locator,
-    data_source: @data_source,
-    empty_message: "There are no stamps to display.",
-    options: [
-      go_to_record: Map.get(assigns, :go_to_record),
-      sort: 0
-    ],
-    title: @page_title
-  do %>
-    <% stamp -> %>
-      <td>
-        <%= live_patch stamp.scott_number,
-          to: Routes.stamp_index_path(@socket, :show, stamp, from: @live_action)
-        %>
-      </td>
-      <td><%= Stamp.formatted_grade(stamp) %></td>
-      <td><%= format_decimal_as_currency(Stamp.total_cost(stamp)) %></td>
-      <td><%= Stamp.formatted_flaws(stamp) %></td>
-      <td>
-        <%= live_patch to: Routes.stamp_index_path(@socket, :edit, stamp), class: "action-icon" do %>
-          <i class="material-icons">edit</i>
-        <% end %>
-        <%= if stamp.status == :collection do %>
-          <%= live_patch to: Routes.stamp_index_path(@socket, :move_to_stock, stamp),
-            class: "action-icon"
-          do %>
-            <i class="material-icons">inventory_2</i>
-          <% end %>
-        <% end %>
-        <%= if stamp.status != :listed do %>
-          <%= live_patch to: Routes.stamp_index_path(@socket, :sell, stamp), class: "action-icon" do %>
-            <i class="material-icons">attach_money</i>
-          <% end %>
-        <% end %>
-      </td>
-  <% end %>
-  <%= if @live_action in [:collection, :collection_to_replace, :show] do %>
+      ]}
+    options={
+      [
+        go_to_record: Map.get(assigns, :go_to_record),
+        sort: 0
+      ]}
+    title={@page_title}
+  >
+    <td>
+      <a
+        class="action-icon"
+        phx-click="open"
+        phx-target="#stamp-detail-modal"
+        phx-value-stamp-id={stamp.id}
+      >
+        <%= stamp.scott_number %>
+      </a>
+    </td>
+    <td><%= Stamp.formatted_grade(stamp) %></td>
+    <td><%= format_decimal_as_currency(Stamp.total_cost(stamp)) %></td>
+    <td><%= Stamp.formatted_flaws(stamp) %></td>
+    <td>
+      <a
+        class="action-icon"
+        phx-click="open"
+        phx-target="#stamp-form-modal"
+        phx-value-action="edit"
+        phx-value-stamp-id={stamp.id}
+        phx-value-status={stamp.status}
+      >
+        <KamanskyWeb.Components.Icons.edit />
+      </a>
+      <%= if stamp.status == :collection do %>
+        <KamanskyWeb.Components.Page.link_with_confirmation
+          action="move_to_stock"
+          content="Are you sure you want to move this stamp to stock?"
+          title="Move to Stock"
+          values={[{"stamp-id", stamp.id}]}
+        >
+          <KamanskyWeb.Components.Icons.archive />
+        </KamanskyWeb.Components.Page.link_with_confirmation>
+      <% end %>
+      <%= if stamp.status != :listed do %>
+        <a
+          class="action-icon"
+          phx-click="open"
+          phx-target="#listing-form-modal"
+          phx-value-stamp-id={stamp.id}
+        >
+          <KamanskyWeb.Components.Icons.money />
+        </a>
+      <% end %>
+    </td>
+  </.live_component>
+  <%= if @live_action in [:collection, :collection_to_replace] do %>
     <KamanskyWeb.StampLive.CollectionComponents.types_footer 
       socket={@socket}
       live_action={@live_action}
-      parent_index={@parent_index}
     />
   <% end %>
 </section>
-<%= if @live_action in [:new, :edit] do %>
-  <%= live_modal KamanskyWeb.StampLive.FormComponent,
-    action: @live_action,
-    form_id: "stamp-form",
-    id: "stamp-form-modal",
-    stamp: @stamp,
-    status: @status,
-    title: (if @live_action == :new, do: "Add New Stamp", else: "Edit Stamp"),
-    return_to: Routes.stamp_index_path(@socket, @status)
-  %>
-<% end %>
-<%= if @live_action == :show do %>
-  <%= live_modal KamanskyWeb.StampLive.DetailComponent,
-    footer: false,
-    id: "stamp-detail-modal",
-    stamp: @stamp,
-    title: "View Stamp",
-    return_to: Routes.stamp_index_path(@socket, @parent_index)
-  %>
-<% end %>
-<%= if @live_action == :move_to_stock do %>
-  <%= live_confirmation_modal(
-    message: "Are you sure you want to move this stamp to stock?",
-    return_to: Routes.stamp_index_path(@socket, @status),
-    success: :move_to_stock,
-    title: "Move Stamp To Stock"
-  ) %>
-<% end %>
-<%= if @live_action == :sell do %>
-  <%= live_modal KamanskyWeb.StampLive.ListingFormComponent,
-    action: @live_action,
-    form_id: "list-stamp-form",
-    id: "list-stamp-form-modal",
-    stamp: @stamp,
-    status: @status,
-    title: "List Stamp for Sale",
-    return_to: Routes.stamp_index_path(@socket, @status)
-  %>
-<% end %>
+<%= live_modal KamanskyWeb.StampLive.DetailComponent,
+  id: "stamp-detail-modal",
+  footer: false
+%>
+<%= live_modal KamanskyWeb.StampLive.FormComponent,
+  id: "stamp-form-modal",
+  form_id: "stamp-form" 
+%>
+<%= live_modal KamanskyWeb.StampLive.ListingFormComponent,
+  id: "listing-form-modal",
+  form_id: "listing-form"
+%>

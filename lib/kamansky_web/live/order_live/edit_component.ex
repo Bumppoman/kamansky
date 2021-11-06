@@ -4,23 +4,23 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
   alias Kamansky.Sales.Orders
 
   @impl true
-  @spec update(%{required(:order) => Kamansky.Sales.Orders.Order.t, optional(:any) => any}, Phoenix.LiveView.Socket.t)
-    :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{order: order} = assigns, socket) do
-    with changeset <- Orders.change_new_order(order),
+  @spec update(%{required(:trigger_params) => %{String.t => any}, optional(:any) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
+  def update(%{trigger_params: %{"order-id" => id}} = assigns, socket) do
+    with order <- Orders.get_order_with_customer!(id),
+      changeset <- Orders.change_new_order(order),
       socket <-
         socket
         |> assign(assigns)
         |> assign(:changeset, changeset)
         |> assign(:customer, order.customer)
+        |> assign(:order, order)
     do
       {:ok, socket}
     end
   end
 
   @impl true
-  @spec handle_event(String.t, %{required(String.t) => map}, Phoenix.LiveView.Socket.t)
-    :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_event(String.t, %{required(String.t) => map}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("submit", %{"order" => order_params}, socket) do
     case Orders.update_order(socket.assigns.order, order_params) do
       {:ok, order} ->

@@ -9,11 +9,13 @@ defmodule KamanskyWeb.CustomerLive.FormComponent do
   @impl true
   @spec update(%{required(:customer) => Customer.t, optional(any) => any}, Phoenix.LiveView.Socket.t)
     :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{customer: customer} = assigns, socket) do
-    with changeset <- Customers.change_customer(customer),
+  def update(%{trigger_params: %{"customer-id" => customer_id}} = assigns, socket) do
+    with customer <- Customers.get_customer!(customer_id),
+    changeset <- Customers.change_customer(customer),
       socket <-
         socket
         |> assign(assigns)
+        |> assign(:customer, customer)
         |> assign(:changeset, changeset)
     do
       {:ok, socket}
@@ -40,12 +42,8 @@ defmodule KamanskyWeb.CustomerLive.FormComponent do
   defp save_customer(socket, customer_params) do
     case Customers.update_customer(socket.assigns.customer, customer_params) do
       {:ok, %Customer{id: id}} ->
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "You have successfully updated this customer.")
-          |> push_redirect(to: Routes.customer_index_path(socket, :index, go_to_record: id))
-        }
+        send self(), {:customer_updated, id}
+        {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}

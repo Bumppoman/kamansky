@@ -5,6 +5,16 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
+  @spec handle_info({atom, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:stamp_reference_added, stamp_reference_id}, socket) do
+    refresh_data_table(socket, stamp_reference_id, "You have successfully added this stamp reference.")
+  end
+
+  def handle_info({:stamp_reference_updated, stamp_reference_id}, socket) do
+    refresh_data_table(socket, stamp_reference_id, "You have successfully updated this stamp reference.")
+  end
+
+  @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(params, _uri, socket) do
     {
@@ -15,13 +25,7 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
     }
   end
 
-  @spec apply_action(Phoenix.LiveView.Socket.t, :edit | :index | :new, map) :: Phoenix.LiveView.Socket.t
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit Stamp Reference")
-    |> assign(:stamp_reference, StampReferences.get_stamp_reference!(id))
-  end
-
+  @spec apply_action(Phoenix.LiveView.Socket.t, :index | :missing_from_collection, map) :: Phoenix.LiveView.Socket.t
   defp apply_action(socket, :index, params) do
     socket
     |> assign(:go_to_record, Map.get(params, "go_to_record"))
@@ -35,27 +39,30 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
     |> assign(:parent_index, nil)
   end
 
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "Add New Stamp Reference")
-    |> assign(:stamp_reference, %StampReference{})
-  end
-
   @spec load_stamps(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
   defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{live_action: :missing_from_collection}} = socket) do
     socket
-    |> assign(:data_count, StampReferences.count_stamp_references_missing_from_collection())
-    |> assign(
-      :data_locator,
-      fn options -> StampReferences.find_row_number_for_stamp_reference_missing_from_collection(options) end
-    )
+    |> assign(:data_count, &StampReferences.count_stamp_references_missing_from_collection/0)
+    |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference_missing_from_collection(options) end)
     |> assign(:data_source, fn options -> StampReferences.list_stamp_references_missing_from_collection(options) end)
   end
 
   defp load_stamps(socket) do
     socket
-    |> assign(:data_count, StampReferences.count_stamp_references())
+    |> assign(:data_count, &StampReferences.count_stamp_references/0)
     |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference(options) end)
     |> assign(:data_source, fn options -> StampReferences.list_stamp_references(options) end)
+  end
+
+  @spec refresh_data_table(Phoenix.LiveView.Socket.t, pos_integer, String.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  defp refresh_data_table(socket, id, message) do
+    send_update KamanskyWeb.Components.DataTable, id: "stamp_references-kamansky-data-table", options: [go_to_record: id]
+
+    {
+      :noreply,
+      socket
+      |> push_event("kamansky:closeModal", %{})
+      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
+    }
   end
 end

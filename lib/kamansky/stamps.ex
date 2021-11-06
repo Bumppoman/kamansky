@@ -88,6 +88,10 @@ defmodule Kamansky.Stamps do
     |> stamp_row_number_lookup(options[:record_id])
   end
 
+  @spec get_or_initialize_stamp(String.t) :: Stamp.t
+  def get_or_initialize_stamp(""), do: %Stamp{}
+  def get_or_initialize_stamp(id), do: get_stamp!(String.to_integer(id))
+
   @spec get_stamp!(integer) :: Stamp.t
   def get_stamp!(id), do: Repo.get!(Stamp, id)
 
@@ -154,10 +158,10 @@ defmodule Kamansky.Stamps do
     |> Repo.update()
   end
 
-  @spec move_stamp_to_stock(Stamp.t)
-    :: {:ok, %Stamp{status: :stock}} | {:error, Ecto.Changeset.t}
-  def move_stamp_to_stock(%Stamp{} = stamp) do
-    stamp
+  @spec move_stamp_to_stock(pos_integer) :: {:ok, %Stamp{status: :stock}} | {:error, Ecto.Changeset.t}
+  def move_stamp_to_stock(stamp_id) do
+    stamp_id
+    |> get_stamp!()
     |> Stamp.changeset(%{})
     |> Ecto.Changeset.put_change(:status, :stock)
     |> Repo.update()
@@ -278,7 +282,7 @@ defmodule Kamansky.Stamps do
     query
     |> select([s], {s.id, row_number() |> over(order_by: [asc: s.scott_number, asc: s.id])})
     |> Repo.all
-    |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(stamp_id) end)
+    |> Enum.find(nil, fn {id, _row} -> id == stamp_id end)
     |> case do
       nil -> 1
       {_id, nil} -> 1

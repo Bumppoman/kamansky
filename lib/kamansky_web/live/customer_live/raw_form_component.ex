@@ -8,19 +8,17 @@ defmodule KamanskyWeb.CustomerLive.RawFormComponent do
   @spec customer_form(map) :: Phoenix.LiveView.Rendered.t
   def customer_form(assigns) do
     ~H"""
-    <div class="row">
-      <div class="col-md-6 form-group required">
-        <%= label @f,
-          :name,
-          class: "form-control-label"
-        %>
-        <%= text_input @f,
-          :name,
-          class: "form-control",
-          required: true,
-          "phx-target": @target,
-          "phx-keyup": (if @existing, do: "search_for_customers")
-        %>
+    <div class="grid grid-cols-2">
+      <div class="form-group required">
+        <%= label @f, :name %>
+        <div class="form-input">
+          <%= text_input @f,
+            :name,
+            required: true,
+            "phx-target": @target,
+            "phx-keyup": (if @existing, do: "search_for_customers")
+          %>
+        </div>
         <%= if @existing and @searched do %>
           <div id="customers">
             <ul class="list-group">
@@ -42,65 +40,37 @@ defmodule KamanskyWeb.CustomerLive.RawFormComponent do
           </div>
         <% end %>
       </div>
-      <div class="col-md-6 form-group">
-        <%= label @f,
-          :email,
-          class: "form-control-label"
-        %>
-        <%= email_input @f,
-          :email,
-          class: "form-control"
-        %>
+      <div class="form-group">
+        <%= label @f, :email %>
+        <div class="form-input">
+          <%= email_input @f, :email %>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col form-group required">
-        <%= label @f,
-          :street_address,
-          "Street Address",
-          class: "form-control-label"
-        %>
-        <%= text_input @f,
-          :street_address,
-          class: "form-control",
-          required: true
-        %>
+    <div class="form-group required">
+      <%= label @f, :street_address, "Street Address" %>
+      <div class="form-input">
+        <%= text_input @f, :street_address, required: true %>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-6 form-group required">
-        <%= label @f,
-          :city,
-          class: "form-control-label"
-        %>
-        <%= text_input @f,
-          :city,
-          class: "form-control",
-          required: true
-        %>
+    <div class="grid grid-cols-6">
+      <div class="col-span-3 form-group required">
+        <%= label @f, :city %>
+        <div class="form-input">
+          <%= text_input @f, :city, required: true %>
+        </div>
       </div>
-      <div class="col-md-2 form-group required" id="customer-state-area" phx-update="ignore">
-        <%= label @f,
-          :state,
-          class: "form-control-label"
-        %>
-        <%= select @f,
-          :state,
-          states(),
-          class: "choices-select"
-        %>
+      <div class="form-group required">
+        <%= label @f, :state %>
+        <div class="form-input">
+          <%= select @f, :state, states() %>
+        </div>
       </div>
-      <div class="col-md-4 form-group required">
-        <%= label @f,
-          :zip,
-          "ZIP Code",
-          class: "form-control-label"
-        %>
-        <%= text_input @f,
-          :zip,
-          class: "form-control",
-          required: true
-        %>
+      <div class="col-span-2 form-group required">
+        <%= label @f, :zip, "ZIP Code" %>
+        <div class="form-input">
+          <%= text_input @f, :zip, required: true %>
+        </div>
       </div>
     </div>
     """

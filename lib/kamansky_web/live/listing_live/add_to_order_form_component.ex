@@ -3,20 +3,21 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
 
   import Kamansky.Helpers
 
-  alias Kamansky.Sales.Listings
+  alias Kamansky.Sales.{Listings, Orders}
   alias Kamansky.Sales.Orders.Order
 
   @impl true
   @spec update(%{required(:listing) => Kamansky.Sales.Listings.Listing.t, optional(any) => any}, Phoenix.LiveView.Socket.t)
     :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{listing: listing} = assigns, socket) do
-    with changeset <- Listings.change_listing(listing),
-      socket <-
+  def update(%{trigger_params: %{"listing-id" => listing_id}} = assigns, socket) do
+    with listing <- Listings.get_listing!(listing_id) do
+      {
+        :ok,
         socket
         |> assign(assigns)
-        |> assign(:changeset, changeset)
-    do
-      {:ok, socket}
+        |> assign(:changeset, Listings.change_listing(listing))
+        |> assign(:pending_orders, Orders.list_pending_orders_to_add_listing())
+      }
     end
   end
 
@@ -24,25 +25,22 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t)
     :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"listing" => listing_params}, socket) do
-    changeset =
+    with changeset <-
       socket.assigns.listing
       |> Listings.change_listing(listing_params)
       |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, :changeset, changeset)}
+    do
+      {:noreply, assign(socket, :changeset, changeset)}
+    end
   end
 
   def handle_event("submit", %{"listing" => listing_params}, socket) do
     case Listings.add_listing_to_order(socket.assigns.listing, listing_params) do
       {:ok, _order} ->
-        {:noreply,
-          socket
-            |> put_flash(:info, "You have successfully added this listing to an order.")
-            |> push_redirect(to: Routes.listing_active_path(socket, :index))
-        }
+        send self(), {:listing_added_to_order, socket.assigns.listing.id}
+        {:noreply, socket}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
+      {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
 end

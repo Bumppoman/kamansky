@@ -1,4 +1,4 @@
-<div class="form-wrapper">
+<div x-init="title = 'Add Listing to Order'">
   <.form
     let={f}
     for={@changeset}
@@ -8,19 +8,19 @@
     phx_submit="submit"
   >
     <p>Add this listing to:</p>
-    <table class="table">
-      <thead>
+    <table class="w-full">
+      <thead class="border-b-2 border-black">
         <tr>
-          <th></th>
-          <th>Order Number</th>
-          <th>Name</th>
-          <th>Date</th>
+          <th class="p-2"></th>
+          <th class="p-2">Order Number</th>
+          <th class="p-2">Name</th>
+          <th class="p-2">Date</th>
         </tr>
       </thead>
       <tbody>
         <%= if Enum.empty?(@pending_orders) do %>
           <tr>
-            <td colspan="4">There are no available orders.</td>
+            <td colspan="4" class="p-2">There are no available orders.</td>
           </tr>
         <% end %>
         <%= for order <- @pending_orders do %>
@@ -33,18 +33,14 @@
         <% end %>
       </tbody>
     </table>
-    <div class="row">
-      <div class="col form-group required">
-        <%= label f, :sale_price, "Sale Price", class: "form-control-label" %>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="material-icons">attach_money</i>
-            </span>
+    <div class="form-group required">
+      <%= label f, :sale_price, "Sale Price" %>
+      <div class="form-input">
+          <div class="form-input-prepend">
+            <span>$</span>
           </div>
-          <%= text_input f, :sale_price, class: "form-control" %>
+          <%= text_input f, :sale_price %>
         </div>
-      </div>
     </div>
   </.form>
 </div>

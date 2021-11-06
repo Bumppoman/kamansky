@@ -25,6 +25,10 @@ defmodule Kamansky.Operations.Purchases do
     Paginate.find_row_number(Purchase, Purchase.display_column_for_sorting(options[:sort][:column]), options)
   end
 
+  @spec get_or_initialize_purchase(String.t) :: Purchase.t
+  def get_or_initialize_purchase(""), do: %Purchase{}
+  def get_or_initialize_purchase(id), do: get_purchase!(String.to_integer(id))
+
   @spec get_purchase!(pos_integer) :: Purchase.t
   def get_purchase!(id), do: Repo.get!(Purchase, id)
 
