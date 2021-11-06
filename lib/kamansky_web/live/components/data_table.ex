@@ -211,11 +211,8 @@ defmodule KamanskyWeb.Components.DataTable do
   defp build_sort(sort_column) when is_integer(sort_column), do: %{column: sort_column, direction: :asc}
   defp build_sort(nil), do: %{column: 0, direction: :asc}
 
-  @spec dummy_page_link :: Phoenix.LiveView.Rendered.t
   defp dummy_page_link do
-    assigns = %{}
-
-    ~H"""
+    ~E"""
     <span class="
       relative
       inline-flex
