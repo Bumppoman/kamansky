@@ -223,6 +223,9 @@
                     Order Number
                   </th>
                   <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
                   <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -241,7 +244,7 @@
                 <% end %>
                 <%= for order <- @pending_orders do %>
                   <tr class="bg-white">
-                    <td class="max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div class="flex">
                         <%= live_redirect to: Routes.order_show_path(@socket, :show, order), class: "group inline-flex space-x-2 truncate text-sm" do %>
                           <p class="text-gray-500 truncate group-hover:text-gray-900">
@@ -250,10 +253,13 @@
                         <% end %>
                       </div>
                     </td>
-                    <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <%= order.customer.name %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time>
                     </td>
-                    <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <%= format_decimal_as_currency(Order.total_paid(order)) %>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

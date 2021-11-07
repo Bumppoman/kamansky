@@ -4,18 +4,30 @@ defmodule Kamansky.Operations.Dashboard do
 
   alias Kamansky.Repo
   alias Kamansky.Sales.Listings.Listing
+  alias Kamansky.Sales.Orders.Order
   alias Kamansky.Stamps.Stamp
 
-  def load_dashboard_data(timezone) do
-    with date <- DateTime.now!(timezone),
-      this_month <- date.month,
-      previous_month <-
-        date.day
-        |> then(&(max(&1, Date.add(date, -&1))))
-        |> Map.get(:day)
-        |> then(&(Date.add(date, -&1)))
-        |> Map.get(:month),
-      stamp_totals <-
+  @spec list_pending_orders :: [Order.t]
+  def list_pending_orders do
+    Order
+    |> where(status: :pending)
+    |> join(:left, [o], c in assoc(o, :customer))
+    |> preload([o, c], customer: c)
+    |> order_by(desc: :ordered_at)
+    |> Repo.all()
+  end
+
+  @spec load_dashboard_data(String.t) :: %{atom: any}
+  def load_dashboard_data(_timezone) do
+    #with date <- DateTime.now!(timezone),
+      #this_month <- date.month,
+      #previous_month <-
+      #  date.day
+      #  |> then(&(max(&1, Date.add(date, -&1))))
+      #  |> Map.get(:day)
+      #  |> then(&(Date.add(date, -&1)))
+      #  |> Map.get(:month),
+    with stamp_totals <-
         from(s in "stamps")
         |> select(
           [s],
