@@ -44,7 +44,7 @@ defmodule KamanskyWeb.DashboardLive.Index do
           ]
         )
         |> assign(:data, Dashboard.load_dashboard_data(socket.assigns.timezone))
-        |> assign(:pending_orders, Orders.list_orders(status: :pending))
+        |> assign(:pending_orders, Dashboard.list_pending_orders())
     do
       {:ok, socket}
     end
