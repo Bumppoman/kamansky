@@ -142,6 +142,6 @@ defmodule KamanskyWeb.OrderLive.Components do
   end
 
   @spec status_badge_color(:completed | :pending | :processed | :shipped) :: String.t
-  defp status_badge_color(:pending), do: " bg-gray-100 text-gray-100"
+  defp status_badge_color(:pending), do: " bg-gray-100 text-gray-800"
   defp status_badge_color(:processed), do: " bg-yellow-100 text-yellow-800"
 end

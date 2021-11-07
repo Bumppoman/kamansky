@@ -10,7 +10,7 @@ defmodule Kamansky.Operations.Dashboard do
   @spec list_unshipped_orders :: [%Order{status: :pending | :processed}]
   def list_unshipped_orders do
     Order
-    |> where(status: [:pending, :processed])
+    |> where([o], o.status in ^[:pending, :processed])
     |> join(:left, [o], c in assoc(o, :customer))
     |> preload([o, c], customer: c)
     |> order_by(desc: :ordered_at)
