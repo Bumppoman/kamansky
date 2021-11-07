@@ -211,25 +211,11 @@ defmodule KamanskyWeb.Components.DataTable do
   defp build_sort(nil), do: %{column: 0, direction: :asc}
 
   defp dummy_page_link do
-    assigns = %{}
-
-    ~H"""
-    <span class=
-      "relative
-      inline-flex
-      items-center
-      px-4
-      py-2
-      border
-      border-gray-300
-      bg-white
-      text-sm
-      font-medium
-      text-gray-700"
-    >
-      ...
-    </span>
-    """
+    Phoenix.HTML.Tag.content_tag(
+      :span,
+      "...",
+      class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+    )
   end
 
   @spec invert_sort_direction(String.t) :: :asc | :desc
