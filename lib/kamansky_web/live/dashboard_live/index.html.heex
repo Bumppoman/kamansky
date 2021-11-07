@@ -210,7 +210,7 @@
       </div>
     </div>
     <h2 class="mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-      Pending orders
+      Unshipped orders
     </h2>
     <div class="hidden sm:block">
       <div class="px-4 sm:px-6 lg:px-8">
@@ -237,12 +237,12 @@
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <%= if Enum.empty?(@pending_orders) do %>
+                <%= if Enum.empty?(@unshipped_orders) do %>
                   <tr class="bg-white">
                     <td colspan="4" class="max-w-0 px-6 py-4 text-sm text-gray-900 w-full whitespace-nowrap">There are currently no pending orders.</td>
                   </tr>
                 <% end %>
-                <%= for order <- @pending_orders do %>
+                <%= for order <- @unshipped_orders do %>
                   <tr class="bg-white">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div class="flex">
@@ -263,9 +263,7 @@
                       <%= format_decimal_as_currency(Order.total_paid(order)) %>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 capitalize">
-                        success
-                      </span>
+                      <KamanskyWeb.OrderLive.Components.status_badge status={order.status} />
                     </td>
                   </tr>
                 <% end %>

@@ -95,7 +95,6 @@ defmodule KamanskyWeb.OrderLive.Index do
     }
   end
 
-
   @spec update_datatable(Phoenix.LiveView.Socket.t, String.t, pos_integer) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp update_datatable(socket, message, order_id) do
     send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: [go_to_record: order_id]

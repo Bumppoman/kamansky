@@ -7,10 +7,10 @@ defmodule Kamansky.Operations.Dashboard do
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Stamps.Stamp
 
-  @spec list_pending_orders :: [Order.t]
-  def list_pending_orders do
+  @spec list_unshipped_orders :: [%Order{status: :pending | :processed}]
+  def list_unshipped_orders do
     Order
-    |> where(status: :pending)
+    |> where(status: [:pending, :processed])
     |> join(:left, [o], c in assoc(o, :customer))
     |> preload([o, c], customer: c)
     |> order_by(desc: :ordered_at)

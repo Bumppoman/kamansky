@@ -110,6 +110,17 @@ defmodule KamanskyWeb.OrderLive.Components do
     """
   end
 
+  @spec status_badge(map) :: Phoenix.LiveView.Rendered.t
+  def status_badge(assigns) do
+    ~H"""
+    <span
+      class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize" <> status_badge_color(@status)}
+    >
+      <%= @status %>
+    </span>
+    """
+  end
+
   @spec get_platform_id_field(Ecto.Changeset.t) :: :ebay_id | :hipstamp_id
   defp get_platform_id_field(changeset) do
     changeset
@@ -129,4 +140,8 @@ defmodule KamanskyWeb.OrderLive.Components do
       _ -> "Hipstamp ID"
     end
   end
+
+  @spec status_badge_color(:completed | :pending | :processed | :shipped) :: String.t
+  defp status_badge_color(:pending), do: " bg-gray-100 text-gray-100"
+  defp status_badge_color(:processed), do: " bg-yellow-100 text-yellow-800"
 end
