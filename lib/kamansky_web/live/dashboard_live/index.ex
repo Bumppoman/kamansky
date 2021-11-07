@@ -5,6 +5,7 @@ defmodule KamanskyWeb.DashboardLive.Index do
 
   alias Kamansky.Operations.Dashboard
   alias Kamansky.Sales.Orders
+  alias Kamansky.Sales.Orders.Order
   alias Kamansky.Stamps
 
   @impl true
@@ -43,6 +44,7 @@ defmodule KamanskyWeb.DashboardLive.Index do
           ]
         )
         |> assign(:data, Dashboard.load_dashboard_data(socket.assigns.timezone))
+        |> assign(:pending_orders, Orders.list_orders(status: :pending))
     do
       {:ok, socket}
     end

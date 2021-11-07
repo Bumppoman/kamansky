@@ -2,6 +2,7 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
   use KamanskyWeb, :live_component
 
   alias Kamansky.Sales.Orders
+  alias Kamansky.Sales.Orders.Order
 
   @impl true
   @spec update(%{required(:trigger_params) => %{String.t => any}, optional(:any) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
@@ -23,13 +24,7 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
   @spec handle_event(String.t, %{required(String.t) => map}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("submit", %{"order" => order_params}, socket) do
     case Orders.update_order(socket.assigns.order, order_params) do
-      {:ok, order} ->
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "You have successfully updated this order.")
-          |> push_redirect(to: Routes.order_index_path(socket, order.status, go_to_record: order.id))
-        }
+      {:ok, %Order{id: order_id}} -> send self(), {:order_updated, order_id}
     end
   end
 

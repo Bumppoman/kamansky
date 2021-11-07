@@ -80,14 +80,7 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
     |> Map.put("customer_id", socket.assigns.customer.id)
     |> Orders.create_order()
     |> case do
-      {:ok, %{id: id}} ->
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "You have successfully created this order.")
-          |> push_redirect(to: Routes.order_index_path(socket, :pending, go_to_record: id))
-        }
-
+      {:ok, %{id: order_id}} -> send self(), {:order_added, order_id}
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end

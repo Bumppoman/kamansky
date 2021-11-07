@@ -3,7 +3,6 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   import Kamansky.Helpers
 
-  alias Kamansky.Sales.Customers.Customer
   alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.Hipstamp
@@ -11,24 +10,29 @@ defmodule KamanskyWeb.OrderLive.Index do
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("load_new_orders", _value, socket) do
-    with :ok <- Hipstamp.Order.load_new_orders, do: {:noreply, socket}
+    with :ok <- Hipstamp.Order.load_new_orders() do
+      send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: []
+      {:noreply, socket}
+    end
   end
 
   def handle_event("mark_completed", %{"order-id" => order_id}, socket) do
-    with order <- Orders.get_order!(order_id) do
-      case Orders.mark_order_as_completed(order) do
-        {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as completed.")
-        {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
-      end
+    order_id
+    |> Orders.get_order!()
+    |> Orders.mark_order_as_completed()
+    |> case do
+      {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as completed.")
+      {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
 
   def handle_event("mark_processed", %{"order-id" => order_id}, socket) do
-    with order <- Orders.get_order!(order_id) do
-      case Orders.mark_order_as_processed(order) do
-        {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as processsed.")
-        {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
-      end
+    order_id
+    |> Orders.get_order!()
+    |> Orders.mark_order_as_processed()
+    |> case do
+      {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as processsed.")
+      {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
 
@@ -46,7 +50,9 @@ defmodule KamanskyWeb.OrderLive.Index do
   end
 
   @impl true
-  @spec handle_info({:update_new_order_step, %{step: pos_integer, customer: Customer.t}}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_info({atom, any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:order_added, order_id}, socket), do: update_datatable(socket, "You have successfully added this order.", order_id)
+  def handle_info({:order_updated, order_id}, socket), do: update_datatable(socket, "You have successfully updated this order.", order_id)
   def handle_info({:update_new_order_step, %{step: 2, customer: customer}}, socket) do
     {
       :noreply,
@@ -85,6 +91,19 @@ defmodule KamanskyWeb.OrderLive.Index do
       :noreply,
       socket
       |> push_event("kamansky:closeConfirmationModal", %{})
+      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
+    }
+  end
+
+
+  @spec update_datatable(Phoenix.LiveView.Socket.t, String.t, pos_integer) :: {:noreply, Phoenix.LiveView.Socket.t}
+  defp update_datatable(socket, message, order_id) do
+    send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: [go_to_record: order_id]
+
+    {
+      :noreply,
+      socket
+      |> push_event("kamansky:closeModal", %{})
       |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
     }
   end

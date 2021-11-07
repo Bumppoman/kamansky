@@ -9,7 +9,7 @@ export const dataTableInit = {
 
     perPageElement.addEventListener('change', event => {
       const perPage = (event.target as HTMLSelectElement).value;
-      this.pushEventTo('#kamansky-data-table', 'per_page_changed', { per_page: perPage });
+      this.pushEventTo('.kamansky-data-table', 'per_page_changed', { per_page: perPage });
     });
     
     this.applySortStyle(this.el);

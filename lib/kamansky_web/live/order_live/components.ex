@@ -5,16 +5,36 @@ defmodule KamanskyWeb.OrderLive.Components do
 
   alias KamanskyWeb.Router.Helpers, as: Routes
 
+  @spec bottom_tabs(map) :: Phoenix.LiveView.Rendered.t
   def bottom_tabs(assigns) do
     ~H"""
-    <nav class="flex font-medium justify-center leading-6 mt-4">
-      <%= for status <- [:pending, :processed, :shipped, :completed] do %>
-        <%= live_redirect String.capitalize(Atom.to_string(status)),
-          to: Routes.order_index_path(@socket, status),
-          class: "block mr-3 px-4 py-2 text-gray-500" <> (if @live_action == status, do: " bg-blue-100 rounded-md text-blue-600", else: " text-opacity-70")
-        %>
-      <% end %>
-    </nav>
+    <div class="mt-4 sm:hidden">
+      <label for="tabs" class="sr-only">Select a tab</label>
+      <select
+        id="tabs"
+        name="tabs"
+        class="block w-full focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md"
+        x-data
+        x-on:change="window.location.href = $el.value"
+      >
+        <%= for status <- [:pending, :processed, :shipped, :completed] do %>
+          <option
+            value={Routes.order_index_path(@socket, status)}
+            {if @live_action == status, do: [selected: ""], else: []}
+          ><%= String.capitalize(Atom.to_string(status)) %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="hidden sm:block sm:mt-4">
+      <nav class="flex font-medium justify-center leading-6">
+        <%= for status <- [:pending, :processed, :shipped, :completed] do %>
+          <%= live_redirect String.capitalize(Atom.to_string(status)),
+            to: Routes.order_index_path(@socket, status),
+            class: "block mr-3 px-4 py-2 text-gray-500" <> (if @live_action == status, do: " bg-blue-100 rounded-md text-blue-600", else: " text-opacity-70")
+          %>
+        <% end %>
+      </nav>
+    </div>
     """
   end
 

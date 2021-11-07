@@ -13,8 +13,7 @@ defmodule KamanskyWeb.Components.DataTable do
   end
 
   @impl true
-  @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t)
-    :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("go_to_page", %{"page" => page}, socket) do
     with page <- String.to_integer(page),
       socket <- assign(socket, current_page: page)
@@ -212,7 +211,7 @@ defmodule KamanskyWeb.Components.DataTable do
   defp build_sort(nil), do: %{column: 0, direction: :asc}
 
   defp dummy_page_link do
-    ~E"""
+    """
     <span class="
       relative
       inline-flex

@@ -1,83 +1,271 @@
-<div id="dashboard">
-  <div class="row mt-4">
-    <div class="col-md-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">Collection</h4>
-          <p class="card-text">
-            <span>Total cost: <%= format_decimal_as_currency(@data.collection_stamp_cost) %></span>
-          </p>
+<div>
+  <KamanskyWeb.Components.Page.page_header page_title="Dashboard" />
+  <div class="mt-4">
+    <div class="px-4 sm:px-6 lg:px-8">
+      <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
+      <div class="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    Collection
+                  </dt>
+                  <dd>
+                    <div class="text-lg font-medium text-gray-900">
+                      <%= format_decimal_as_currency(@data.collection_stamp_cost) %>
+                    </div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    Stock
+                  </dt>
+                  <dd>
+                    <div class="text-lg font-medium text-gray-900">
+                      <%= format_decimal_as_currency(@data.stock_stamp_cost) %>
+                    </div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    Listings
+                  </dt>
+                  <dd>
+                    <div class="text-lg font-medium text-gray-900">
+                      <%= format_decimal_as_currency(@data.listed_stamp_cost) %> <span class="text-gray-500 text-sm">(cost)</span> /
+                      <%= format_decimal_as_currency(@data.total_listing_price) %> <span class="text-gray-500 text-sm">(listed price)</span>
+                    </div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                    Sales
+                  </dt>
+                  <dd>
+                    <div class="text-lg font-medium text-gray-900">
+                      <%= format_decimal_as_currency(@data.total_gross_profit) %> <span class="text-gray-500 text-sm">(gross)</span> /
+                      <%= format_decimal_as_currency(@total_net_profit) %> <span class="text-gray-500 text-sm">(net)</span>
+                    </div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">Stock</h4>
-          <p class="card-text">
-            <span>Total cost: <%= format_decimal_as_currency(@data.stock_stamp_cost) %></span>
-          </p>
+    <div class="mt-8 px-4 sm:px-6 lg:px-8">
+      <h2 class="text-lg leading-6 font-medium text-gray-900">Month over month</h2>
+      <div class="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <h4 class="font-medium mb-2 text-gray-900">This month</h4>
+            <div class="flex items-center">
+              <div class="mx-5 w-0 flex-1">
+                <dl class="flex justify-between">
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                      Collection
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @stamps_this_month_for_collection %>
+                        <span class="text-sm text-gray-500">stamps at</span>
+                        <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_collection) %>
+                      </div>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                      Stock
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @stamps_this_month_for_stock %>
+                        <span class="text-sm text-gray-500">stamps at</span>
+                        <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_stock) %>
+                      </div>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                      Listings
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @stamps_this_month_for_listings %>
+                        <span class="text-sm text-gray-500">stamps at</span>
+                        <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_listings) %>
+                      </div>
+                    </dd>
+                  </div>
+                </dl>
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                      Orders
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @orders_this_month %>
+                        <span class="text-sm text-gray-500">orders (</span>
+                        <%= @stamps_in_orders_this_month %>
+                        <span class="text-sm text-gray-500">stamps) for</span>
+                        <%= format_decimal_as_currency(@net_profit_this_month) %>
+                        <span class="text-sm text-gray-500">net profit</span>
+                      </div>
+                    </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <h4 class="font-medium mb-2 text-gray-900">Last month</h4>
+            <div class="flex items-center">
+              <div class="mx-5 w-0 flex-1">
+                <dl class="flex justify-between">
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                      Collection
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @stamps_last_month_for_collection %>
+                        <span class="text-sm text-gray-500">stamps at</span>
+                        <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_collection) %>
+                      </div>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                      Stock
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @stamps_last_month_for_stock %>
+                        <span class="text-sm text-gray-500">stamps at</span>
+                        <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_stock) %>
+                      </div>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500 truncate">
+                      Listings
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @stamps_last_month_for_listings %>
+                        <span class="text-sm text-gray-500">stamps at</span>
+                        <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_listings) %>
+                      </div>
+                    </dd>
+                  </div>
+                </dl>
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">
+                      Orders
+                    </dt>
+                    <dd>
+                      <div class="text-lg font-medium text-gray-900">
+                        <%= @orders_last_month %>
+                        <span class="text-sm text-gray-500">orders (</span>
+                        <%= @stamps_in_orders_last_month %>
+                        <span class="text-sm text-gray-500">stamps) for</span>
+                        <%= format_decimal_as_currency(@net_profit_last_month) %>
+                        <span class="text-sm text-gray-500">net profit</span>
+                      </div>
+                    </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">Listings</h4>
-          <p class="card-text">
-            <ul class="list-unstyled">
-              <li>Total cost: <%= format_decimal_as_currency(@data.listed_stamp_cost) %></li>
-              <li>Total listing price: <%= format_decimal_as_currency(@data.total_listing_price) %></li>
-            </ul>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">Sales</h4>
-          <p class="card-text">
-            <ul class="list-unstyled">
-              <li>Total orders: <%= @data.total_orders %> (<%= @data.total_stamps_sold %> stamps)</li>
-              <li>Total stamp cost: <%= format_decimal_as_currency(@data.sold_stamp_cost) %></li>
-              <li>Gross profit: <%= format_decimal_as_currency(@data.total_gross_profit) %></li>
-              <li>Net profit: <%= format_decimal_as_currency(@total_net_profit) %></li>
-            </ul>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row mt-4">
-    <div class="col-md-3">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Month to Date</h4>
-          <p class="card-text">
-            <ul class="list-unstyled">
-              <li>Purchased for collection: <%= @stamps_this_month_for_collection %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_collection) %></li>
-              <li>Purchased for stock: <%= @stamps_this_month_for_stock %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_stock) %></li>
-              <li>Purchased and listed: <%= @stamps_this_month_for_listings %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_this_month_for_listings) %></li>
-              <li>Orders: <%= @orders_this_month %> orders (<%= @stamps_in_orders_this_month %> stamps) for <%= format_decimal_as_currency(@net_profit_this_month) %> net profit</li>
-            </ul>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6"></div>
-    <div class="col-md-3">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Previous Month</h4>
-          <p class="card-text">
-            <ul class="list-unstyled">
-              <li>Purchased for collection: <%= @stamps_last_month_for_collection %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_collection) %></li>
-              <li>Purchased for stock: <%= @stamps_last_month_for_stock %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_stock) %></li>
-              <li>Purchased and listed: <%= @stamps_last_month_for_listings %> stamps at <%= format_decimal_as_currency(@cost_of_stamps_last_month_for_listings) %></li>
-              <li>Orders: <%= @orders_last_month %> orders (<%= @stamps_in_orders_last_month %> stamps) for <%= format_decimal_as_currency(@net_profit_last_month) %> net profit</li>
-            </ul>
-          </p>
+    <h2 class="mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
+      Pending orders
+    </h2>
+    <div class="hidden sm:block">
+      <div class="px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col mt-2">
+          <div class="align-middle min-w-full overflow-x-auto shadow overflow-hidden sm:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Order Number
+                  </th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total
+                  </th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <%= if Enum.empty?(@pending_orders) do %>
+                  <tr class="bg-white">
+                    <td colspan="4" class="max-w-0 px-6 py-4 text-sm text-gray-900 w-full whitespace-nowrap">There are currently no pending orders.</td>
+                  </tr>
+                <% end %>
+                <%= for order <- @pending_orders do %>
+                  <tr class="bg-white">
+                    <td class="max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div class="flex">
+                        <%= live_redirect to: Routes.order_show_path(@socket, :show, order), class: "group inline-flex space-x-2 truncate text-sm" do %>
+                          <p class="text-gray-500 truncate group-hover:text-gray-900">
+                            #<%= Order.order_number(order) %>
+                          </p>
+                        <% end %>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">
+                      <time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time>
+                    </td>
+                    <td class="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-500">
+                      <%= format_decimal_as_currency(Order.total_paid(order)) %>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 capitalize">
+                        success
+                      </span>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

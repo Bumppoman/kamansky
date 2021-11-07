@@ -3,6 +3,7 @@
     buttons={
       [
         %{
+          display: @live_action != :missing_from_collection,
           options: %{
             "phx-click": "open",
             "phx-target": "#stamp_reference-form-modal",
