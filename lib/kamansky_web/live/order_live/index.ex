@@ -64,10 +64,11 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(_params, _uri, socket) do
+  def handle_params(params, _uri, socket) do
     {
       :noreply,
       socket
+      |> assign(:go_to_record, Map.get(params, "go_to_record"))
       |> assign(:page_title, String.capitalize(Atom.to_string(socket.assigns.live_action)) <> " Orders")
       |> load_orders(socket.assigns.live_action)
     }
