@@ -2,7 +2,7 @@
   <KamanskyWeb.Components.Page.page_header
     breadcrumbs={
       [
-        {"Customer List", Routes.customer_index_path(@socket, :index)},
+        {"Customer List", Routes.customer_index_path(@socket, :index, go_to_record: @customer.id)},
         "Customer Information"
       ]
     }

@@ -1,5 +1,13 @@
-<div class="mt-5">
-  <h2 class="mb-2">Order #<%= Order.order_number(@order) %></h2>
+<div>
+  <KamanskyWeb.Components.Page.page_header
+    breadcrumbs={
+      [
+        {"#{String.capitalize(Atom.to_string(@order.status))} Orders", Routes.order_index_path(@socket, @order.status, go_to_record: @order.id)},
+        @page_title
+      ]
+    },
+    page_title={@page_title}
+  />
   <table>
     <thead class="border-b-2 border-black">
       <tr class="text-left">
