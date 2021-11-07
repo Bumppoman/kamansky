@@ -24,7 +24,10 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
   @spec handle_event(String.t, %{required(String.t) => map}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("submit", %{"order" => order_params}, socket) do
     case Orders.update_order(socket.assigns.order, order_params) do
-      {:ok, %Order{id: order_id}} -> send self(), {:order_updated, order_id}
+      {:ok, %Order{id: order_id}} ->
+        send self(), {:order_updated, order_id}
+        {:noreply, socket}
+      {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, :changeset, changeset)}
     end
   end
 

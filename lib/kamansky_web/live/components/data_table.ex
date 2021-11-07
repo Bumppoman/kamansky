@@ -211,9 +211,11 @@ defmodule KamanskyWeb.Components.DataTable do
   defp build_sort(nil), do: %{column: 0, direction: :asc}
 
   defp dummy_page_link do
-    """
-    <span class="
-      relative
+    assigns = %{}
+
+    ~H"""
+    <span class=
+      "relative
       inline-flex
       items-center
       px-4

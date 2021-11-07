@@ -115,9 +115,7 @@ defmodule KamanskyWeb.OrderLive.Components do
     ~H"""
     <span
       class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize" <> status_badge_color(@status)}
-    >
-      <%= @status %>
-    </span>
+    ><%= @status %></span>
     """
   end
 
