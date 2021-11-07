@@ -24,7 +24,7 @@
           <div class="d-flex">
             <div class="mr-3">
               <img
-                class="h-16"
+                class="h-16 max-w-max"
                 src={
                   if @copy_in_collection.front_photo do
                     Attachment.path(@copy_in_collection.front_photo)
@@ -185,7 +185,7 @@
             class="drag-and-drop-file-preview hidden"
           >
             <%= for entry <- @uploads.front_photo.entries do %>
-              <%= live_img_preview entry, class: "h-32" %>
+              <%= live_img_preview entry, class: "h-32 max-w-max" %>
             <% end %>
           </div>
         </div>
@@ -253,7 +253,7 @@
             class="drag-and-drop-file-preview hidden"
           >
             <%= for entry <- @uploads.rear_photo.entries do %>
-              <%= live_img_preview entry, height: 100 %>
+              <%= live_img_preview entry, class: "h-32 max-w-max" %>
             <% end %>
           </div>
         </div>
