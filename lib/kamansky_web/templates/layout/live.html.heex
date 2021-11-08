@@ -76,7 +76,7 @@
                 <div 
                   class="inline-block relative text-left"
                   x-data="{adminDropdown: false}" 
-                  @click.away="adminDropdown = false"
+                  x-on:click.away="adminDropdown = false"
                 >
                   <div>
                     <button 
@@ -162,13 +162,60 @@
             </div>
           <% end %>
         </div>
-        <div class="ml-6">
+        <div class="hidden sm:block sm:ml-6">
           <%= if @current_user do %>
-            <%= link "Sign out",
-              to: Routes.user_session_path(@socket, :delete), 
-              method: :delete,
-              class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" 
-            %>
+            <div class="flex items-center">
+              <div 
+                class="ml-3 relative"
+                x-data="{userMenuOpen: false}"
+                x-on:click.away="userMenuOpen = false"
+              >
+                <div>
+                  <button 
+                    type="button" 
+                    class="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" 
+                    id="user-menu-button" 
+                    aria-expanded="false" 
+                    aria-haspopup="true"
+                    x-on:click="userMenuOpen = !userMenuOpen"
+                  >
+                    <span class="sr-only">Open user menu</span>
+                    <svg 
+                      class="h-8 w-8 rounded-full text-blue-300"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 100 100"
+                    >
+                      <circle cx="50" cy="50" r="50" fill="currentColor" />
+                      <text class="text-4xl" stroke="white" fill="white" dominant-baseline="central" text-anchor="middle" x="50" y="50">
+                        <%= @current_user.initials %>
+                      </text>
+                    </svg>
+                  </button>
+                </div>
+                <div 
+                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" 
+                  role="menu" 
+                  aria-orientation="vertical" 
+                  aria-labelledby="user-menu-button" 
+                  tabindex="-1"
+                  x-show="userMenuOpen"
+                  x-transition:enter="ease-out duration-100 transition"
+                  x-transition:enter-start="opacity-0 scale-95 transform"
+                  x-transition:enter-end="opacity-100 scale-100 transform"
+                  x-transition:leave="ease-in duration-75 transition"
+                  x-transition:leave-start="opacity-100 scale-100 transform"
+                  x-transition:leave-end="opacity-0 scale-95 transform"
+                >
+                  <%= link "Sign out",
+                    class: "block px-4 py-2 text-sm text-gray-700",
+                    method: :delete,
+                    role: "menuitem",
+                    tabindex: -1,
+                    to: Routes.user_session_path(@socket, :delete)
+                  %>
+                </div>
+              </div>
+            </div>
           <% else %>
             <%= link "Sign in",
               to: Routes.user_session_path(@socket, :new),
