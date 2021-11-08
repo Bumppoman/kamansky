@@ -25,14 +25,24 @@ defmodule Kamansky.Operations.Trends do
         era_average_listing_time <-
           era_sold_listings_query
           |> join(:left, [l], o in assoc(l, :order))
-          |> select([l, s, ..., o], avg(fragment("CASE WHEN ? IS NOT NULL THEN ? ELSE ? END", l.order_id, o.ordered_at - l.inserted_at, ^DateTime.utc_now() - l.inserted_at)))
+          |> select(
+            [l, s, ..., o],
+            avg(
+              fragment(
+                "CASE WHEN ? IS NOT NULL THEN ? ELSE ? END",
+                l.order_id,
+                o.ordered_at - l.inserted_at,
+                ^DateTime.utc_now() - l.inserted_at
+              )
+            )
+          )
           |> Repo.one()
       ) do
         {
           era.name,
           %{
             average_listing_time: average_listing_time(era_average_listing_time),
-            conversion_percentage: conversion_percentage(era_total_listings, total_listings),
+            conversion_percentage: conversion_percentage(era_total_sold, total_listings),
             percentage_of_total_listings: round((era_total_listings / total_listings) * 100),
             percentage_of_total_sales: round((era_total_sold / total_sold) * 100),
             total_cost:
@@ -47,7 +57,7 @@ defmodule Kamansky.Operations.Trends do
   end
 
   @spec average_listing_time(any) :: integer
-  defp average_listing_time(%{seconds: seconds, days: days}), do: days + (if seconds > 43200, do: 1, else: 0)
+  defp average_listing_time(%{secs: secs, days: days}), do: days + (if secs > 43200, do: 1, else: 0)
   defp average_listing_time(_), do: 0
 
   @spec conversion_percentage(any, any) :: integer

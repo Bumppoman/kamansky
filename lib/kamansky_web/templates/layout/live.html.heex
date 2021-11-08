@@ -1,64 +1,64 @@
 <header class="bg-white">
-  <%= if @logged_in do %>
-    <nav class="bg-gray-800" x-data="{menuOpen: false}">
-      <div class="max-w-7xl mx-auto pr-2 sm:pr-6 lg:pr-8">
-        <div class="relative flex items-center justify-between h-16">
-          <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            <!-- Mobile menu button-->
-            <button
-              type="button" 
-              class="
-                inline-flex 
-                items-center 
-                justify-center 
-                p-2 
-                rounded-md 
-                text-gray-400 
-                hover:text-white 
-                hover:bg-gray-700 
-                focus:outline-none 
-                focus:ring-2 
-                focus:ring-inset 
-                focus:ring-white" 
-              aria-controls="mobile-menu" 
-              aria-expanded="false"
-              x-on:click="menuOpen = !menuOpen"
+  <nav class="bg-gray-800" x-data="{menuOpen: false}">
+    <div class="max-w-7xl mx-auto pr-2 sm:pr-6 lg:pr-8">
+      <div class="relative flex items-center justify-between h-16">
+        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+          <!-- Mobile menu button-->
+          <button
+            type="button" 
+            class="
+              inline-flex 
+              items-center 
+              justify-center 
+              p-2 
+              rounded-md 
+              text-gray-400 
+              hover:text-white 
+              hover:bg-gray-700 
+              focus:outline-none 
+              focus:ring-2 
+              focus:ring-inset 
+              focus:ring-white" 
+            aria-controls="mobile-menu" 
+            aria-expanded="false"
+            x-on:click="menuOpen = !menuOpen"
+          >
+            <span class="sr-only">Open main menu</span>
+            <svg 
+              class="h-6 w-6" 
+              :class="menuOpen ? 'hidden' : 'block'"
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              aria-hidden="true"
             >
-              <span class="sr-only">Open main menu</span>
-              <svg 
-                class="h-6 w-6" 
-                :class="menuOpen ? 'hidden' : 'block'"
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                aria-hidden="true"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg 
-                class="h-6 w-6" 
-                :class="menuOpen ? 'block' : 'hidden'"
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                aria-hidden="true"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg 
+              class="h-6 w-6" 
+              :class="menuOpen ? 'block' : 'hidden'"
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+          <div class="flex-shrink-0 flex items-center px-5">
+            <%= live_redirect to: Routes.dashboard_index_path(@socket, :index) do %>
+              <img 
+                class="h-8 w-auto" 
+                src={Routes.static_path(@socket, "/images/bumppoman-stamps-logo-white.svg")} 
+                alt="Bumppoman Stamps"
+              />
+            <% end %>
           </div>
-          <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-            <div class="flex-shrink-0 flex items-center px-5">
-              <%= live_redirect to: Routes.dashboard_index_path(@socket, :index) do %>
-                <img 
-                  class="h-8 w-auto" 
-                  src={Routes.static_path(@socket, "/images/bumppoman-stamps-logo-white.svg")} 
-                  alt="Bumppoman Stamps"
-                />
-              <% end %>
-            </div>
+          <%= if @current_user do %>
             <div class="hidden sm:block sm:ml-6">
               <div class="flex space-x-4">
                 <%= for link <- live_navbar_links(@socket, @live_action) do %>
@@ -160,7 +160,21 @@
                 </div>
               </div>
             </div>
-          </div>
+          <% end %>
+        </div>
+        <div class="ml-6">
+          <%= if @current_user do %>
+            <%= link "Sign out",
+              to: Routes.user_session_path(@socket, :delete), 
+              method: :delete,
+              class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" 
+            %>
+          <% else %>
+            <%= link "Sign in",
+              to: Routes.user_session_path(@socket, :new),
+              class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" 
+            %>
+          <% end %>
         </div>
       </div>
       <div class="sm:hidden" id="mobile-menu" x-show="menuOpen">
@@ -189,30 +203,10 @@
           <% end %>
         </div>
       </div>
-    </nav>
-  <% else %>
-    <.form
-      let={f}
-      for={:login}
-      action={Routes.session_path(@socket, :create)}
-      class="row row-cols-md-auto p-3 align-items-center justify-content-center"
-    >
-      <div class="col">
-        <%= label f, :username, class: "visually-hidden" %>
-        <%= text_input f, :username, class: "form-control", placeholder: "Username" %>
-      </div>
-      <div class="col">
-        <%= label f, :password, class: "visually-hidden" %>
-        <%= password_input f, :password, class: "form-control", placeholder: "Password" %>
-      </div>
-      <div class="col">
-        <%= submit "Login", class: "btn btn-primary" %>
-      </div>
-    </.form>
-  <% end %>
+    </div>
+  </nav>
 </header>
 <main role="main" class="bg-white mx-auto my-3 p-8 w-11/12">
-  <%= if @logged_in do %>
     <%= if live_flash(@flash, :info) do %>
       <div
         id="kamansky-success-message"
@@ -254,14 +248,8 @@
           x-transition:leave-end="max-h-0 scale-y-0"
         ><%= live_flash(@flash, :info).message %></div>
       </div>
-  <% end %>
+    <% end %>
     <%= @inner_content %>
-  <% else %>
-    <div>
-      <h1>Bumppoman Industries</h1>
-      <p>Please log in.</p>
-    </div>
-  <% end %>
   <div
     class="fixed z-10 inset-0 overflow-y-auto"
     x-data="{detail: {action: null, content: null, title: null, values: null}, open: false}"

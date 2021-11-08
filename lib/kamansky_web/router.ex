@@ -1,6 +1,8 @@
 defmodule KamanskyWeb.Router do
   use KamanskyWeb, :router
 
+  import KamanskyWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,7 +10,7 @@ defmodule KamanskyWeb.Router do
     plug :put_root_layout, {KamanskyWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug KamanskyWeb.Auth
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -16,9 +18,7 @@ defmodule KamanskyWeb.Router do
   end
 
   scope "/", KamanskyWeb do
-    pipe_through :browser
-    post "/login", SessionController, :create
-    delete "/logout", SessionController, :delete
+    pipe_through [:browser, :require_authenticated_user]
 
     live_session :default, on_mount: KamanskyWeb.InitAssigns do
       live "/", DashboardLive.Index, :index
@@ -106,5 +106,38 @@ defmodule KamanskyWeb.Router do
 
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Authentication routes
+
+  scope "/", KamanskyWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/register", UserRegistrationController, :new
+    post "/users/register", UserRegistrationController, :create
+    get "/users/login", UserSessionController, :new
+    post "/users/login", UserSessionController, :create
+    get "/users/reset_password", UserResetPasswordController, :new
+    post "/users/reset_password", UserResetPasswordController, :create
+    get "/users/reset_password/:token", UserResetPasswordController, :edit
+    put "/users/reset_password/:token", UserResetPasswordController, :update
+  end
+
+  scope "/", KamanskyWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/users/settings", UserSettingsController, :edit
+    put "/users/settings", UserSettingsController, :update
+    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", KamanskyWeb do
+    pipe_through [:browser]
+
+    delete "/users/logout", UserSessionController, :delete
+    get "/users/confirm", UserConfirmationController, :new
+    post "/users/confirm", UserConfirmationController, :create
+    get "/users/confirm/:token", UserConfirmationController, :edit
+    post "/users/confirm/:token", UserConfirmationController, :update
   end
 end
