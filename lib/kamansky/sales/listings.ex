@@ -99,14 +99,14 @@ defmodule Kamansky.Sales.Listings do
     |> then(&Paginate.list(Listings, &1, params))
   end
 
-  @spec mark_listing_sold(Listing.t, [order_id: integer, sale_price: Decimal.t])
-    :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  @spec mark_listing_sold(Listing.t, [order_id: integer, sale_price: Decimal.t]) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def mark_listing_sold(%Listing{} = listing, order_id: order_id, sale_price: sale_price) do
     listing
     |> Ecto.Changeset.change(order_id: order_id, sale_price: sale_price, status: :sold)
     |> Repo.update()
   end
 
+  @spec median_price_data_for_sold_listings :: map
   def median_price_data_for_sold_listings do
     for class <- Stamps.Stamp.grade_classes() do
       {
@@ -126,51 +126,6 @@ defmodule Kamansky.Sales.Listings do
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
   def search_query(query, search), do: where(query, [l, s], ilike(s.scott_number, ^"%#{search}%"))
-
-  def sold_listing_data_by_era do
-    for era <- Stamps.StampReferences.StampReference.eras() do
-      with(
-        era_listings_query <-
-          Listing
-          |> join(:left, [l], s in assoc(l, :stamp))
-          |> join(:left, [l, s], sr in assoc(s, :stamp_reference))
-          |> where([l, s, sr], sr.year_of_issue >= ^era.start and sr.year_of_issue <= ^era.finish),
-        era_sold_listings_query <- where(era_listings_query, status: :sold),
-        era_total_listings <- Repo.aggregate(era_listings_query, :count),
-        total_listings <- Repo.aggregate(Listing, :count),
-        era_total_sold <- Repo.aggregate(era_sold_listings_query, :count),
-        total_sold <-
-          Listing
-          |> where(status: :sold)
-          |> Repo.aggregate(:count),
-        era_average_listing_time <-
-          era_sold_listings_query
-          |> join(:left, [l], o in assoc(l, :order))
-          |> select([l, s, ..., o], avg(fragment("CASE WHEN ? IS NOT NULL THEN ? ELSE ? END", l.order_id, o.ordered_at - l.inserted_at, ^DateTime.utc_now() - l.inserted_at)))
-          |> Repo.one()
-      ) do
-        {
-          era.name,
-          %{
-            average_listing_time:
-              if era_average_listing_time.secs > 43200 do
-                era_average_listing_time.days + 1
-              else
-                era_average_listing_time.days
-              end,
-            conversion_percentage: round((era_total_sold / era_total_listings) * 100),
-            percentage_of_total_listings: round((era_total_listings / total_listings) * 100),
-            percentage_of_total_sales: round((era_total_sold / total_sold) * 100),
-            total_cost:
-              era_sold_listings_query
-              |> select([l, s], sum(s.cost + s.purchase_fees))
-              |> Repo.one(),
-            total_sales_income: Repo.aggregate(era_sold_listings_query, :sum, :sale_price)
-          }
-        }
-      end
-    end
-  end
 
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t

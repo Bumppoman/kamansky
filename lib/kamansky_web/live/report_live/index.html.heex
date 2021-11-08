@@ -1,6 +1,6 @@
 <div>
   <KamanskyWeb.Components.Page.page_header page_title="Reports" />
-  <div class="kamansky-data-table mt-4">
+  <div class="mt-4 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -11,28 +11,28 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <th colspan="4" class="bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= @year %></th>
+        <tr class="bg-gray-50">
+          <th colspan="4" class="px-6 py-4 text-left text-xs font-medium text-gray-500"><%= @year %></th>
         </tr>
-        <%= for {month, data} <- @reports, month != :totals do %>
-          <tr>
-            <td>
+        <%= for {{month, data}, counter} <- Enum.with_index(@reports), month != :totals do %>
+          <tr class={if rem(counter, 2) != 0, do: "bg-gray-50", else: "bg-white"}>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
               <%= live_redirect Calendar.strftime(Date.new!(@year, month, 1), "%B %Y"),
                 to: Routes.report_show_path(@socket, :index, year: @year, month: month)
               %>
             </td>
-            <td><%= format_decimal_as_currency(data.gross_sales) %></td>
-            <td><%= format_decimal_as_currency(data.total_expenses) %></td>
-            <td><%= format_decimal_as_currency(data.net_profit) %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.gross_sales) %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.total_expenses) %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.net_profit) %></td>
           </tr>
         <% end %>
       </tbody>
       <tfoot>
-        <tr>
-          <td>Totals for year</td>
-          <td><%= format_decimal_as_currency(@totals.gross_sales) %></td>
-          <td><%= format_decimal_as_currency(@totals.total_expenses) %></td>
-          <td><%= format_decimal_as_currency(@totals.net_profit) %></td>
+        <tr class="font-semibold">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Totals for year</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(@totals.gross_sales) %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(@totals.total_expenses) %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(@totals.net_profit) %></td>
         </tr>
       </tfoot>
     </table>

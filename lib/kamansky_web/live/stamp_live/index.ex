@@ -25,9 +25,27 @@ defmodule KamanskyWeb.StampLive.Index do
   end
 
   @impl true
-  @spec handle_info({atom, integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_info({:stamp_added, id}, socket), do: refresh_data_table(socket, id, "You have successfully added this stamp.")
-  def handle_info({:stamp_updated, id}, socket), do: refresh_data_table(socket, id, "You have successfully updated this stamp.")
+  @spec handle_info({atom, integer | Stamp.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:stamp_added, stamp}, socket) do
+    {
+      :noreply,
+      socket
+      |> push_event("kamansky:closeModal", %{})
+      |> put_flash(:info, %{message: "You have successfully added this stamp", timestamp: Time.utc_now()})
+      |> push_redirect(Routes.stamp_index_path(socket, stamp.status, go_to_record: stamp.id))
+    }
+  end
+
+  def handle_info({:stamp_updated, id}, socket) do
+    send_update KamanskyWeb.Components.DataTable, id: "stamps-kamansky-data-table", options: [go_to_record: id]
+
+    {
+      :noreply,
+      socket
+      |> push_event("kamansky:closeModal", %{})
+      |> put_flash(:info, %{message: "You have successfully updated this stamp.", timestamp: Time.utc_now()})
+    }
+  end
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -66,17 +84,5 @@ defmodule KamanskyWeb.StampLive.Index do
     |> assign(:data_locator, fn options -> Stamps.find_row_number_for_stamp(status, options) end)
     |> assign(:data_source, fn options -> Stamps.list_stamps(status, options) end)
     |> assign(:status, status)
-  end
-
-  @spec refresh_data_table(Phoenix.LiveView.Socket.t, pos_integer, String.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  defp refresh_data_table(socket, id, message) do
-    send_update KamanskyWeb.Components.DataTable, id: "stamps-kamansky-data-table", options: [go_to_record: id]
-
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
-    }
   end
 end

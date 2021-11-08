@@ -1,8 +1,7 @@
 import { dataTableInit } from './datatable';
-//import { disappearingSuccessMessage } from './utils';
 import { fileUpload } from './fileUpload';
 import { modalInit } from './modal';
-//import { format, grade, hingeQuality } from './trends';
+import { format, grade, hingeQuality } from './trends';
 import { successMessage } from './successMessage';
 
 export interface Hook {
@@ -18,11 +17,10 @@ export interface Hook {
 
 export const Hooks = {
   dataTableInit,
-  //disappearingSuccessMessage,
   fileUpload,
-  //format,
-  //grade,
-  //hingeQuality,
+  format,
+  grade,
+  hingeQuality,
   modalInit,
   successMessage
 }

@@ -3,6 +3,7 @@ defmodule KamanskyWeb.TrendLive.Index do
 
   import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
 
+  alias Kamansky.Operations.Trends
   alias Kamansky.Sales.Listings
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
@@ -19,7 +20,7 @@ defmodule KamanskyWeb.TrendLive.Index do
       {
         :ok,
         socket
-        |> assign(:era_sold_listing_data, Listings.sold_listing_data_by_era())
+        |> assign(:era_sold_listing_data, Trends.sold_listing_data_by_era())
         |> assign(:format_data, format_data(sold_stamps_by_format, total_sold_stamps))
         |> assign(:hinged, (hinged / total_sold_stamps) * 100)
         |> assign(:letter_grade_data, letter_grade_data(sold_stamps_by_grade, total_sold_stamps))

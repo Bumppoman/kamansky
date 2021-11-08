@@ -1,102 +1,89 @@
 <div>
-  <div class="row mt-4">
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">Hinged/Never Hinged</h4>
-          <p class="card-text">
-            <canvas 
-              id="trends-hinge-quality" 
-              phx-hook="hingeQuality" 
-              data-hinged={@hinged}
-              data-never-hinged={@never_hinged}
-            />
-          </p>
-        </div>
-      </div>
+  <KamanskyWeb.Components.Page.page_header page_title="Trends" />
+  <div class="grid grid-cols-3 mt-4">
+    <div>
+      <h4 class="font-medium text-xl">Hinged/Never Hinged</h4>
+      <p class="mt-2">
+        <canvas 
+          id="trends-hinge-quality" 
+          phx-hook="hingeQuality" 
+          data-hinged={@hinged}
+          data-never-hinged={@never_hinged}
+        />
+      </p>
     </div>
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">By Grade</h4>
-          <p class="card-text">
-            <canvas 
-              id="trends-grade" 
-              phx-hook="grade" 
-              data-letter-grade={@letter_grade_data}
-            />
-          </p>
-        </div>
-      </div>
+    <div>
+      <h4 class="font-medium text-xl">By Grade</h4>
+      <p class="mt-2">
+        <canvas 
+          id="trends-grade" 
+          phx-hook="grade" 
+          data-letter-grade={@letter_grade_data}
+        />
+      </p>
     </div>
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">By Format</h4>
-          <p class="card-text">
-            <canvas 
-              id="trends-format" 
-              phx-hook="format" 
-              data-format={@format_data}
-            />
-          </p>
-        </div>
-      </div>
+    <div>
+      <h4 class="font-medium text-xl">By Format</h4>
+      <p class="mt-2">
+        <canvas 
+          id="trends-format" 
+          phx-hook="format" 
+          data-format={@format_data}
+        />
+      </p>
     </div>
   </div>
-  <div class="row mt-4">
-    <div class="col-md-8">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">Sales by Era</h4>
-          <p class="card-text">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Era</th>
-                  <th>Sales ($)</th>
-                  <th>Cost ($)</th>
-                  <th>% of Total Sales</th>
-                  <th>% of Total Listings</th>
-                  <th>% Conversion</th>
-                  <th>Average Time to Sale</th>
-                </tr>
-              </thead>
-              <tbody>
-                <%= for {era, data} <- @era_sold_listing_data do %>
-                  <tr>
-                    <td><%= era %></td>
-                    <td><%= format_decimal_as_currency(data.total_sales_income) %></td>
-                    <td><%= format_decimal_as_currency(data.total_cost) %></td>
-                    <td><%= data.percentage_of_total_sales %></td>
-                    <td><%= data.percentage_of_total_listings %></td>
-                    <td><%= data.conversion_percentage %></td>
-                    <td><%= data.average_listing_time %> days</td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </p>
-        </div>
+  <div class="gap-4 grid grid-cols-3 mt-4">
+    <div class="col-span-2">
+      <h4 class="font-medium text-xl">Sales by Era</h4>
+      <div class="mt-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales ($)</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost ($)</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% of Total Sales</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% of Total Listings</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Conversion</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Average Time to Sale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= for {{era, data}, counter} <- Enum.with_index(@era_sold_listing_data) do %>
+              <tr class={if rem(counter, 2) != 0, do: "bg-white", else: "bg-gray-50"}>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= era %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.total_sales_income) %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.total_cost) %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.percentage_of_total_sales %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.percentage_of_total_listings %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.conversion_percentage %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.average_listing_time %> days</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h4 class="card-title">Median Price</h4>
-          <p class="card-text">
-            <table class="table">
-              <tbody>
-                <%= for class <- Stamp.grade_classes() do %>
-                  <tr>
-                    <td><%= class.name %></td>
-                    <td><%= format_decimal_as_currency(Map.get(@median_sold_price_data, class.name, 0)) %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </p>
-        </div>
+    <div>
+      <h4 class="font-medium text-xl">Median Price</h4>
+      <div class="mt-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Median Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= for {class, counter} <- Enum.with_index(Stamp.grade_classes()) do %>
+              <tr class={if rem(counter, 2) != 0, do: "bg-white", else: "bg-gray-50"}>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= class.name %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(Map.get(@median_sold_price_data, class.name, 0)) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

@@ -89,8 +89,8 @@ defmodule KamanskyWeb.StampLive.FormComponent do
       |> Map.put("status", add_to)
       |> Stamps.create_stamp(front_photo, rear_photo)
       |> case do
-        {:ok, %Stamp{id: id}} ->
-          send self(), {:stamp_added, id}
+        {:ok, stamp} ->
+          send self(), {:stamp_added, stamp}
           {:noreply, socket}
 
         {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
