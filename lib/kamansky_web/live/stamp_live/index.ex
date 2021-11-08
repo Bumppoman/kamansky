@@ -32,12 +32,12 @@ defmodule KamanskyWeb.StampLive.Index do
       socket
       |> push_event("kamansky:closeModal", %{})
       |> put_flash(:info, %{message: "You have successfully added this stamp", timestamp: Time.utc_now()})
-      |> push_redirect(Routes.stamp_index_path(socket, stamp.status, go_to_record: stamp.id))
+      |> push_redirect(to: Routes.stamp_index_path(socket, stamp.status, go_to_record: stamp.id))
     }
   end
 
-  def handle_info({:stamp_updated, id}, socket) do
-    send_update KamanskyWeb.Components.DataTable, id: "stamps-kamansky-data-table", options: [go_to_record: id]
+  def handle_info({:stamp_updated, stamp_id}, socket) do
+    send_update KamanskyWeb.Components.DataTable, id: "stamps-kamansky-data-table", options: [go_to_record: stamp_id]
 
     {
       :noreply,
