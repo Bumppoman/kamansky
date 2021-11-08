@@ -77,7 +77,7 @@ defmodule Kamansky.Stamps do
   def find_row_number_for_stamp(status, options) do
     Stamp
     |> where(status: ^status)
-    |> stamp_row_number_lookup(options[:record_id])
+    |> Paginate.find_row_number(Stamp.display_column_for_sorting(options[:sort][:column]), options)
   end
 
   @spec find_row_number_for_stamp_in_collection_below_grade(pos_integer, Paginate.params) :: integer

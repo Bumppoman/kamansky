@@ -10,9 +10,7 @@ defmodule Kamansky.Stamps.StampReferences do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @spec change_stamp_reference(StampReference.t, map) :: Ecto.Changeset.t
-  def change_stamp_reference(%StampReference{} = stamp_reference, attrs \\ %{}) do
-    StampReference.changeset(stamp_reference, attrs)
-  end
+  def change_stamp_reference(%StampReference{} = stamp_reference, attrs \\ %{}), do: StampReference.changeset(stamp_reference, attrs)
 
   @spec count_stamp_references :: integer
   def count_stamp_references, do: Repo.aggregate(StampReference, :count, :id)
@@ -68,9 +66,7 @@ defmodule Kamansky.Stamps.StampReferences do
   def list_stamp_references(params), do: Paginate.list(StampReferences, StampReference, params)
 
   @spec list_stamp_references_missing_from_collection(Paginate.params) :: [StampReference.t]
-  def list_stamp_references_missing_from_collection(params) do
-    Paginate.list(StampReferences, missing_from_collection_query(), params)
-  end
+  def list_stamp_references_missing_from_collection(params), do: Paginate.list(StampReferences, missing_from_collection_query(), params)
 
   @spec list_stamp_references_with_sales(Paginate.params) :: [StampReference.t]
   def list_stamp_references_with_sales(params) do
@@ -117,9 +113,7 @@ defmodule Kamansky.Stamps.StampReferences do
   def sort(query, %{column: 2, direction: direction}) do
     order_by(query, [sr, ..., l], [{^direction, fragment("conversion_percentage")}, desc: count(l.id), asc: :scott_number])
   end
-  def sort(query, %{column: 4, direction: direction}) do
-    order_by(query, [sr, s, l], {^direction, sum(l.sale_price - s.cost - s.purchase_fees)})
-  end
+  def sort(query, %{column: 4, direction: direction}), do: order_by(query, [sr, s, l], {^direction, sum(l.sale_price - s.cost - s.purchase_fees)})
 
   @spec update_stamp_reference(StampReference.t, map) :: {:ok, StampReference.t} | {:error, Ecto.Changeset.t}
   def update_stamp_reference(%StampReference{} = stamp_reference, attrs) do
@@ -134,7 +128,5 @@ defmodule Kamansky.Stamps.StampReferences do
     |> where([..., s], is_nil(s.scott_number))
   end
 
-  defp with_sales_query do
-    join(StampReference, :inner, [sr], s in Stamp, on: sr.scott_number == s.scott_number and s.status == :sold)
-  end
+  defp with_sales_query, do: join(StampReference, :inner, [sr], s in Stamp, on: sr.scott_number == s.scott_number and s.status == :sold)
 end
