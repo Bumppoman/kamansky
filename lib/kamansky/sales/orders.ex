@@ -199,9 +199,8 @@ defmodule Kamansky.Sales.Orders do
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
   def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :id})
-  def sort(query, %{column: 1, direction: direction}) do
-    order_by(query, [{^direction, :ordered_at}, {^direction, :id}])
-  end
+  def sort(query, %{column: 1, direction: direction}), do: order_by(query, [o, c], [{^direction, c.name}, {^direction, :id}])
+  def sort(query, %{column: 2, direction: direction}), do: order_by(query, [{^direction, :ordered_at}, {^direction, :id}])
 
   @spec total_gross_profit(:all) :: integer
   def total_gross_profit(:all) do

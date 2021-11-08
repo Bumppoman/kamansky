@@ -26,6 +26,7 @@
     headers={
       [
         "Order Number",
+        "Customer",
         "Date",
         "Total",
         "Net Profit/Loss",
@@ -39,13 +40,14 @@
     empty_message="There are no orders to display."
     options={[
       go_to_record: Map.get(assigns, :go_to_record),
-      sort: %{column: 1, direction: :desc}
+      sort: %{column: 0, direction: :desc}
     ]}
     title={@page_title}
   >
     <td>
       <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
     </td>
+    <td><%= order.customer.name %></td>
     <td><%= formatted_date(order.ordered_at) %></td>
     <td><%= format_decimal_as_currency(Order.total_paid(order)) %></td>
     <td class={if Decimal.gt?(Order.net_profit(order), 0), do: "text-green-600", else: "text-red-600"}>
