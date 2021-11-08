@@ -98,7 +98,7 @@ defmodule Kamansky.Paginate do
     end
   end
 
-  @doc "Return an `Ecto.Query`, limited for display in a `KamanskyWeb.TableLiveComponent`."
+  @doc "Return an `Ecto.Query`, limited for display in a `KamanskyWeb.Components.DataTable`."
   @spec limit_for_data_table(Ecto.Query.t, params) :: Ecto.Query.t
   def limit_for_data_table(query, %{limit: limit, offset: offset}) do
     query

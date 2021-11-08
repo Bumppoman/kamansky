@@ -68,25 +68,17 @@ defmodule KamanskyWeb.OrderLive.Index do
     {
       :noreply,
       socket
+      |> assign(:data_count, fn -> Orders.count_orders(status: socket.assigns.live_action) end)
+      |> assign(:data_locator, fn options -> Orders.find_row_number_for_order(socket.assigns.live_action, options) end)
+      |> assign(:data_source, fn options -> Orders.list_orders(:display, socket.assigns.live_action, options) end)
       |> assign(:go_to_record, Map.get(params, "go_to_record"))
       |> assign(:page_title, String.capitalize(Atom.to_string(socket.assigns.live_action)) <> " Orders")
-      |> load_orders(socket.assigns.live_action)
     }
-  end
-
-  @spec load_orders(Phoenix.LiveView.Socket.t, map | atom) :: Phoenix.LiveView.Socket.t
-  defp load_orders(socket, %{"status" => status}), do: load_orders(socket, String.to_existing_atom(status))
-  defp load_orders(socket, %{}), do: load_orders(socket, socket.assigns.live_action)
-  defp load_orders(socket, status) when status in [:pending, :finalized, :processed, :shipped, :completed] do
-    socket
-    |> assign(:data_count, fn -> Orders.count_orders(status: status) end)
-    |> assign(:data_locator, fn options -> Orders.find_row_number_for_order(status, options) end)
-    |> assign(:data_source, fn options -> Orders.list_orders(:display, status, options) end)
   end
 
   @spec order_successfully_advanced(Phoenix.LiveView.Socket.t, String.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp order_successfully_advanced(socket, message) do
-    send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: []
+    send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: [go_to_record: nil]
 
     {
       :noreply,
