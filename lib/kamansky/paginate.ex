@@ -74,19 +74,22 @@ defmodule Kamansky.Paginate do
   @spec find_row_number(Ecto.Queryable.t, atom, params) :: integer
   def find_row_number(query, sort_column, options) do
     with(
+      query_column <-
+        if is_list(sort_column) do
+          sort_column
+        else
+          [{options[:sort][:direction], dynamic([q], field(q, ^sort_column))}]
+        end,
       record_query <-
         query
+        |> windows([q], [row: [order_by: ^query_column]])
         |> select(
           [q],
           %{
             id: q.id,
             row_number: over(
               row_number(),
-              order_by:
-                {
-                  ^options[:sort][:direction],
-                  field(q, ^sort_column)
-                }
+              :row
             )
           }
         )

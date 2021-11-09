@@ -46,14 +46,24 @@ defmodule Kamansky.Sales.Listings do
   def exclude_from_count(query), do: query
 
   @spec find_row_number_for_listing(atom, map) :: integer
+  #def find_row_number_for_listing(status, options) do
+  #  Listing
+  #  |> where(status: ^status)
+  #  |> join(:left, [l], s in assoc(l, :stamp))
+  #  |> select([l, s], {l.id, over(row_number(), order_by: [{:asc, s.scott_number}, {:asc, l.id}])})
+  #  |> Repo.all
+  #  |> Enum.find(nil, fn {id, _row} -> id == options[:record_id] end)
+  #  |> elem(1)
+  #end
+
   def find_row_number_for_listing(status, options) do
     Listing
     |> where(status: ^status)
     |> join(:left, [l], s in assoc(l, :stamp))
-    |> select([l, s], {l.id, over(row_number(), order_by: [{:asc, s.scott_number}, {:asc, l.id}])})
-    |> Repo.all
-    |> Enum.find(nil, fn {id, _row} -> id == String.to_integer(options[:record_id]) end)
-    |> elem(1)
+    |> Paginate.find_row_number(
+      Listing.display_column_for_sorting(options[:sort][:column]),
+      options
+    )
   end
 
   @spec get_listing!(integer) :: Listing.t

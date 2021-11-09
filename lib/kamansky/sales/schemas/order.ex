@@ -91,9 +91,7 @@ defmodule Kamansky.Sales.Orders.Order do
   def hipstamp?(%Order{}), do: true
 
   @spec net_profit(Order.t) :: Decimal.t
-  def net_profit(%Order{} = order) do
-    Decimal.sub(total_paid(order), total_cost(order))
-  end
+  def net_profit(%Order{} = order), do: Decimal.sub(total_paid(order), total_cost(order))
 
   @spec order_number(Order.t) :: charlist
   def order_number(%Order{id: id}), do: :io_lib.format("~9..0B", [id])
@@ -140,7 +138,5 @@ defmodule Kamansky.Sales.Orders.Order do
   def total_paid(%Order{item_price: item_price, shipping_price: shipping_price}), do: Decimal.add(item_price, shipping_price)
 
   @spec total_stamp_cost(Order.t) :: Decimal.t
-  def total_stamp_cost(%Order{listings: listings}) do
-    Enum.reduce(listings, 0, &Decimal.add(Stamp.total_cost(&1.stamp), &2))
-  end
+  def total_stamp_cost(%Order{listings: listings}), do: Enum.reduce(listings, 0, &Decimal.add(Stamp.total_cost(&1.stamp), &2))
 end

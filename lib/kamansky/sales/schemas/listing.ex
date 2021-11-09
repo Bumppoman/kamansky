@@ -3,6 +3,7 @@ defmodule Kamansky.Sales.Listings.Listing do
   @timestamps_opts [type: :utc_datetime]
 
   import Ecto.Changeset
+  import Ecto.Query, warn: false
 
   alias __MODULE__
   alias Kamansky.Stamps.Stamp
@@ -35,6 +36,12 @@ defmodule Kamansky.Sales.Listings.Listing do
     listing
     |> cast(attrs, [:hipstamp, :listing_price, :order_id, :sale_price])
     |> validate_required([])
+  end
+
+  @spec display_column_for_sorting(integer) :: atom
+  def display_column_for_sorting(column) do
+    [[asc: dynamic([l, s], s.scott_number), asc: dynamic([l], l.id)], :ordered_at]
+    |> Enum.at(column)
   end
 
   @spec hipstamp_changeset(Listing.t, map) :: Ecto.Changeset.t
