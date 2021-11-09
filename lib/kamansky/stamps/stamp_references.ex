@@ -86,7 +86,7 @@ defmodule Kamansky.Stamps.StampReferences do
                 ^get_value_for_ecto_enum(Stamp, :status, :sold),
                 sr.scott_number
               ),
-            median_sale_price: fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?)", l.listing_price),
+            median_sale_price: fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?) AS median_sale_price", l.listing_price),
             scott_number: sr.scott_number,
             total_profit: sum(l.sale_price - s.cost - s.purchase_fees),
             total_sold: count(l.id)
@@ -113,6 +113,7 @@ defmodule Kamansky.Stamps.StampReferences do
   def sort(query, %{column: 2, direction: direction}) do
     order_by(query, [sr, ..., l], [{^direction, fragment("conversion_percentage")}, desc: count(l.id), asc: :scott_number])
   end
+  def sort(query, %{column: 3, direction: direction}), do: order_by(query, [sr], [{^direction, fragment("median_sale_price")}])
   def sort(query, %{column: 4, direction: direction}), do: order_by(query, [sr, s, l], {^direction, sum(l.sale_price - s.cost - s.purchase_fees)})
 
   @spec update_stamp_reference(StampReference.t, map) :: {:ok, StampReference.t} | {:error, Ecto.Changeset.t}

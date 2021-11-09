@@ -1,4 +1,5 @@
 <section>
+  <KamanskyWeb.Components.Page.page_header page_title={@page_title} />
   <.live_component module={KamanskyWeb.Components.DataTable}
     id="trends-scott_number-kamansky-data-table"
     let={stamp}
@@ -23,7 +24,6 @@
           sort: %{column: 1, direction: :desc}
         ]
       }
-    title={@page_title}
   >
     <td><%= stamp.scott_number %></td>
     <td><%= stamp.total_sold %></td>

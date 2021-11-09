@@ -16,6 +16,7 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
         socket
         |> assign(assigns)
         |> assign(:changeset, Listings.change_listing(listing))
+        |> assign(:listing, listing)
         |> assign(:pending_orders, Orders.list_pending_orders_to_add_listing())
       }
     end

@@ -66,6 +66,7 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
         :noreply,
         socket
         |> assign(:button_text, "Create Order")
+        |> assign(:customer, customer)
         |> assign(:changeset, Orders.change_new_order(order))
         |> assign(:order, order)
         |> assign(:order_step, 2)
@@ -80,7 +81,9 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
     |> Map.put("customer_id", socket.assigns.customer.id)
     |> Orders.create_order()
     |> case do
-      {:ok, %{id: order_id}} -> send self(), {:order_added, order_id}
+      {:ok, %{id: order_id}} ->
+        send self(), {:order_added, order_id}
+        {:noreply, socket}
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
