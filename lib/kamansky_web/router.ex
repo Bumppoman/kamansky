@@ -92,7 +92,7 @@ defmodule KamanskyWeb.Router do
 
     scope "/" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: KamanskyWeb.Telemetry
+      live_dashboard "/phx_dashboard", metrics: KamanskyWeb.Telemetry
     end
   end
 

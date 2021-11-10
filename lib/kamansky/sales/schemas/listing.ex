@@ -38,9 +38,9 @@ defmodule Kamansky.Sales.Listings.Listing do
     |> validate_required([])
   end
 
-  @spec display_column_for_sorting(integer) :: atom
+  @spec display_column_for_sorting(integer) :: atom | keyword
   def display_column_for_sorting(column) do
-    [[asc: dynamic([l, s], s.scott_number), asc: dynamic([l], l.id)], :ordered_at]
+    [[dynamic([l, s], s.scott_number), {:asc, dynamic([l], l.id)}]]
     |> Enum.at(column)
   end
 

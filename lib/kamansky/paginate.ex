@@ -71,15 +71,9 @@ defmodule Kamansky.Paginate do
     end)
   end
 
-  @spec find_row_number(Ecto.Queryable.t, atom, params) :: integer
+  @spec find_row_number(Ecto.Queryable.t, atom | list, params) :: integer
   def find_row_number(query, sort_column, options) do
-    with(
-      query_column <-
-        if is_list(sort_column) do
-          sort_column
-        else
-          [{options[:sort][:direction], dynamic([q], field(q, ^sort_column))}]
-        end,
+    with query_column <- make_query_column(sort_column, options[:sort][:direction]),
       record_query <-
         query
         |> windows([q], [row: [order_by: ^query_column]])
@@ -93,7 +87,7 @@ defmodule Kamansky.Paginate do
             )
           }
         )
-    ) do
+    do
       from(rq in subquery(record_query))
       |> where(id: ^(if is_binary(options[:record_id]), do: String.to_integer(options[:record_id]), else: options[:record_id]))
       |> select([rq], rq.row_number)
@@ -130,6 +124,10 @@ defmodule Kamansky.Paginate do
     |> implementation.sort(sort)
     |> limit_for_data_table(params)
   end
+
+  @spec make_query_column(atom | list, :asc | :desc) :: keyword
+  defp make_query_column(sort_column, direction) when is_list(sort_column), do: Enum.map(sort_column, &(if is_tuple(&1), do: &1, else: {direction, &1}))
+  defp make_query_column(sort_column, direction), do: [{direction, dynamic([q], field(q, ^sort_column))}]
 
   @spec records(atom, Ecto.Queryable.t, params) :: [any]
   defp records(implementation, query, params) do

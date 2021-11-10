@@ -8,18 +8,7 @@ defmodule KamanskyWeb.Components.Page do
       class="action-icon"
       title={@title}
       x-data
-      x-on:click=
-      {
-        "$dispatch(
-          'kamansky:openConfirmationModal',
-          {
-            action: '#{@action}',
-            content: '#{@content}',
-            title: '#{@title}',
-            values: [#{Enum.map_join(@values, ",", &("{key:'#{elem(&1, 0)}',value:'#{elem(&1, 1)}'}"))}]
-          }
-        )"
-      }
+      x-on:click={confirmation_dispatch(@action, @content, @title, @values)}
     >
       <%= render_slot(@inner_block) %>
     </a>
@@ -70,27 +59,7 @@ defmodule KamanskyWeb.Components.Page do
         <%= if Map.has_key?(assigns, :buttons) do %>
           <div class="mt-5 flex lg:mt-0 lg:ml-4">
             <%= for button <- @buttons, Map.get(button, :display, true) do %>
-              <button
-                type="button"
-                class={"
-                  inline-flex
-                  items-center
-                  ml-3
-                  px-4
-                  py-2
-                  border
-                  rounded-md
-                  shadow-sm
-                  text-sm
-                  font-medium
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-offset-2
-                  focus:ring-indigo-500" <> button_color(Map.get(button, :color, :blue))}
-                {button.options}
-              >
-                <%= button.title %>
-              </button>
+              <.header_button {button} />
             <% end %>
           </div>
         <% end %>
@@ -99,6 +68,74 @@ defmodule KamanskyWeb.Components.Page do
     """
   end
 
+  @spec button_color(atom) :: String.t
   defp button_color(:blue), do: " bg-indigo-600 border-transparent text-white hover:bg-indigo-700"
   defp button_color(:gray), do: " bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+  defp button_color(:secondary), do: " bg-indigo-100 border-transparent text-indigo-700 hover:bg-indigo-200"
+
+  defp header_button(%{with_confirmation: true} = assigns) do
+    ~H"""
+    <button
+      type="button"
+      class={"
+        inline-flex
+        items-center
+        ml-3
+        px-4
+        py-2
+        border
+        rounded-md
+        shadow-sm
+        text-sm
+        font-medium
+        focus:outline-none
+        focus:ring-2
+        focus:ring-offset-2
+        focus:ring-indigo-500" <> button_color(Map.get(assigns, :color, :blue))}
+      x-data
+      x-on:click={confirmation_dispatch(@options.confirmation.action, @options.confirmation.content, @title, @options.confirmation.values)}
+    >
+      <%= @title %>
+    </button>
+    """
+  end
+
+  defp header_button(assigns) do
+    ~H"""
+    <button
+      type="button"
+      class={"
+        inline-flex
+        items-center
+        ml-3
+        px-4
+        py-2
+        border
+        rounded-md
+        shadow-sm
+        text-sm
+        font-medium
+        focus:outline-none
+        focus:ring-2
+        focus:ring-offset-2
+        focus:ring-indigo-500" <> button_color(Map.get(assigns, :color, :blue))}
+      { @options }
+    >
+      <%= @title %>
+    </button>
+    """
+  end
+
+  @spec confirmation_dispatch(String.t, String.t, String.t, [{String.t, String.t}]) :: String.t
+  defp confirmation_dispatch(action, content, title, values) do
+    "$dispatch(
+      'kamansky:openConfirmationModal',
+      {
+        action: '#{action}',
+        content: '#{content}',
+        title: '#{title}',
+        values: [#{Enum.map_join(values, ",", &("{key:'#{elem(&1, 0)}',value:'#{elem(&1, 1)}'}"))}]
+      }
+    )"
+  end
 end

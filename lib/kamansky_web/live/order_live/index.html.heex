@@ -11,6 +11,19 @@
           title: "Load New Orders"
         },
         %{
+          color: :secondary,
+          display: @live_action == :processed,
+          options: %{
+            confirmation: %{
+              action: "mark_all_processed_shipped",
+              content: "Are you sure you want to mark all processed orders as shipped?",
+              values: []
+            }
+          },
+          title: "Mark All as Shipped",
+          with_confirmation: true
+        },
+        %{
           display: @live_action == :pending,
           options: %{
             "phx-click": "open",

@@ -10,9 +10,18 @@ defmodule KamanskyWeb.OrderLive.Index do
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("load_new_orders", _value, socket) do
-    with :ok <- Hipstamp.Order.load_new_orders() do
-      send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: []
+    with :ok <- Hipstamp.Order.load_new_orders(),
+      :ok <- refresh_datatable()
+    do
       {:noreply, socket}
+    end
+  end
+
+  def handle_event("mark_all_processed_shipped", _value, socket) do
+    with orders <- Orders.list_orders(status: :processed),
+      :ok <- Enum.each(orders, &mark_order_shipped/1)
+    do
+      close_modal_with_success(socket, :confirmation, "You have successfully marked these orders as shipped.")
     end
   end
 
@@ -21,7 +30,7 @@ defmodule KamanskyWeb.OrderLive.Index do
     |> Orders.get_order!()
     |> Orders.mark_order_as_completed()
     |> case do
-      {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as completed.")
+      {:ok, _order} -> close_modal_with_success(socket, :confirmation, "You have successfully marked this order as completed.")
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
@@ -31,28 +40,23 @@ defmodule KamanskyWeb.OrderLive.Index do
     |> Orders.get_order!()
     |> Orders.mark_order_as_processed()
     |> case do
-      {:ok, _order} -> order_successfully_advanced(socket, "You have successfully marked this order as processsed.")
+      {:ok, _order} -> close_modal_with_success(socket, :confirmation, "You have successfully marked this order as processsed.")
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
 
   def handle_event("mark_shipped", %{"order-id" => order_id}, socket) do
-    with(
-      order <- Orders.get_order!(order_id),
-      {:ok, _order} <-
-        case order do
-          o when not is_nil(o.hipstamp_id) -> Hipstamp.Order.mark_shipped(order)
-          _ -> Orders.mark_order_as_shipped(order)
-        end
-    ) do
-      order_successfully_advanced(socket, "You have successfully marked this order as shipped.")
+    with order <- Orders.get_order!(order_id),
+      {:ok, _order} <- mark_order_shipped(order)
+    do
+      close_modal_with_success(socket, :confirmation, "You have successfully marked this order as shipped.")
     end
   end
 
   @impl true
   @spec handle_info({atom, any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_info({:order_added, order_id}, socket), do: update_datatable(socket, "You have successfully added this order.", order_id)
-  def handle_info({:order_updated, order_id}, socket), do: update_datatable(socket, "You have successfully updated this order.", order_id)
+  def handle_info({:order_added, order_id}, socket), do: close_modal_with_success(socket, :form, "You have successfully added this order.", order_id)
+  def handle_info({:order_updated, order_id}, socket), do: close_modal_with_success(socket, :form, "You have successfully updated this order.", order_id)
   def handle_info({:update_new_order_step, %{step: 2, customer: customer}}, socket) do
     {
       :noreply,
@@ -76,27 +80,26 @@ defmodule KamanskyWeb.OrderLive.Index do
     }
   end
 
-  @spec order_successfully_advanced(Phoenix.LiveView.Socket.t, String.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  defp order_successfully_advanced(socket, message) do
-    send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: [go_to_record: nil]
+  @spec mark_order_shipped(Order.t) :: {:ok, Order.t}
+  defp mark_order_shipped(%Order{hipstamp_id: hipstamp_id} = order) when not is_nil(hipstamp_id), do: Hipstamp.Order.mark_shipped(order)
+  defp mark_order_shipped(%Order{} = order), do: Orders.mark_order_as_shipped(order)
 
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeConfirmationModal", %{})
-      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
-    }
+  @spec close_modal_with_success(Phoenix.LiveView.Socket.t, :confirmation | :form, String.t, pos_integer | nil) :: {:noreply, Phoenix.LiveView.Socket.t}
+  defp close_modal_with_success(socket, modal, message, order_id \\ nil) do
+    with _ <- refresh_datatable([go_to_record: order_id]) do
+      {
+        :noreply,
+        socket
+        |> push_event(modal_event(modal), %{})
+        |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
+      }
+    end
   end
 
-  @spec update_datatable(Phoenix.LiveView.Socket.t, String.t, pos_integer) :: {:noreply, Phoenix.LiveView.Socket.t}
-  defp update_datatable(socket, message, order_id) do
-    send_update KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: [go_to_record: order_id]
+  @spec modal_event(:confirmation | :form) :: String.t
+  defp modal_event(:confirmation), do: "kamansky:closeConfirmationModal"
+  defp modal_event(:form), do: "kamansky:closeModal"
 
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
-    }
-  end
+  @spec refresh_datatable(list) :: any
+  defp refresh_datatable(options \\ []), do: send_update(KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: options)
 end
