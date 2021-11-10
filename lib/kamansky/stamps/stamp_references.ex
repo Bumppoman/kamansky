@@ -1,8 +1,15 @@
 defmodule Kamansky.Stamps.StampReferences do
-  use Kamansky.Paginate
-
   import Ecto.Query, warn: false
   import Kamansky.Helpers, only: [get_value_for_ecto_enum: 3]
+
+  @sort_columns [
+    :scott_number,
+    [quote(do: dynamic([sr, ..., l], count(l.id)))],
+    [quote(do: dynamic([sr], fragment("conversion_percentage"))), {:desc, quote(do: dynamic([sr, ..., l], count(l.id)))}, {:asc, :scott_number}],
+    [quote(do: dynamic([sr], fragment("median_sale_price")))],
+    [quote(do: dynamic([sr, s, l], sum(l.sale_price - s.cost - s.purchase_fees)))]
+  ]
+  use Kamansky.Paginate
 
   alias __MODULE__
   alias Kamansky.Repo
@@ -105,16 +112,6 @@ defmodule Kamansky.Stamps.StampReferences do
     |> where([s], ilike(s.scott_number, ^"#{search}%"))
     |> or_where([s], ilike(s.title, ^"%#{search}%"))
   end
-
-  @impl true
-  @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
-  def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :scott_number})
-  def sort(query, %{column: 1, direction: direction}), do: order_by(query, [sr, s, l], {^direction, count(l.id)})
-  def sort(query, %{column: 2, direction: direction}) do
-    order_by(query, [sr, ..., l], [{^direction, fragment("conversion_percentage")}, desc: count(l.id), asc: :scott_number])
-  end
-  def sort(query, %{column: 3, direction: direction}), do: order_by(query, [sr], [{^direction, fragment("median_sale_price")}])
-  def sort(query, %{column: 4, direction: direction}), do: order_by(query, [sr, s, l], {^direction, sum(l.sale_price - s.cost - s.purchase_fees)})
 
   @spec update_stamp_reference(StampReference.t, map) :: {:ok, StampReference.t} | {:error, Ecto.Changeset.t}
   def update_stamp_reference(%StampReference{} = stamp_reference, attrs) do

@@ -72,7 +72,7 @@
               <% end %>
             </tbody>
             <%= if @total_items > 0 do %>
-              <tfoot class={if @total_pages == 1, do: "hidden sm:block", else: ""}>
+              <tfoot class={if @total_pages == 1, do: "hidden sm:table-footer-group", else: ""}>
                 <tr>
                   <td colspan={Enum.count(@headers)}>
                     <div class="bg-white px-4 flex items-center justify-between sm:px-6">

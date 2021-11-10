@@ -1,4 +1,5 @@
 defmodule Kamansky.Operations.Expenses do
+  @sort_columns [:date]
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
@@ -39,10 +40,6 @@ defmodule Kamansky.Operations.Expenses do
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
   def search_query(query, search), do: where(query, [e], ilike(e.description, ^"%#{search}%"))
-
-  @impl true
-  @spec sort(Ecto.Queryable.t, Paginate.sort) :: Ecto.Query.t
-  def sort(query, %{column: 0, direction: direction}), do: order_by(query, {^direction, :date})
 
   @spec update_expense(Expense.t, map) :: {:ok, Expense.t} | {:error, Ecto.Changeset.t}
   def update_expense(%Expense{} = expense, attrs) do

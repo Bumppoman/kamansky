@@ -1,8 +1,13 @@
 defmodule Kamansky.Stamps do
-  use Kamansky.Paginate
-
   import Ecto.Query, warn: false
   import Kamansky.Helpers, only: [filter_query_for_month: 2]
+
+  @sort_columns [
+    [:scott_number, {:asc, :id}],
+    [nulls_last: :grade, asc: :id],
+    [quote(do: dynamic([s], s.cost + s.purchase_fees)), {:asc, :id}]
+  ]
+  use Kamansky.Paginate
 
   alias __MODULE__
   alias Kamansky.Repo
@@ -226,18 +231,6 @@ defmodule Kamansky.Stamps do
       )
       |> Repo.update()
     end
-  end
-
-  @impl true
-  @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
-  def sort(query, %{column: 0, direction: direction}), do: order_by(query, [{^direction, :scott_number}, asc: :id])
-
-  def sort(query, %{column: 1, direction: direction}) do
-    order_by(query, [{^String.to_existing_atom(Atom.to_string(direction) <> "_nulls_last"), :grade}, asc: :id])
-  end
-
-  def sort(query, %{column: 2, direction: direction}) do
-    order_by(query, [s], [{^direction, s.cost + s.purchase_fees}, asc: :id])
   end
 
   @spec update_stamp(

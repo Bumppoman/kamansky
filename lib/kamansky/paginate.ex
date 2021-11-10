@@ -26,7 +26,9 @@ defmodule Kamansky.Paginate do
   }
 
   defmacro __using__(opts \\ []) do
-    quote do
+    quote bind_quoted: [opts: opts] do
+      import Ecto.Query, warn: false
+
       alias Kamansky.Paginate
 
       @behaviour Paginate
@@ -43,7 +45,19 @@ defmodule Kamansky.Paginate do
       @impl true
       def primary_key, do: unquote(Keyword.get(opts, :primary_key, :id))
 
-      defoverridable exclude_from_count: 1
+      if Module.has_attribute?(__MODULE__, :sort_columns) do
+        @sort_columns
+        |> Enum.with_index()
+        |> Enum.each(fn {column, index} ->
+          @impl true
+          def sort(query, %{column: unquote(index), direction: direction}), do: order_by(query, ^Paginate.make_query_column(unquote(column), direction))
+        end)
+      else
+        @impl true
+        def sort(_, _), do: raise "You must implement the sort function or define @sort_columns"
+      end
+
+      defoverridable exclude_from_count: 1, sort: 2
     end
   end
 
@@ -118,6 +132,12 @@ defmodule Kamansky.Paginate do
     end
   end
 
+  @spec make_query_column(atom | list, :asc | :desc) :: keyword
+  def make_query_column(sort_column, direction) when is_list(sort_column) do
+    Enum.map(sort_column, &(sort_direction(direction, &1)))
+  end
+  def make_query_column(sort_column, direction), do: [{direction, dynamic([q], field(q, ^sort_column))}]
+
   @spec sort_and_limit(atom, Ecto.Queryable.t, params) :: Ecto.Query.t
   def sort_and_limit(implementation, query, %{sort: sort} = params) do
     query
@@ -125,14 +145,20 @@ defmodule Kamansky.Paginate do
     |> limit_for_data_table(params)
   end
 
-  @spec make_query_column(atom | list, :asc | :desc) :: keyword
-  defp make_query_column(sort_column, direction) when is_list(sort_column), do: Enum.map(sort_column, &(if is_tuple(&1), do: &1, else: {direction, &1}))
-  defp make_query_column(sort_column, direction), do: [{direction, dynamic([q], field(q, ^sort_column))}]
-
   @spec records(atom, Ecto.Queryable.t, params) :: [any]
   defp records(implementation, query, params) do
     implementation
     |> sort_and_limit(query, params)
     |> Repo.all()
   end
+
+  @spec sort_direction(:asc | :desc, {atom, atom} | atom) :: {atom, atom}
+  defp sort_direction(desired_direction, {:nulls_first, column}) do
+    {String.to_existing_atom(Atom.to_string(desired_direction) <> "_nulls_first"), column}
+  end
+  defp sort_direction(desired_direction, {:nulls_last, column}) do
+    {String.to_existing_atom(Atom.to_string(desired_direction) <> "_nulls_last"), column}
+  end
+  defp sort_direction(_desired_direction, {direction, column}), do: {direction, column}
+  defp sort_direction(desired_direction, column), do: {desired_direction, column}
 end
