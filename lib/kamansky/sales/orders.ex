@@ -131,6 +131,7 @@ defmodule Kamansky.Sales.Orders do
   def list_orders_for_customer(customer_id, params) do
     Order
     |> where(customer_id: ^customer_id)
+    |> join(:left, [o], c in assoc(o, :customer))
     |> then(&Paginate.list(Orders, &1, params))
   end
 
