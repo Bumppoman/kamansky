@@ -43,6 +43,7 @@
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales ($)</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost ($)</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Ratio</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% of Total Sales</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% of Total Listings</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion</th>
@@ -55,6 +56,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= era %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.total_sales_income) %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.total_cost) %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.profit_ratio %>%</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.percentage_of_total_sales %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.percentage_of_total_listings %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.conversion_percentage %>%</td>

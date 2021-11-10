@@ -36,7 +36,12 @@ defmodule Kamansky.Operations.Trends do
               )
             )
           )
-          |> Repo.one()
+          |> Repo.one(),
+        total_cost <-
+          era_sold_listings_query
+          |> select([l, s], sum(s.cost + s.purchase_fees))
+          |> Repo.one(),
+        total_sales_income <- Repo.aggregate(era_sold_listings_query, :sum, :sale_price)
       ) do
         {
           era.name,
@@ -45,11 +50,9 @@ defmodule Kamansky.Operations.Trends do
             conversion_percentage: conversion_percentage(era_total_sold, total_listings),
             percentage_of_total_listings: round((era_total_listings / total_listings) * 100),
             percentage_of_total_sales: round((era_total_sold / total_sold) * 100),
-            total_cost:
-              era_sold_listings_query
-              |> select([l, s], sum(s.cost + s.purchase_fees))
-              |> Repo.one(),
-            total_sales_income: Repo.aggregate(era_sold_listings_query, :sum, :sale_price)
+            profit_ratio: profit_ratio(total_sales_income, total_cost),
+            total_cost: total_cost,
+            total_sales_income: total_sales_income
           }
         }
       end
@@ -65,4 +68,13 @@ defmodule Kamansky.Operations.Trends do
     round((era_total_sold / total_listings) * 100)
   end
   defp conversion_percentage(_, _), do: 0
+
+  @spec profit_ratio(any, any) :: Decimal.t
+  defp profit_ratio(%Decimal{} = total_sales_income, %Decimal{} = total_cost) do
+    Decimal.sub(total_sales_income, total_cost)
+    |> Decimal.div(total_sales_income)
+    |> Decimal.mult(100)
+    |> Decimal.round(2)
+  end
+  defp profit_ratio(_, _), do: 0
 end
