@@ -1,0 +1,89 @@
+<section>
+  <KamanskyWeb.Components.Page.page_header page_title={@page_title} />
+  <.live_component module={KamanskyWeb.Components.DataTable}
+    id="bid-listings-kamansky-data-table"
+    let={listing}
+    data_count={@data_count}
+    data_locator={@data_locator}
+    data_source={@data_source}
+    empty_message="There are no listings to display."
+    headers=
+    {
+      [
+        "Scott Number",
+        "Inventory Key",
+        "Grade",
+        "Price",
+        "Listing Date",
+        %{text: "Actions", sort: :disabled}
+      ]
+    }
+    options=
+    {
+      [
+        go_to_record: Map.get(assigns, :go_to_record),
+        sort: 0
+      ]
+    }
+    parent_action={:bid}
+    title="Listings with eBay Bids"
+  >
+    <td>
+      <a
+        class="action-icon"
+        phx-click="open"
+        phx-target="#stamp-detail-modal"
+        phx-value-stamp-id={listing.stamp.id}
+      >
+        <%= listing.stamp.scott_number %>
+      </a>
+    </td>
+    <td>#<%= listing.stamp.inventory_key %></td>
+    <td>
+      <span><%= Stamp.formatted_grade(listing.stamp) %></span>
+      <%= if Stamp.flaws?(listing.stamp) do %>
+        <sup class="fs-6">
+          <a
+            tabindex="0"
+            title="Flaws"
+          >*</a>
+        </sup>
+      <% end %>
+    </td>
+    <td><%= format_decimal_as_currency(listing.listing_price) %></td>
+    <td><%= formatted_date(listing.inserted_at) %></td>
+    <td>
+      <a
+        class="action-icon"
+        title="Add Listing to Order"
+        phx-click="open"
+        phx-target="#listing-add-to-order-form-modal"
+        phx-value-listing-id={listing.id}
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          class="h-5 w-5" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            stroke-width="2" 
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" 
+          />
+        </svg>
+      </a>
+    </td>
+  </.live_component>
+  <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
+</section>
+<%= live_modal KamanskyWeb.ListingLive.AddToOrderFormComponent,
+  id: "listing-add-to-order-form-modal",
+  form_id: "listing-add-to-order-form"
+%>
+<%= live_modal KamanskyWeb.StampLive.DetailComponent,
+  id: "stamp-detail-modal",
+  footer: false 
+%>
