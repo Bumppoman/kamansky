@@ -15,10 +15,12 @@ defmodule Kamansky.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Kamansky.PubSub},
       # Start the Endpoint (http/https)
-      KamanskyWeb.Endpoint
+      KamanskyWeb.Endpoint,
       # Start a worker by calling: Kamansky.Worker.start_link(arg)
       # {Kamansky.Worker, arg}
     ]
+
+    children = children ++ (if Application.get_env(:kamansky, :env) == :prod, do: [Kamansky.Jobs.MonitorListings], else: [])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

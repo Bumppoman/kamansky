@@ -59,4 +59,17 @@ defmodule Kamansky.Services.Hipstamp.Listing do
 
     :ok
   end
+
+  @spec maybe_remove_listing(Listing.t) :: :ok | {:error, Ecto.Changeset.t} | {:ok, Listing.t}
+  def maybe_remove_listing(%Listing{hipstamp_id: hipstamp_id} = listing) when not is_nil(hipstamp_id) do
+    remove_listing(listing)
+    Listings.remove_hipstamp_id_from_listing(listing)
+  end
+  def maybe_remove_listing(%Listing{} = _listing), do: :ok
+
+  @spec remove_listing(Listing.t) :: :ok
+  def remove_listing(%Listing{} = listing) do
+    Hipstamp.delete!("/listings/" <> listing.hipstamp_id)
+    :ok
+  end
 end

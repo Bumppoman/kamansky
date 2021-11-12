@@ -52,7 +52,8 @@ defmodule Kamansky.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:tesla, "~> 1.4.3"},
       {:hackney, "~> 1.17.0"},
-      {:tzdata, "~> 1.1"}
+      {:tzdata, "~> 1.1"},
+      {:sweet_xml, "~> 0.7.1"}
     ]
   end
 

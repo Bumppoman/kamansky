@@ -19,6 +19,13 @@ config :kamansky, KamanskyWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
+  https: [
+    ip: {127, 0, 0, 1},
+    port: 4001,
+    cipher_suite: :strong,
+    certfile: "priv/cert/selfsigned.pem",
+    keyfile: "priv/cert/selfsigned_key.pem"
+  ],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -79,5 +86,7 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :kamansky, :env, :dev
 
 import_config "dev.secret.exs"

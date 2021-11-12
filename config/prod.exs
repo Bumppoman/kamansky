@@ -56,3 +56,5 @@ config :logger, level: :info
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
 config :tzdata, :data_dir, "/etc/elixir_tzdata_data"
+
+config :kamansky, :env, :prod

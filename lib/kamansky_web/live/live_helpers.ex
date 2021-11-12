@@ -53,7 +53,7 @@ defmodule KamanskyWeb.LiveHelpers do
     ]
   end
 
-  def live_navbar_admin_links(%Phoenix.LiveView.Socket{view: view} = socket, live_action) do
+  def live_navbar_admin_links(%Phoenix.LiveView.Socket{view: view} = socket, _live_action) do
     [
       %{
         title: "Customers",

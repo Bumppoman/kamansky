@@ -1,6 +1,14 @@
 defmodule Kamansky.Operations.Accounts.User do
   use Ecto.Schema
+
   import Ecto.Changeset
+
+  alias __MODULE__
+
+  @type t :: Ecto.Schema.t | %User{
+    email: String.t,
+    ebay_token: String.t
+  }
 
   schema "users" do
     field :email, :string
@@ -8,6 +16,7 @@ defmodule Kamansky.Operations.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :initials, :string
+    field :ebay_token, :string
 
     timestamps()
   end
@@ -29,6 +38,7 @@ defmodule Kamansky.Operations.Accounts.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
+  @spec registration_changeset(t, map, list) :: Ecto.Changeset.t
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password])
@@ -137,5 +147,9 @@ defmodule Kamansky.Operations.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  def ebay_token_changeset(user, attrs) do
+    cast(user, attrs, [:ebay_token])
   end
 end

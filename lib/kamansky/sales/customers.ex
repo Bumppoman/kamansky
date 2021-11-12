@@ -43,6 +43,19 @@ defmodule Kamansky.Sales.Customers do
     |> Repo.insert_or_update()
   end
 
+  @spec insert_or_update_ebay_customer(map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
+  def insert_or_update_ebay_customer(attrs) do
+    Customer
+    |> where(ebay_id: ^attrs[:ebay_id])
+    |> Repo.one()
+    |> case do
+      %Customer{} = customer -> customer
+      nil -> %Customer{}
+    end
+    |> change_customer(attrs)
+    |> Repo.insert_or_update()
+  end
+
   @spec insert_or_update_hipstamp_customer(map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
   def insert_or_update_hipstamp_customer(attrs) do
     Customer

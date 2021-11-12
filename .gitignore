@@ -31,10 +31,12 @@ npm-debug.log
 # Since we are building assets from assets/,
 # we ignore priv/static. You may want to comment
 # this depending on your deployment strategy.
+/priv/cert/
 /priv/static/
 
 # Hard-coded secrets
 /config/dev.secret.exs
+/config/runtime.exs
 /config/releases.exs
 
 # Ignore lexer

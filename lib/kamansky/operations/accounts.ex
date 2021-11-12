@@ -347,4 +347,11 @@ defmodule Kamansky.Operations.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  @spec set_ebay_token(User.t, String.t) :: {:ok, User.t} | {:error, Ecto.Changeset.t}
+  def set_ebay_token(user, token) do
+    user
+    |> User.ebay_token_changeset(%{token: token})
+    |> Repo.update()
+  end
 end

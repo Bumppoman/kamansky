@@ -126,6 +126,8 @@ defmodule KamanskyWeb.Router do
   scope "/", KamanskyWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    get "/users/ebay_auth/auth_code", UserEbayAuthController, :auth_code
+    get "/users/ebay_auth/new", UserEbayAuthController, :new
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email

@@ -47,7 +47,10 @@ if config_env() == :prod do
   config :kamansky, :uploads_directory, "/data/kamansky"
   config :kamansky, :hipstamp_api_key, "hspr6aedf3b8b4e6848f780d75794292"
   config :kamansky, :hipstamp_username, "Bumppoman"
-
+  config :kamansky, :ebay_authorization_token, "AgAAAA**AQAAAA**aAAAAA**7jKMYQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wNkYeiDJaDowmdj6x9nY+seQ**KdgGAA**AAMAAA**QXOQtAT8gUgcLSfgBmn6bXG/h3gJWpIpGMKjzFA6vz23+7iqR4Lomt/Iv25RTvgbXkttS1b/CZSMpzrD0icXrdsqPVag+UHkRGrU+u8wOCpUy5TlU01DoeKhKL/+cny1XztxAINGztv4Jp3Kbm8v/w8wr3JA0iPV5CDcqhhq5b2MEcXfLwSvMDr7naId/PAZbgsacV0ZuW8ASrFBsyLs+RoBJY55IdMslnNqKLwIsQOsiI6OBIxaYsGA1CXMWVkXrbjbWUQn8VYsB0A287ODXXMyPBgiKcaW8q1x+KMXrQ7EArafLN3/QcOv1g05DPBMdvvP+xgzMLzqtDMkWhTux+LlpPaQftwjp0RUNa+rY9uzQbbB/h7ZMoGKnxcsakDH3jcI64+B3mbHmipdIILT/GXN1COMNyD8Fk3t6bfKE8aDURkfJ2Qhg9PHM69j48l1vVBtir7FSaQFfxH7XrS4WOleTBy42XlAMW2KgGEOSmZLSwlXr7k03zvoBUJxjaAwqafuHeADWUTXs+/5zCOL9wdYz8Miw5YxzPzHFutZ5m/d1o9Sj1UB1BNpXKDRtspIfOEhZkSeejOeINS7GTyZs7iFwCr0OWVVX5Nfk4/CMxl+FVy8BGlisLemre+xhIqX47K9w47YyoQqYGvpjKBQC6BwGLWFSiod++UEiBGvDcV5TpyjHJSRNjSOEOmAM4+YkO12JLb5byFqq6uXl1TTGDS0r+Qsp/+BAoR4mSa8DSlXqNEZ+KoQ5+0E6D/VXJMP"
+  config :kamansky, :ebay_client_id, "BrendonS-Kamansky-PRD-dddd5c0ce-8e82ef7d"
+  config :kamansky, :ebay_client_secret, "PRD-ddd5c0ce8fed-8fa1-47d6-9907-7f4e"
+  config :kamansky, :ebay_redirect_uri, "Brendon_Stanton-BrendonS-Kamans-shvxuces"
 
   # ## Configuring the mailer
   #

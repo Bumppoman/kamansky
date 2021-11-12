@@ -102,6 +102,13 @@ defmodule Kamansky.Sales.Orders do
     end
   end
 
+  @spec insert_or_update_order(Order.t, map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
+  def insert_or_update_order(order, attrs) do
+    order
+    |> Ecto.Changeset.change(attrs)
+    |> Repo.insert_or_update()
+  end
+
   @spec insert_or_update_hipstamp_order(Order.t, map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
   def insert_or_update_hipstamp_order(order, attrs) do
     order
@@ -188,13 +195,20 @@ defmodule Kamansky.Sales.Orders do
   end
 
   @spec most_recent_order(:hipstamp | :ebay) :: Order.t | nil
+  def most_recent_order(:ebay) do
+    Order
+    |> where([o], not is_nil(o.ebay_id))
+    |> order_by(desc: :ordered_at)
+    |> limit(1)
+    |> Repo.one()
+  end
+
   def most_recent_order(:hipstamp) do
     Order
     |> where([o], not is_nil(o.hipstamp_id))
     |> order_by(desc: :ordered_at)
     |> limit(1)
     |> Repo.one()
-
   end
 
   @doc false

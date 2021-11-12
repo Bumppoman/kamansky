@@ -14,7 +14,7 @@ defmodule Kamansky.Sales.Customers.Customer do
     zip: String.t,
     country: String.t,
     hipstamp_id: integer,
-    ebay_id: integer,
+    ebay_id: String.t,
     amount_spent_ytd: Decimal.t,
     most_recent_order_date: DateTime.t,
     orders: [Kamansky.Sales.Orders.Order.t]
@@ -29,7 +29,7 @@ defmodule Kamansky.Sales.Customers.Customer do
     field :zip, :string
     field :country, :string
     field :hipstamp_id, :integer
-    field :ebay_id, :integer
+    field :ebay_id, :string
 
     field :amount_spent_ytd, :decimal, virtual: true
     field :existing, :boolean, virtual: true, default: false
@@ -43,9 +43,9 @@ defmodule Kamansky.Sales.Customers.Customer do
     customer
     |> cast(attrs,
       [
-        :city, :country, :email, :existing,
-        :hipstamp_id, :name, :state, :street_address,
-        :zip
+        :city, :country, :ebay_id, :email,
+        :existing, :hipstamp_id, :name, :state,
+        :street_address, :zip
       ]
     )
   end

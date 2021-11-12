@@ -59,6 +59,15 @@ defmodule Kamansky.Sales.Listings do
   @spec get_listing!(integer) :: Listing.t
   def get_listing!(id), do: Repo.get!(Listing, id)
 
+  @spec get_listing_by_ebay_id(pos_integer) :: Listing.t
+  def get_listing_by_ebay_id(ebay_id) do
+    Listing
+    |> where(ebay_id: ^ebay_id)
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> preload([l, s], [stamp: s])
+    |> Repo.one()
+  end
+
   @spec get_listing_to_list(integer) :: Listing.t | nil
   def get_listing_to_list(id) do
     Listing
@@ -120,6 +129,13 @@ defmodule Kamansky.Sales.Listings do
       }
     end
     |> Enum.into(%{})
+  end
+
+  @spec remove_hipstamp_id_from_listing(Listing.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  def remove_hipstamp_id_from_listing(listing) do
+    listing
+    |> Ecto.Changeset.change(hipstamp_id: nil)
+    |> Repo.update()
   end
 
   @doc false
