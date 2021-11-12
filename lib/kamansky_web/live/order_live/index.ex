@@ -12,7 +12,7 @@ defmodule KamanskyWeb.OrderLive.Index do
   def handle_event("load_new_orders", _value, socket) do
     with :ok <- Hipstamp.Order.load_new_orders(),
       :ok <- Ebay.Order.load_new_orders(),
-      :ok <- refresh_datatable()
+      {:phoenix, :send_update, _update} <- refresh_datatable()
     do
       {:noreply, socket}
     end
