@@ -32,15 +32,21 @@ defmodule Kamansky.Jobs.MonitorListings do
   end
 
   defp work do
-    Ebay.Listing.list_active_listings_with_bids()
-    |> Enum.each(fn listing ->
-      listing.item_id
-      |> Listings.get_listing_by_ebay_id()
-      |> Hipstamp.Listing.maybe_remove_listing()
-      |> case do
-        {:ok, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: removed Hipstamp listing for listing #{listing.id}")
-        :ok -> :ok
-      end
+    Enum.each(
+      Ebay.Listing.list_active_listings_with_bids(),
+      fn listing ->
+        with listing <- Listings.get_listing_by_ebay_id(listing.item_id) do
+          if listing.status != :bid do
+            with {:ok, listing} <- Listings.mark_listing_bid(listing) do
+              listing
+              |> Hipstamp.Listing.maybe_remove_listing()
+              |> case do
+                {:ok, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: removed Hipstamp listing for listing #{listing.id}")
+                :ok -> :ok
+              end
+            end
+          end
+        end
     end)
   end
 end

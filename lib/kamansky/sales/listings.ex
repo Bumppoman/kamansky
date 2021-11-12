@@ -108,6 +108,13 @@ defmodule Kamansky.Sales.Listings do
     |> then(&Paginate.list(Listings, &1, params))
   end
 
+  @spec mark_listing_bid(Listing.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  def mark_listing_bid(%Listing{} = listing) do
+    listing
+    |> Ecto.Changeset.change(status: :bid)
+    |> Repo.update()
+  end
+
   @spec mark_listing_sold(Listing.t, [order_id: integer, sale_price: Decimal.t]) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def mark_listing_sold(%Listing{} = listing, order_id: order_id, sale_price: sale_price) do
     listing
