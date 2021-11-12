@@ -69,7 +69,7 @@ defmodule Kamansky.Services.Hipstamp.Listing do
 
   @spec remove_listing(Listing.t) :: :ok
   def remove_listing(%Listing{} = listing) do
-    Hipstamp.delete!("/listings/" <> listing.hipstamp_id)
+    Hipstamp.delete!("/listings/#{listing.hipstamp_id}")
     :ok
   end
 end
