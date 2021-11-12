@@ -5,11 +5,13 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
+  alias Kamansky.Services.{Ebay, Hipstamp}
 
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("load_new_orders", _value, socket) do
     with :ok <- Hipstamp.Order.load_new_orders(),
+      :ok <- Ebay.Order.load_new_orders(),
       :ok <- refresh_datatable()
     do
       {:noreply, socket}
