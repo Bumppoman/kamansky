@@ -20,8 +20,8 @@ defmodule KamanskyWeb.ListingLive.Active do
 
   @impl true
   @spec handle_info({:listing_added_to_order, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_info({:listing_added_to_order, listing_id}, socket) do
-    send_update KamanskyWeb.Components.DataTable, id: "listings-kamansky-data-table", options: [go_to_record: listing_id]
+  def handle_info({:listing_added_to_order, _listing_id}, socket) do
+    send_update KamanskyWeb.Components.DataTable, id: "listings-kamansky-data-table", options: []
     {:noreply, put_flash(socket, :info, %{message: "You have successfully added this listing to an order.", timestamp: Time.utc_now()})}
   end
 

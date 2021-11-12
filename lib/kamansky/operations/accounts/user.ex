@@ -7,6 +7,8 @@ defmodule Kamansky.Operations.Accounts.User do
 
   @type t :: Ecto.Schema.t | %User{
     email: String.t,
+    hashed_password: String.t,
+    initials: String.t,
     ebay_token: String.t
   }
 
@@ -17,6 +19,8 @@ defmodule Kamansky.Operations.Accounts.User do
     field :confirmed_at, :naive_datetime
     field :initials, :string
     field :ebay_token, :string
+
+    has_many :notifications, Kamansky.Operations.Accounts.Notification
 
     timestamps()
   end

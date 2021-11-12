@@ -5,7 +5,6 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
-  alias Kamansky.Services.Hipstamp
 
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -19,7 +18,7 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   def handle_event("mark_all_processed_shipped", _value, socket) do
     with orders <- Orders.list_orders(status: :processed),
-      :ok <- Enum.each(orders, &mark_order_shipped/1)
+      :ok <- Enum.each(orders, &Kamansky.Services.Order.mark_order_shipped/1)
     do
       close_modal_with_success(socket, :confirmation, "You have successfully marked these orders as shipped.")
     end
@@ -47,7 +46,7 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   def handle_event("mark_shipped", %{"order-id" => order_id}, socket) do
     with order <- Orders.get_order!(order_id),
-      {:ok, _order} <- mark_order_shipped(order)
+      {:ok, _order} <- Kamansky.Services.Order.mark_order_shipped(order)
     do
       close_modal_with_success(socket, :confirmation, "You have successfully marked this order as shipped.")
     end
@@ -79,10 +78,6 @@ defmodule KamanskyWeb.OrderLive.Index do
       |> assign(:page_title, String.capitalize(Atom.to_string(socket.assigns.live_action)) <> " Orders")
     }
   end
-
-  @spec mark_order_shipped(Order.t) :: {:ok, Order.t}
-  defp mark_order_shipped(%Order{hipstamp_id: hipstamp_id} = order) when not is_nil(hipstamp_id), do: Hipstamp.Order.mark_shipped(order)
-  defp mark_order_shipped(%Order{} = order), do: Orders.mark_order_as_shipped(order)
 
   @spec close_modal_with_success(Phoenix.LiveView.Socket.t, :confirmation | :form, String.t, pos_integer | nil) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp close_modal_with_success(socket, modal, message, order_id \\ nil) do

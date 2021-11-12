@@ -73,6 +73,19 @@ defmodule KamanskyWeb.Components.Page do
   defp button_color(:gray), do: " bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
   defp button_color(:secondary), do: " bg-indigo-100 border-transparent text-indigo-700 hover:bg-indigo-200"
 
+  @spec confirmation_dispatch(String.t, String.t, String.t, [{String.t, String.t}]) :: String.t
+  defp confirmation_dispatch(action, content, title, values) do
+    "$dispatch(
+      'kamansky:openConfirmationModal',
+      {
+        action: '#{action}',
+        content: '#{content}',
+        title: '#{title}',
+        values: [#{Enum.map_join(values, ",", &("{key:'#{elem(&1, 0)}',value:'#{elem(&1, 1)}'}"))}]
+      }
+    )"
+  end
+
   defp header_button(%{with_confirmation: true} = assigns) do
     ~H"""
     <button
@@ -124,18 +137,5 @@ defmodule KamanskyWeb.Components.Page do
       <%= @title %>
     </button>
     """
-  end
-
-  @spec confirmation_dispatch(String.t, String.t, String.t, [{String.t, String.t}]) :: String.t
-  defp confirmation_dispatch(action, content, title, values) do
-    "$dispatch(
-      'kamansky:openConfirmationModal',
-      {
-        action: '#{action}',
-        content: '#{content}',
-        title: '#{title}',
-        values: [#{Enum.map_join(values, ",", &("{key:'#{elem(&1, 0)}',value:'#{elem(&1, 1)}'}"))}]
-      }
-    )"
   end
 end

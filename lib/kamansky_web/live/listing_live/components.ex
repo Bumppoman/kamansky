@@ -3,6 +3,7 @@ defmodule KamanskyWeb.ListingLive.Components do
 
   alias KamanskyWeb.Router.Helpers, as: Routes
 
+  @spec tabs(map) :: Phoenix.LiveView.Rendered.t
   def tabs(assigns) do
     ~H"""
     <nav class="flex font-medium justify-center leading-6 mt-4">

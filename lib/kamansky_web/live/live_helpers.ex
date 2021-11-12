@@ -43,7 +43,7 @@ defmodule KamanskyWeb.LiveHelpers do
       %{
         title: "Listings",
         to: Routes.listing_active_path(socket, :index),
-        active: view == KamanskyWeb.ListingLive.Active or view == KamanskyWeb.ListingLive.Sold
+        active: view in [KamanskyWeb.ListingLive.Active, KamanskyWeb.ListingLive.Bid, KamanskyWeb.ListingLive.Sold]
       },
       %{
         title: "Orders",
@@ -53,6 +53,7 @@ defmodule KamanskyWeb.LiveHelpers do
     ]
   end
 
+  @spec live_navbar_admin_links(Phoenix.LiveView.Socket.t, atom) :: [map]
   def live_navbar_admin_links(%Phoenix.LiveView.Socket{view: view} = socket, _live_action) do
     [
       %{

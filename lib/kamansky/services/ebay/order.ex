@@ -1,3 +1,5 @@
+require Logger
+
 defmodule Kamansky.Services.Ebay.Order do
   import SweetXml
   import Kamansky.Helpers, only: [humanize_and_capitalize: 1]
@@ -10,43 +12,40 @@ defmodule Kamansky.Services.Ebay.Order do
 
   @spec all_pending(DateTime.t) :: list
   def all_pending(%DateTime{} = from_time) do
-    content =
-      """
-      <?xml version="1.0" encoding="utf-8"?>
-      <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-        #{Ebay.requester_credentials()}
-        <CreateTimeFrom>#{DateTime.to_iso8601(from_time)}</CreateTimeFrom>
-        <CreateTimeTo>#{DateTime.to_iso8601(DateTime.utc_now())}</CreateTimeTo>
-        <IncludeFinalValueFee>true</IncludeFinalValueFee>
-      </GetOrdersRequest>
-      """
-
-    with {:ok, response} <- Ebay.post("", content, headers: [{"X-EBAY-API-CALL-NAME", "GetOrders"}]) do
-      response.body
-      |> parse(dtd: :none)
-      |> xpath(~x"//Order"l,
-        ebay_order_id: ~x"./OrderID/text()"s,
-        ordered_at: ~x"CreatedTime/text()"s,
-        customer: [
-          ~x".",
-          ebay_user_id: ~x"./BuyerUserID/text()"s,
-          name: ~x"./ShippingAddress/Name/text()"s,
-          street_address_1: ~x"./ShippingAddress/Street1/text()"s,
-          street_address_2: ~x"./ShippingAddress/Street2/text()"s,
-          city: ~x"./ShippingAddress/CityName/text()"s,
-          state: ~x"./ShippingAddress/StateOrProvince/text()"s,
-          zip: ~x"./ShippingAddress/PostalCode/text()"s,
-          country: ~x"./ShippingAddress/Country/text()"s
-        ],
-        transactions: [
-          ~x".//Transaction"l,
-          ebay_item_id: ~x".//Item/ItemID/text()"s,
-          item_price: ~x"./TransactionPrice/text()"s,
-          selling_fees: ~x"./FinalValueFee/text()"s,
-          shipping_price: ~x"./ActualShippingCost/text()"s
-        ]
-      )
-    end
+    """
+    <?xml version="1.0" encoding="utf-8"?>
+    <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+      #{Ebay.requester_credentials()}
+      <CreateTimeFrom>#{DateTime.to_iso8601(from_time)}</CreateTimeFrom>
+      <CreateTimeTo>#{DateTime.to_iso8601(DateTime.utc_now())}</CreateTimeTo>
+      <IncludeFinalValueFee>true</IncludeFinalValueFee>
+    </GetOrdersRequest>
+    """
+    |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "GetOrders"}]))
+    |> Map.get(:body)
+    |> parse(dtd: :none)
+    |> xpath(~x"//Order"l,
+      ebay_order_id: ~x"./OrderID/text()"s,
+      ordered_at: ~x"CreatedTime/text()"s,
+      customer: [
+        ~x".",
+        ebay_user_id: ~x"./BuyerUserID/text()"s,
+        name: ~x"./ShippingAddress/Name/text()"s,
+        street_address_1: ~x"./ShippingAddress/Street1/text()"s,
+        street_address_2: ~x"./ShippingAddress/Street2/text()"s,
+        city: ~x"./ShippingAddress/CityName/text()"s,
+        state: ~x"./ShippingAddress/StateOrProvince/text()"s,
+        zip: ~x"./ShippingAddress/PostalCode/text()"s,
+        country: ~x"./ShippingAddress/Country/text()"s
+      ],
+      transactions: [
+        ~x".//Transaction"l,
+        ebay_item_id: ~x".//Item/ItemID/text()"s,
+        item_price: ~x"./TransactionPrice/text()"s,
+        selling_fees: ~x"./FinalValueFee/text()"s,
+        shipping_price: ~x"./ActualShippingCost/text()"s
+      ]
+    )
   end
 
   @spec load_new_orders :: :ok
@@ -105,6 +104,29 @@ defmodule Kamansky.Services.Ebay.Order do
           end
         end
       )
+    end
+  end
+
+  @spec mark_shipped(Order.t) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
+  def mark_shipped(order) do
+    """
+    <?xml version="1.0" encoding="utf-8"?>
+    <CompleteSaleRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+      #{Ebay.requester_credentials()}
+      <OrderID>#{order.ebay_id}</OrderID>
+      <Shipped>true</Shipped>
+    </CompleteSaleRequest>
+    """
+    |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "CompleteSale"}]))
+    |> Map.get(:body)
+    |> parse(dtd: :none)
+    |> xpath(~x"//CompleteSaleResponse",
+      errors: ~x".//Errors"l,
+      timestamp: ~x".//Timestamp/text()"s
+    )
+    |> case do
+      %{errors: []} -> Orders.mark_order_as_shipped(order)
+      %{errors: errors} -> {:error, errors}
     end
   end
 
