@@ -18,6 +18,7 @@ defmodule Kamansky.Application do
       KamanskyWeb.Endpoint,
       # Start a worker by calling: Kamansky.Worker.start_link(arg)
       # {Kamansky.Worker, arg}
+      Kamansky.Jobs.ManageSettings
     ]
 
     children = children ++ (if Application.get_env(:kamansky, :env) == :prod, do: [Kamansky.Jobs.MonitorListings], else: [])

@@ -23,6 +23,8 @@ defmodule KamanskyWeb.Router do
     live_session :default, on_mount: KamanskyWeb.InitAssigns do
       live "/", DashboardLive.Index, :index
 
+      live "/admin/settings", SettingsLive.Index, :index
+
       live "/customers", CustomerLive.Index, :index
       live "/customers/:id/edit", CustomerLive.Index, :edit
       live "/customers/:id/show", CustomerLive.Show, :show

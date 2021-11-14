@@ -1,6 +1,7 @@
 defmodule Kamansky.Services.Hipstamp.Order do
   import Kamansky.Helpers, only: [humanize_and_capitalize: 1]
 
+  alias Kamansky.Operations.Administration
   alias Kamansky.Sales.{Customers, Listings, Orders}
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.Hipstamp
@@ -81,8 +82,8 @@ defmodule Kamansky.Services.Hipstamp.Order do
               order,
               selling_fees: selling_fees,
               shipping_cost: Decimal.add(
-                Decimal.from_float(0.55),
-                Decimal.from_float(0.2 * Float.floor(Enum.count(listings) / 6))
+                Decimal.from_float(Administration.get_setting!(:shipping_cost)),
+                Decimal.from_float(Administration.get_setting!(:additional_ounce) * Float.floor(Enum.count(listings) / 6))
               )
             )
           end

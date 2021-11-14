@@ -77,6 +77,11 @@ defmodule KamanskyWeb.LiveHelpers do
         active: view == KamanskyWeb.ReportLive.Index
       },
       %{
+        title: "Settings",
+        to: Routes.settings_index_path(socket, :index),
+        active: view == KamanskyWeb.SettingsLive.Index
+      },
+      %{
         title: "Stamp References",
         to: Routes.stamp_reference_index_path(socket, :index),
         active: view == KamanskyWeb.StampReferenceLive.Index
