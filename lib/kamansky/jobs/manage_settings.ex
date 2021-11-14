@@ -23,8 +23,8 @@ defmodule Kamansky.Jobs.ManageSettings do
 
   @impl true
   @spec handle_call({:insert, any}, {pid, any}, any) :: {:reply, :ok, any}
-  def handle_call({:insert, {key, value}}, _ref, state) do
-    :ets.insert(@name, {key, value})
+  def handle_call({:insert, kv}, _ref, state) do
+    insert_into_table(kv)
     {:reply, :ok, state}
   end
 
@@ -58,13 +58,16 @@ defmodule Kamansky.Jobs.ManageSettings do
   def load_config do
     with {:ok, body} <- File.read(@config_file),
       {:ok, json} <- Jason.decode(body),
-      changes <- Enum.into(Enum.map(json, fn {key, value} -> {String.to_atom(key), value} end), %{})
+      changes <- Enum.into(Enum.map(json, fn {key, value} -> {String.to_atom(key), value} end), %{}),
+      changeset <- Administration.change_settings(%Settings{}, changes),
+      :ok <- Enum.each(changeset.changes, &insert_into_table/1)
     do
-      %Settings{}
-      |> Administration.change_settings(changes)
-      |> update()
+      Ecto.Changeset.apply_changes(changeset)
     end
   end
+
+  @spec insert_into_table({atom, any}) :: true
+  defp insert_into_table(kv), do: :ets.insert(@name, kv)
 
   @spec save_config :: :ok
   defp save_config do
