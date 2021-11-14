@@ -48,6 +48,38 @@
                   <div class="mt-2 text-xs">Base cost for each additional ounce</div>
                 </div>
               </div>
+              <div class="grid grid-cols-3 gap-5">
+                <div class="form-group">
+                  <%= label f, :hipstamp_percentage_fee, "Hipstamp percentage fee" %>
+                  <div class="form-input">
+                    <div class="form-input-prepend">
+                      <span>$</span>
+                    </div>
+                    <%= text_input f, :hipstamp_percentage_fee %>
+                  </div>
+                  <div class="mt-2 text-xs">Percentage of entire order charged by Hipstamp</div>
+                </div>
+                <div class="form-group">
+                  <%= label f, :paypal_percentage_fee, "PayPal percentage fee" %>
+                  <div class="form-input">
+                    <div class="form-input-prepend">
+                      <span>$</span>
+                    </div>
+                    <%= text_input f, :paypal_percentage_fee %>
+                  </div>
+                  <div class="mt-2 text-xs">Percentage of entire order charged by PayPal</div>
+                </div>
+                <div class="form-group">
+                  <%= label f, :paypal_flat_fee, "PayPal flat fee" %>
+                  <div class="form-input">
+                    <div class="form-input-prepend">
+                      <span>$</span>
+                    </div>
+                    <%= text_input f, :paypal_flat_fee %>
+                  </div>
+                  <div class="mt-2 text-xs">Flat fee on each order charged by PayPal</div>
+                </div>
+              </div>
             </div>
             <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
               <button type="submit" class="btn btn-blue">

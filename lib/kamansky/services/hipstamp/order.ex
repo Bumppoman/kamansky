@@ -41,7 +41,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
       |> Enum.reverse()
       |> Enum.each(
         fn(hipstamp_order) ->
-          with order <- Orders.get_or_initialize_order(hipstamp_id: String.to_integer(hipstamp_order["id"])),
+          with %Order{} = order <- Orders.initialize_order(hipstamp_id: String.to_integer(hipstamp_order["id"])),
             ordered_at <- parse_ordered_at(hipstamp_order["created_at"]),
             customer_name <-
               normalize_name(
@@ -82,8 +82,8 @@ defmodule Kamansky.Services.Hipstamp.Order do
               order,
               selling_fees: selling_fees,
               shipping_cost: Decimal.add(
-                Decimal.from_float(Administration.get_setting!(:shipping_cost)),
-                Decimal.from_float(Administration.get_setting!(:additional_ounce) * Float.floor(Enum.count(listings) / 6))
+                Decimal.new(Administration.get_setting!(:shipping_cost)),
+                Decimal.from_float(String.to_float(Administration.get_setting!(:additional_ounce)) * Float.floor(Enum.count(listings) / 6))
               )
             )
           end

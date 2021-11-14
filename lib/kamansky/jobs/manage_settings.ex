@@ -1,6 +1,7 @@
 defmodule Kamansky.Jobs.ManageSettings do
   use GenServer
 
+  alias Kamansky.Operations.Administration
   alias Kamansky.Operations.Administration.Settings
 
   @config_file "config/kamansky.json"
@@ -53,12 +54,15 @@ defmodule Kamansky.Jobs.ManageSettings do
     end
   end
 
-  @spec load_config :: :ok
-  defp load_config do
+  @spec load_config :: {:ok, Settings.t}
+  def load_config do
     with {:ok, body} <- File.read(@config_file),
-      {:ok, json} <- Jason.decode(body)
+      {:ok, json} <- Jason.decode(body),
+      changes <- Enum.into(Enum.map(json, fn {key, value} -> {String.to_atom(key), value} end), %{})
     do
-      Enum.each(json, fn {key, value} -> :ets.insert(@name, {String.to_atom(key), value}) end)
+      %Settings{}
+      |> Administration.change_settings(changes)
+      |> update()
     end
   end
 

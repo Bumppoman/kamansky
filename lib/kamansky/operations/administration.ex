@@ -5,7 +5,10 @@ defmodule Kamansky.Operations.Administration do
   def change_settings(%Settings{} = settings, attrs \\ %{}), do: Settings.changeset(settings, attrs)
 
   @spec get_setting!(atom) :: any
-  def get_setting!(setting), do: Kamansky.Jobs.ManageSettings.get_value(setting)
+  def get_setting!(setting), do: Map.get(list_settings(), setting)
+
+  @spec list_settings :: Settings.t
+  def list_settings, do: Kamansky.Jobs.ManageSettings.list_settings()
 
   @spec update_settings(Settings.t, map) :: {:ok, Settings.t} | {:error, Ecto.Changeset.t}
   def update_settings(%Settings{} = settings, attrs) do

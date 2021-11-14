@@ -102,6 +102,18 @@ defmodule Kamansky.Sales.Orders do
     end
   end
 
+  @spec initialize_order(keyword) :: Order.t | nil
+  def initialize_order(params) do
+    Order
+    |> where(^params)
+    |> limit(1)
+    |> Repo.one()
+    |> case do
+      %Order{} -> nil
+      nil -> struct(Order, params)
+    end
+  end
+
   @spec insert_or_update_order(Order.t, map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
   def insert_or_update_order(order, attrs) do
     order

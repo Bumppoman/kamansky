@@ -4,6 +4,7 @@ defmodule Kamansky.Services.Ebay.Order do
   import SweetXml
   import Kamansky.Helpers, only: [humanize_and_capitalize: 1]
 
+  alias Kamansky.Operations.Administration
   alias Kamansky.Sales.{Customers, Listings, Orders}
   alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Sales.Orders.Order
@@ -97,8 +98,8 @@ defmodule Kamansky.Services.Ebay.Order do
               order,
               selling_fees: Decimal.add(Decimal.new("0.30"), Enum.reduce(ebay_order.transactions, 0, &Decimal.add(Decimal.new(&1.selling_fees), &2))),
               shipping_cost: Decimal.add(
-                Decimal.from_float(0.55),
-                Decimal.from_float(0.2 * Float.floor(Enum.count(listings) / 6))
+                Decimal.from_float(Administration.get_setting!(:shipping_cost)),
+                Decimal.from_float(Administration.get_setting!(:additional_ounce) * Float.floor(Enum.count(listings) / 6))
               )
             )
           end
