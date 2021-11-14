@@ -82,8 +82,8 @@ defmodule Kamansky.Services.Hipstamp.Order do
               order,
               selling_fees: selling_fees,
               shipping_cost: Decimal.add(
-                Decimal.new(Administration.get_setting!(:shipping_cost)),
-                Decimal.from_float(String.to_float(Administration.get_setting!(:additional_ounce)) * Float.floor(Enum.count(listings) / 6))
+                Administration.get_setting!(:shipping_cost),
+                Decimal.from_float(Decimal.to_float(Administration.get_setting!(:additional_ounce)) * Float.floor(Enum.count(listings) / 6))
               )
             )
           end

@@ -54,20 +54,19 @@ defmodule Kamansky.Jobs.ManageSettings do
     end
   end
 
-  @spec load_config :: {:ok, Settings.t}
-  def load_config do
-    with {:ok, body} <- File.read(@config_file),
-      {:ok, json} <- Jason.decode(body),
-      changes <- Enum.into(Enum.map(json, fn {key, value} -> {String.to_atom(key), value} end), %{}),
-      changeset <- Administration.change_settings(%Settings{}, changes),
-      :ok <- Enum.each(changeset.changes, &insert_into_table/1)
-    do
-      Ecto.Changeset.apply_changes(changeset)
-    end
-  end
-
   @spec insert_into_table({atom, any}) :: true
   defp insert_into_table(kv), do: :ets.insert(@name, kv)
+
+  @spec load_config :: :ok
+  defp load_config do
+    with {:ok, body} <- File.read(@config_file),
+      {:ok, json} <- Jason.decode(body),
+      changes <- Enum.into(json, %{}, fn {key, value} -> {String.to_atom(key), value} end),
+      changeset <- Administration.change_settings(%Settings{}, changes)
+    do
+      Enum.each(changeset.changes, &insert_into_table/1)
+    end
+  end
 
   @spec save_config :: :ok
   defp save_config do

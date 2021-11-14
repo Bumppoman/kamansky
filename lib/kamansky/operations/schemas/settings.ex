@@ -7,16 +7,25 @@ defmodule Kamansky.Operations.Administration.Settings do
 
   @type t :: %Settings{
     additional_ounce: Decimal.t,
+    hipstamp_percentage_fee: Decimal.t,
+    paypal_flat_fee: Decimal.t,
+    paypal_percentage_fee: Decimal.t,
     shipping_cost: Decimal.t
   }
 
   defstruct [
     :additional_ounce,
+    :hipstamp_percentage_fee,
+    :paypal_flat_fee,
+    :paypal_percentage_fee,
     :shipping_cost
   ]
 
   @types %{
     additional_ounce: :decimal,
+    hipstamp_percentage_fee: :decimal,
+    paypal_flat_fee: :decimal,
+    paypal_percentage_fee: :decimal,
     shipping_cost: :decimal
   }
 
