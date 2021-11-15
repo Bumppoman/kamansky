@@ -21,7 +21,7 @@ defmodule Kamansky.Application do
       Kamansky.Jobs.ManageSettings
     ]
 
-    children = children ++ (if Application.get_env(:kamansky, :env) == :prod, do: [Kamansky.Jobs.MonitorListings, Kamansky.Jobs.MonitorOrders], else: [])
+    children = children ++ (if Application.get_env(:kamansky, :env) == :prod, do: [Kamansky.Jobs.MonitorListings], else: [])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
