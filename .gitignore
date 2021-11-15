@@ -36,6 +36,7 @@ npm-debug.log
 
 # Hard-coded secrets
 /config/dev.secret.exs
+/config/kamansky.json
 /config/releases.exs
 /config/runtime.exs
 
