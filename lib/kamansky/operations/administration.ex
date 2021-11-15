@@ -1,7 +1,7 @@
 defmodule Kamansky.Operations.Administration do
   alias Kamansky.Operations.Administration.Settings
 
-  @spec change_settings(Settings.t, map) :: Ecto.Changeset.t
+  @spec change_settings(map, map) :: Ecto.Changeset.t
   def change_settings(%Settings{} = settings, attrs \\ %{}), do: Settings.changeset(settings, attrs)
 
   @spec get_setting!(atom) :: any
