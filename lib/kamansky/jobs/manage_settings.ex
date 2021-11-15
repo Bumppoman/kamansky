@@ -14,6 +14,7 @@ defmodule Kamansky.Jobs.ManageSettings do
   def init(state) do
     :ets.new(@name, [:set, :protected, :named_table])
     load_config()
+
     {:ok, state}
   end
 

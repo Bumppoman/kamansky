@@ -138,6 +138,13 @@ defmodule Kamansky.Sales.Listings do
     |> Enum.into(%{})
   end
 
+  @spec remove_ebay_id_from_listing(Listing.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
+  def remove_ebay_id_from_listing(listing) do
+    listing
+    |> Ecto.Changeset.change(ebay_id: nil)
+    |> Repo.update()
+  end
+
   @spec remove_hipstamp_id_from_listing(Listing.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
   def remove_hipstamp_id_from_listing(listing) do
     listing

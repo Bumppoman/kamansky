@@ -1,6 +1,8 @@
 defmodule Kamansky.Services.Ebay.Listing do
   import SweetXml
 
+  alias Kamansky.Sales.Listings
+  alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Services.Ebay
 
   @spec get_listing(String.t) :: any
@@ -42,5 +44,30 @@ defmodule Kamansky.Services.Ebay.Listing do
       item_id: ~x".//ItemID/text()"s
     )
     |> Enum.filter(&(String.to_integer(&1.bid_count) > 0))
+  end
+
+  @spec maybe_remove_listing(Listing.t) :: :ok | {:error, Ecto.Changeset.t} | {:ok, Listing.t}
+  def maybe_remove_listing(%Listing{ebay_id: ebay_id} = listing) when not is_nil(ebay_id) do
+    remove_listing(listing)
+    Listings.remove_ebay_id_from_listing(listing)
+  end
+  def maybe_remove_listing(%Listing{} = _listing), do: :ok
+
+  @spec remove_listing(Listing.t) :: :ok
+  def remove_listing(%Listing{} = listing) do
+    """
+    <?xml version="1.0" encoding="utf-8"?>
+    <EndItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+      #{Ebay.requester_credentials()}
+      <ItemID>#{listing.ebay_id}</ItemID>
+      <EndingReason>NotAvailable</EndingReason>
+    </EndItemRequest>
+    """
+    |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "EndItem"}]))
+    |> Map.get(:body)
+    |> parse(dtd: :none)
+    |> xpath(~x"//EndTime"s)
+
+    :ok
   end
 end

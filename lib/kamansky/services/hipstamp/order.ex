@@ -32,14 +32,14 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
-  @spec load_new_orders :: :ok
+  @spec load_new_orders :: [Order.t]
   def load_new_orders do
     with %Order{ordered_at: from_date} <- Orders.most_recent_order(:hipstamp),
       new_orders <- all_pending(from_date)
     do
       new_orders
       |> Enum.reverse()
-      |> Enum.each(
+      |> Enum.flat_map(
         fn(hipstamp_order) ->
           with %Order{} = order <- Orders.initialize_order(hipstamp_id: String.to_integer(hipstamp_order["id"])),
             ordered_at <- parse_ordered_at(hipstamp_order["created_at"]),
@@ -78,14 +78,17 @@ defmodule Kamansky.Services.Hipstamp.Order do
               ),
             listings <- update_order_listings(hipstamp_order["SaleListings"], order.id)
           do
-            Orders.update_order_fees(
-              order,
+            order
+            |> Orders.update_order_fees(
               selling_fees: selling_fees,
               shipping_cost: Decimal.add(
                 Administration.get_setting!(:shipping_cost),
                 Decimal.from_float(Decimal.to_float(Administration.get_setting!(:additional_ounce)) * Float.floor(Enum.count(listings) / 6))
               )
             )
+            |> elem(1)
+          else
+            _ -> []
           end
         end
       )

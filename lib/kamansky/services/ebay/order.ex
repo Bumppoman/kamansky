@@ -49,14 +49,14 @@ defmodule Kamansky.Services.Ebay.Order do
     )
   end
 
-  @spec load_new_orders :: :ok
+  @spec load_new_orders :: [Order.t]
   def load_new_orders do
     with %Order{ordered_at: from_date} <- Orders.most_recent_order(:ebay),
       new_orders <- all_pending(from_date)
     do
       new_orders
       |> Enum.reverse()
-      |> Enum.each(
+      |> Enum.flat_map(
         fn(ebay_order) ->
           with order <- Orders.get_or_initialize_order(ebay_id: ebay_order.ebay_order_id),
             ordered_at <- parse_ordered_at(ebay_order.ordered_at),
@@ -94,14 +94,17 @@ defmodule Kamansky.Services.Ebay.Order do
               ),
             listings <- update_order_listings(ebay_order.transactions, order.id)
           do
-            Orders.update_order_fees(
-              order,
+            order
+            |> Orders.update_order_fees(
               selling_fees: Decimal.add(Decimal.new("0.30"), Enum.reduce(ebay_order.transactions, 0, &Decimal.add(Decimal.new(&1.selling_fees), &2))),
               shipping_cost: Decimal.add(
-                Decimal.from_float(Administration.get_setting!(:shipping_cost)),
-                Decimal.from_float(Administration.get_setting!(:additional_ounce) * Float.floor(Enum.count(listings) / 6))
+                Administration.get_setting!(:shipping_cost),
+                Decimal.from_float(Decimal.to_float(Administration.get_setting!(:additional_ounce)) * Float.floor(Enum.count(listings) / 6))
               )
             )
+            |> elem(1)
+          else
+            _ -> []
           end
         end
       )

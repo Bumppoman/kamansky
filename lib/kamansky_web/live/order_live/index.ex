@@ -10,8 +10,8 @@ defmodule KamanskyWeb.OrderLive.Index do
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("load_new_orders", _value, socket) do
-    with :ok <- Hipstamp.Order.load_new_orders(),
-      :ok <- Ebay.Order.load_new_orders(),
+    with _orders <- Hipstamp.Order.load_new_orders(),
+      _orders <- Ebay.Order.load_new_orders(),
       {:phoenix, :send_update, _update} <- refresh_datatable()
     do
       {:noreply, socket}
