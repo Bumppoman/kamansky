@@ -103,6 +103,7 @@ defmodule Kamansky.Services.Ebay.Order do
               )
             )
             |> elem(1)
+            |> List.wrap()
           else
             _ -> []
           end

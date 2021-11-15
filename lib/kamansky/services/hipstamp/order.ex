@@ -87,6 +87,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
               )
             )
             |> elem(1)
+            |> List.wrap()
           else
             _ -> []
           end
