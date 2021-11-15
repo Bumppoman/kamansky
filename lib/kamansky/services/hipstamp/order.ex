@@ -104,9 +104,9 @@ defmodule Kamansky.Services.Hipstamp.Order do
 
   @spec calculate_selling_fees(Decimal.t, Decimal.t) :: Decimal.t
   defp calculate_selling_fees(item_price, shipping_price) do
-    with hipstamp_coefficient <- Decimal.from_float(0.0895),
-      paypal_coefficient <- Decimal.from_float(0.0349),
-      paypal_flat_fee <- Decimal.from_float(0.49),
+    with hipstamp_coefficient <- Administration.get_setting!(:hipstamp_percentage_fee),
+      paypal_coefficient <- Administration.get_setting!(:paypal_percentage_fee),
+      paypal_flat_fee <- Administration.get_setting!(:paypal_flat_fee),
       hipstamp_fees <-
         item_price
         |> Decimal.add(shipping_price)

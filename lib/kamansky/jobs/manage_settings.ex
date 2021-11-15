@@ -10,9 +10,6 @@ defmodule Kamansky.Jobs.ManageSettings do
   @spec start_link(any) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(_), do: GenServer.start_link(__MODULE__, [], name: @name)
 
-  @spec insert(atom, any) :: any
-  def insert(key, value), do: GenServer.call(@name, {:insert, {key, value}})
-
   @impl true
   @spec init(any) :: {:ok, any}
   def init(state) do
@@ -21,26 +18,10 @@ defmodule Kamansky.Jobs.ManageSettings do
     {:ok, state}
   end
 
-  @impl true
-  @spec handle_call({:insert, any}, {pid, any}, any) :: {:reply, :ok, any}
-  def handle_call({:insert, kv}, _ref, state) do
-    insert_into_table(kv)
-    {:reply, :ok, state}
-  end
-
   @spec get_value(atom) :: any
   def get_value(key) do
     @name
-    |> :ets.lookup(key)
-    |> hd()
-    |> elem(1)
-  end
-
-  @spec list_settings :: map
-  def list_settings do
-    @name
-    |> :ets.tab2list()
-    |> then(&struct(Settings, &1))
+    |> :ets.lookup(:settings)
   end
 
   @spec lookup(atom) :: [{atom, any}]
@@ -54,18 +35,15 @@ defmodule Kamansky.Jobs.ManageSettings do
     end
   end
 
-  @spec insert_into_table({atom, any}) :: true
-  defp insert_into_table(kv), do: :ets.insert(@name, kv)
-
-  @spec load_config :: :ok
+  #@spec load_config :: true
   defp load_config do
-    with {:ok, body} <- File.read(@config_file),
-      {:ok, json} <- Jason.decode(body),
-      changes <- Enum.into(json, %{}, fn {key, value} -> {String.to_atom(key), value} end),
-      changeset <- Administration.change_settings(%Settings{}, changes)
-    do
-      Enum.each(changeset.changes, &insert_into_table/1)
-    end
+    @config_file
+    |> File.read!()
+    |> Jason.decode!()
+    |> Enum.into(%{}, fn {key, value} -> {String.to_atom(key), value} end)
+    |> then(&Administration.change_settings(%Settings{}, &1))
+    |> Ecto.Changeset.apply_changes()
+    |> then(&:ets.insert(@name, {:settings, &1}))
   end
 
   @spec save_config :: :ok
