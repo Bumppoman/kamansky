@@ -1,6 +1,7 @@
 defmodule Kamansky.Jobs.ManageSettings do
   use GenServer
 
+  alias Kamansky.Operations.Administration
   alias Kamansky.Operations.Administration.Settings
 
   @config_file "config/kamansky.json"
@@ -45,7 +46,7 @@ defmodule Kamansky.Jobs.ManageSettings do
     |> File.read!()
     |> Jason.decode!()
     |> Enum.into(%{}, fn {key, value} -> {String.to_atom(key), value} end)
-    |> then(&Ecto.Changeset.change(%Settings{}, &1))
+    |> then(&Administration.change_settings(%Settings{}, &1))
     |> Ecto.Changeset.apply_changes()
     |> replace_settings()
   end
