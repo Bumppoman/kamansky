@@ -6,7 +6,7 @@ defmodule KamanskyWeb.SettingsLive.Index do
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, _session, socket) do
-    with settings <- Kamansky.Jobs.ManageSettings.list_settings() do
+    with settings <- Kamansky.Jobs.ManageSettings.get_settings() do
       {
         :ok,
         socket

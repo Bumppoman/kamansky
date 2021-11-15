@@ -18,15 +18,15 @@ defmodule Kamansky.Jobs.ManageSettings do
   end
 
   @impl true
-  @spec handle_call(:list | {:replace, Settings.t}, {pid, any}, any) :: {:reply, Settings.t, any}
-  def handle_call(:list, _ref, state), do: {:reply, retrieve_settings(), state}
+  @spec handle_call(:get | {:replace, Settings.t}, {pid, any}, any) :: {:reply, Settings.t, any}
+  def handle_call(:get, _ref, state), do: {:reply, retrieve_settings(), state}
   def handle_call({:replace, settings}, _ref, state), do: {:reply, replace_settings(settings), state}
 
   @spec get_value(atom) :: any
-  def get_value(key), do: Map.get(list_settings(), key)
+  def get_value(key), do: Map.get(get_settings(), key)
 
-  @spec list_settings :: Settings.t
-  def list_settings, do: GenServer.call(@name, :list)
+  @spec get_settings :: Settings.t
+  def get_settings, do: GenServer.call(@name, :get)
 
   @spec update(Ecto.Changeset.t) :: {:ok, Settings.t}
   def update(changeset) do
