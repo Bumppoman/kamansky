@@ -1,7 +1,6 @@
 defmodule Kamansky.Jobs.ManageSettings do
   use GenServer
 
-  alias Kamansky.Operations.Administration
   alias Kamansky.Operations.Administration.Settings
 
   @config_file "config/kamansky.json"
@@ -19,10 +18,9 @@ defmodule Kamansky.Jobs.ManageSettings do
   end
 
   @impl true
-  @spec handle_call(:list, {pid, any}, any) :: {:reply, Settings.t, any}
-  def handle_call(:list, _ref, state) do
-    {:reply, retrieve_settings(), state}
-  end
+  @spec handle_call(:list | {:replace, Settings.t}, {pid, any}, any) :: {:reply, Settings.t, any}
+  def handle_call(:list, _ref, state), do: {:reply, retrieve_settings(), state}
+  def handle_call({:replace, settings}, _ref, state), do: {:reply, replace_settings(settings), state}
 
   @spec get_value(atom) :: any
   def get_value(key), do: Map.get(list_settings(), key)
@@ -33,7 +31,7 @@ defmodule Kamansky.Jobs.ManageSettings do
   @spec update(Ecto.Changeset.t) :: {:ok, Settings.t}
   def update(changeset) do
     with settings <- Ecto.Changeset.apply_changes(changeset) do
-      replace_settings(settings)
+      GenServer.call(@name, {:replace, settings})
       save_config()
 
       {:ok, settings}
@@ -46,7 +44,7 @@ defmodule Kamansky.Jobs.ManageSettings do
     |> File.read!()
     |> Jason.decode!()
     |> Enum.into(%{}, fn {key, value} -> {String.to_atom(key), value} end)
-    |> then(&Administration.change_settings(%Settings{}, &1))
+    |> then(&Ecto.Changeset.change(%Settings{}, &1))
     |> Ecto.Changeset.apply_changes()
     |> replace_settings()
   end
