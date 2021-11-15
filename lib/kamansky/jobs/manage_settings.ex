@@ -27,13 +27,13 @@ defmodule Kamansky.Jobs.ManageSettings do
   @spec lookup(atom) :: [{atom, any}]
   def lookup(key), do: :ets.lookup(@name, key)
 
-  @spec update(Ecto.Changeset.t) :: {:ok, Settings.t}
-  def update(changeset) do
-    with :ok <- Enum.each(changeset.changes, fn {key, value} -> insert(key, value) end) do
-      save_config()
-      {:ok, Ecto.Changeset.apply_changes(changeset)}
-    end
-  end
+  #@spec update(Ecto.Changeset.t) :: {:ok, Settings.t}
+  #def update(changeset) do
+  #  with :ok <- Enum.each(changeset.changes, fn {key, value} -> insert(key, value) end) do
+  #    save_config()
+  #    {:ok, Ecto.Changeset.apply_changes(changeset)}
+  #  end
+  #end
 
   #@spec load_config :: true
   defp load_config do
@@ -46,10 +46,10 @@ defmodule Kamansky.Jobs.ManageSettings do
     |> then(&:ets.insert(@name, {:settings, &1}))
   end
 
-  @spec save_config :: :ok
-  defp save_config do
-    list_settings()
-    |> Jason.encode!()
-    |> then(&File.write!(@config_file, &1))
-  end
+  #@spec save_config :: :ok
+  #defp save_config do
+  #  list_settings()
+  #  |> Jason.encode!()
+  #  |> then(&File.write!(@config_file, &1))
+  #end
 end
