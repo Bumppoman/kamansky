@@ -29,6 +29,9 @@ defmodule Kamansky.Operations.Administration.Settings do
     shipping_cost: :decimal
   }
 
+  @spec __changeset__ :: map
+  def __changeset__, do: @types
+
   @spec changeset(t, map) :: Ecto.Changeset.t
   def changeset(settings, params) do
     {settings, types()}
