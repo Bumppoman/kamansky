@@ -61,18 +61,7 @@
           <%= if @current_user do %>
             <div class="hidden sm:block sm:ml-6">
               <div class="flex space-x-4">
-                <%= for link <- live_navbar_links(@socket, @live_action) do %>
-                  <%= live_redirect link.title,
-                    to: link.to,
-                    class: "font-medium px-3 py-2 rounded-md text-sm" <> (
-                      if link.active do
-                        " bg-gray-900 text-white"
-                      else 
-                        " text-gray-300 hover:bg-gray-700 hover:text-white"
-                      end
-                    )
-                  %>
-                <% end %>
+                <KamanskyWeb.Components.Page.navbar_links socket={@socket} platform="desktop" />
                 <div 
                   class="inline-block relative text-left z-20"
                   x-data="{adminDropdown: false}" 
@@ -242,18 +231,7 @@
               end
             )
           %>
-          <%= for link <- live_navbar_links(@socket, @live_action) do %>
-            <%= live_redirect link.title,
-              to: link.to,
-              class: "block font-medium px-3 py-2 rounded-md text-base" <> (
-                if link.active do
-                  " bg-gray-900 text-white"
-                else 
-                  " text-gray-300 hover:bg-gray-700 hover:text-white"
-                end
-              )
-            %>
-          <% end %>
+          <KamanskyWeb.Components.Page.navbar_links socket={@socket} platform="mobile" />
         </div>
       </div>
     </div>

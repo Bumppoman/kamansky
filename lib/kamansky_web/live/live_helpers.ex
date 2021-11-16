@@ -27,32 +27,6 @@ defmodule KamanskyWeb.LiveHelpers do
     end
   end
 
-  @spec live_navbar_links(Phoenix.LiveView.Socket.t, atom) :: [%{title: String.t, to: String.t, active: boolean}]
-  def live_navbar_links(%Phoenix.LiveView.Socket{view: view} = socket, live_action) do
-    [
-      %{
-        title: "Collection",
-        to: Routes.stamp_index_path(socket, :collection),
-        active: view == KamanskyWeb.StampLive.Index and live_action == :collection
-      },
-      %{
-        title: "Stock",
-        to: Routes.stamp_index_path(socket, :stock),
-        active: view == KamanskyWeb.StampLive.Index and live_action == :stock
-      },
-      %{
-        title: "Listings",
-        to: Routes.listing_active_path(socket, :index),
-        active: view in [KamanskyWeb.ListingLive.Active, KamanskyWeb.ListingLive.Bid, KamanskyWeb.ListingLive.Sold]
-      },
-      %{
-        title: "Orders",
-        to: Routes.order_index_path(socket, :pending),
-        active: view == KamanskyWeb.OrderLive.Index
-      }
-    ]
-  end
-
   @spec live_navbar_admin_links(Phoenix.LiveView.Socket.t, atom) :: [map]
   def live_navbar_admin_links(%Phoenix.LiveView.Socket{view: view} = socket, _live_action) do
     [
