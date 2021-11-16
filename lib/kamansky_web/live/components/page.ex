@@ -1,8 +1,6 @@
 defmodule KamanskyWeb.Components.Page do
   use Phoenix.Component
 
-  alias KamanskyWeb.Router.Helpers, as: Routes
-
   @spec link_with_confirmation(map) :: Phoenix.LiveView.Rendered.t
   def link_with_confirmation(assigns) do
     ~H"""
@@ -17,24 +15,12 @@ defmodule KamanskyWeb.Components.Page do
     """
   end
 
-  @spec navbar_links(map) :: Phoenix.LiveView.Rendered.t
-  def navbar_links(assigns) do
+  @spec navbar_link(map) :: Phoenix.LiveView.Rendered.t
+  def navbar_link(assigns) do
     ~H"""
-    <%= live_redirect "Collection",
-      to: Routes.stamp_index_path(@socket, :collection),
-      class: navbar_link_class(@platform, @socket.view == KamanskyWeb.StampLive.Index and @socket.assigns.live_action == :collection)
-    %>
-    <%= live_redirect "Stock",
-      to: Routes.stamp_index_path(@socket, :stock),
-      class: navbar_link_class(@platform, @socket.view == KamanskyWeb.StampLive.Index and @socket.assigns.live_action == :stock)
-    %>
-    <%= live_redirect "Listings",
-      to: Routes.listing_active_path(@socket, :index),
-      class: navbar_link_class(@platform, @socket.view in [KamanskyWeb.ListingLive.Active, KamanskyWeb.ListingLive.Bid, KamanskyWeb.ListingLive.Sold])
-    %>
-    <%= live_redirect "Orders",
-      to: Routes.order_index_path(@socket, :pending),
-      class: navbar_link_class(@platform, @socket.view in [KamanskyWeb.OrderLive.Index, KamanskyWeb.OrderLive.Show])
+    <%= live_redirect @title,
+      to: @to,
+      class: navbar_link_class(@platform, @active)
     %>
     """
   end

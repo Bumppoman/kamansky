@@ -61,7 +61,30 @@
           <%= if @current_user do %>
             <div class="hidden sm:block sm:ml-6">
               <div class="flex space-x-4">
-                <KamanskyWeb.Components.Page.navbar_links socket={@socket} platform="desktop" />
+                <KamanskyWeb.Components.Page.navbar_link
+                  platform="desktop"
+                  title="Collection" 
+                  to={Routes.stamp_index_path(@socket, :collection)}
+                  active={@socket.view == KamanskyWeb.StampLive.Index and @live_action == :collection}
+                />
+                <KamanskyWeb.Components.Page.navbar_link
+                  platform="desktop"
+                  title="Stock" 
+                  to={Routes.stamp_index_path(@socket, :stock)}
+                  active={@socket.view == KamanskyWeb.StampLive.Index and @live_action == :stock}
+                />
+                <KamanskyWeb.Components.Page.navbar_link
+                  platform="desktop"
+                  title="Listings" 
+                  to={Routes.listing_active_path(@socket, :index)}
+                  active={@socket.view in [KamanskyWeb.ListingLive.Active, KamanskyWeb.ListingLive.Bid, KamanskyWeb.ListingLive.Sold]}
+                />
+                <KamanskyWeb.Components.Page.navbar_link
+                  platform="desktop"
+                  title="Orders" 
+                  to={Routes.order_index_path(@socket, :pending)}
+                  active={@socket.view in [KamanskyWeb.OrderLive.Index, KamanskyWeb.OrderLive.Show]}
+                />
                 <div 
                   class="inline-block relative text-left z-20"
                   x-data="{adminDropdown: false}" 
@@ -231,7 +254,30 @@
               end
             )
           %>
-          <KamanskyWeb.Components.Page.navbar_links socket={@socket} platform="mobile" />
+          <KamanskyWeb.Components.Page.navbar_link
+            platform="mobile"
+            title="Collection" 
+            to={Routes.stamp_index_path(@socket, :collection)}
+            active={@socket.view == KamanskyWeb.StampLive.Index and @live_action == :collection}
+          />
+          <KamanskyWeb.Components.Page.navbar_link
+            platform="mobile"
+            title="Stock" 
+            to={Routes.stamp_index_path(@socket, :stock)}
+            active={@socket.view == KamanskyWeb.StampLive.Index and @live_action == :stock}
+          />
+          <KamanskyWeb.Components.Page.navbar_link
+            platform="mobile"
+            title="Listings" 
+            to={Routes.listing_active_path(@socket, :index)}
+            active={@socket.view in [KamanskyWeb.ListingLive.Active, KamanskyWeb.ListingLive.Bid, KamanskyWeb.ListingLive.Sold]}
+          />
+          <KamanskyWeb.Components.Page.navbar_link
+            platform="mobile"
+            title="Orders" 
+            to={Routes.order_index_path(@socket, :pending)}
+            active={@socket.view in [KamanskyWeb.OrderLive.Index, KamanskyWeb.OrderLive.Show]}
+          />
         </div>
       </div>
     </div>
