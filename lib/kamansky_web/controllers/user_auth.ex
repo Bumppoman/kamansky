@@ -30,6 +30,7 @@ defmodule KamanskyWeb.UserAuth do
 
     conn
     |> renew_session()
+    |> put_session(:user_id, user.id)
     |> put_session(:user_token, token)
     |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(token)}")
     |> maybe_write_remember_me_cookie(token, params)

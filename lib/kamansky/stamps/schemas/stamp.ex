@@ -225,8 +225,8 @@ defmodule Kamansky.Stamps.Stamp do
   @spec grade_classes :: [%{start: integer, finish: integer, name: String.t, long_name: String.t}]
   def grade_classes, do: @grade_classes
 
-  @spec hinged?(%Stamp{hinged: boolean}) :: boolean
-  def hinged?(%Stamp{hinged: hinged}), do: hinged
+  @spec hinged?(Stamp.t) :: boolean
+  def hinged?(%Stamp{hinged: hinged, hinge_remnant: hinge_remnant}), do: hinged || hinge_remnant
 
   @spec history(Stamp.t) :: [String.t]
   def history(%Stamp{} = stamp) do

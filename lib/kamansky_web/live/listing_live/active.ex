@@ -8,7 +8,7 @@ defmodule KamanskyWeb.ListingLive.Active do
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     {
       :ok,
       socket

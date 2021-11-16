@@ -83,7 +83,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
               selling_fees: selling_fees,
               shipping_cost: Decimal.add(
                 Administration.get_setting!(:shipping_cost),
-                Decimal.from_float(Decimal.to_float(Administration.get_setting!(:additional_ounce)) * Float.floor(Enum.count(listings) / 6))
+                Decimal.mult(Administration.get_setting!(:additional_ounce), Decimal.from_float(Float.floor(Enum.count(listings) / 6)))
               )
             )
             |> elem(1)
@@ -168,8 +168,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
       sale_listings,
       fn sale_listing ->
         with(
-          %Stamp{listing: listing} = stamp <-
-            Stamps.get_stamp_by_inventory_key(sale_listing["private_id"], with_listing: true),
+          %Stamp{listing: listing} = stamp <- Stamps.get_stamp_by_inventory_key(sale_listing["private_id"], with_listing: true),
           {:ok, _stamp} <- Stamps.mark_stamp_as_sold(stamp),
           {:ok, listing} <-
             Listings.mark_listing_sold(

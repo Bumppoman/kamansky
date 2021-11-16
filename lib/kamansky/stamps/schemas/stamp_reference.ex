@@ -8,43 +8,43 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
   @eras [
     %{
       start: 1847,
-      finish: 1899,
+      finish: 1900,
       name: "19th Century"
     },
     %{
-      start: 1900,
-      finish: 1909,
-      name: "1900-1909"
+      start: 1901,
+      finish: 1910,
+      name: "1901-1910"
     },
     %{
-      start: 1910,
-      finish: 1919,
-      name: "1910-1919"
+      start: 1911,
+      finish: 1920,
+      name: "1911-1920"
     },
     %{
-      start: 1920,
-      finish: 1929,
-      name: "1920-1929"
+      start: 1921,
+      finish: 1930,
+      name: "1921-1930"
     },
     %{
-      start: 1930,
-      finish: 1939,
-      name: "1930-1939"
+      start: 1931,
+      finish: 1940,
+      name: "1931-1940"
     },
     %{
-      start: 1940,
-      finish: 1949,
-      name: "1940-1949"
+      start: 1941,
+      finish: 1950,
+      name: "1941-1950"
     },
     %{
-      start: 1950,
-      finish: 1959,
-      name: "1950-1959"
+      start: 1951,
+      finish: 1960,
+      name: "1951-1960"
     },
     %{
-      start: 1960,
+      start: 1961,
       finish: DateTime.utc_now().year,
-      name: "1960-present"
+      name: "1961-present"
     }
   ]
 
@@ -87,6 +87,13 @@ defmodule Kamansky.Stamps.StampReferences.StampReference do
   def display_column_for_sorting(column) do
     [:scott_number]
     |> Enum.at(column)
+  end
+
+  @spec era(t) :: String.t
+  def era(%StampReference{year_of_issue: year_of_issue}) do
+    @eras
+    |> Enum.find(&(year_of_issue in &1.start..&1.finish))
+    |> Map.get(:name)
   end
 
   @spec eras :: [%{start: integer, finish: integer, name: String.t}]

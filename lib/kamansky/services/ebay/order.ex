@@ -11,15 +11,16 @@ defmodule Kamansky.Services.Ebay.Order do
   alias Kamansky.Services.Ebay
   alias Kamansky.Stamps
 
-  @spec all_pending(DateTime.t) :: list
-  def all_pending(%DateTime{} = from_time) do
+  @spec all_pending :: list
+  def all_pending do
     """
     <?xml version="1.0" encoding="utf-8"?>
     <GetOrdersRequest xmlns="urn:ebay:apis:eBLBaseComponents">
       #{Ebay.requester_credentials()}
-      <CreateTimeFrom>#{DateTime.to_iso8601(from_time)}</CreateTimeFrom>
+      <CreateTimeFrom>#{Date.to_iso8601(Date.add(Date.utc_today(), -7))}</CreateTimeFrom>
       <CreateTimeTo>#{DateTime.to_iso8601(DateTime.utc_now())}</CreateTimeTo>
       <IncludeFinalValueFee>true</IncludeFinalValueFee>
+      <OrderStatus>Completed</OrderStatus>
     </GetOrdersRequest>
     """
     |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "GetOrders"}]))
@@ -51,9 +52,7 @@ defmodule Kamansky.Services.Ebay.Order do
 
   @spec load_new_orders :: [Order.t]
   def load_new_orders do
-    with %Order{ordered_at: from_date} <- Orders.most_recent_order(:ebay),
-      new_orders <- all_pending(from_date)
-    do
+    with new_orders <- all_pending() do
       new_orders
       |> Enum.reverse()
       |> Enum.flat_map(

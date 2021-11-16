@@ -9,7 +9,8 @@ defmodule Kamansky.Operations.Accounts.User do
     email: String.t,
     hashed_password: String.t,
     initials: String.t,
-    ebay_token: String.t
+    ebay_token: String.t,
+    notifications: [Kamansky.Operations.Accounts.Notifications.Notification.t]
   }
 
   schema "users" do
@@ -20,7 +21,7 @@ defmodule Kamansky.Operations.Accounts.User do
     field :initials, :string
     field :ebay_token, :string
 
-    has_many :notifications, Kamansky.Operations.Accounts.Notification
+    has_many :notifications, Kamansky.Operations.Accounts.Notifications.Notification
 
     timestamps()
   end
