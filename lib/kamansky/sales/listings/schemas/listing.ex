@@ -57,6 +57,10 @@ defmodule Kamansky.Sales.Listings.Listing do
   def hipstamp?(%Listing{hipstamp_listing: %HipstampListing{}}), do: true
   def hipstamp?(%Listing{}), do: false
 
+  @spec internal_only?(t) :: boolean
+  def internal_only?(%Listing{ebay_listing: nil, hipstamp_listing: nil}), do: true
+  def internal_only?(%Listing{}), do: false
+
   @spec net_profit(Listing.t) :: Decimal.t
   def net_profit(%Listing{} = listing), do: Decimal.sub(listing.sale_price, Stamp.total_cost(listing.stamp))
 end

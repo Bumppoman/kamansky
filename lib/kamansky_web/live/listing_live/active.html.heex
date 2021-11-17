@@ -54,38 +54,40 @@
     <td><%= format_decimal_as_currency(listing.listing_price) %></td>
     <td><%= formatted_date(listing.inserted_at) %></td>
     <td>
-      <div class="flex">
-        <%= cond do %>
-          <% Listing.ebay?(listing) -> %>
-            <a
-              href={"https://www.ebay.com/itm/#{listing.ebay_listing.ebay_id}"}
-              class="action-icon ml-2"
-              target="_blank"
-              title="View on eBay"
-            >
-              <img
-                class="h-5 w-5"
-                src={Routes.static_path(@socket, "/images/ebay-logo.svg")} 
-              />
-            </a>
-          <% Listing.hipstamp?(listing) -> %>
-            <a
-              href={"https://www.hipstamp.com/listing/stamp/#{listing.hipstamp_listing.hipstamp_id}"}
-              class="action-icon ml-2"
-              target="_blank"
-              title="View on Hipstamp"
-            >
-              <img
-                class="h-5 w-5"
-                src={Routes.static_path(@socket, "/images/hipstamp-logo.png")} 
-              />
-            </a>
-          <% true -> %> None
+      <div class="flex gap-2">
+        <%= if Listing.ebay?(listing) do %>
+          <a
+            href={"https://www.ebay.com/itm/#{listing.ebay_listing.ebay_id}"}
+            class="action-icon"
+            target="_blank"
+            title="View on eBay"
+          >
+            <img
+              class="h-5 w-5"
+              src={Routes.static_path(@socket, "/images/ebay-logo.svg")} 
+            />
+          </a>
+        <% end %>
+        <%= if Listing.hipstamp?(listing) do %>
+          <a
+            href={"https://www.hipstamp.com/listing/stamp/#{listing.hipstamp_listing.hipstamp_id}"}
+            class="action-icon"
+            target="_blank"
+            title="View on Hipstamp"
+          >
+            <img
+              class="h-5 w-5"
+              src={Routes.static_path(@socket, "/images/hipstamp-logo.png")} 
+            />
+          </a>
+        <% end %>
+        <%= if Listing.internal_only?(listing) do %>
+          <span>None</span>
         <% end %>
       </div>
     </td>
     <td>
-      <div class="flex">
+      <div class="flex gap-2">
         <a
           class="action-icon"
           title="Add Listing to Order"
