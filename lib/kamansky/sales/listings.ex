@@ -138,20 +138,6 @@ defmodule Kamansky.Sales.Listings do
     |> Enum.into(%{})
   end
 
-  @spec remove_ebay_id_from_listing(Listing.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
-  def remove_ebay_id_from_listing(listing) do
-    listing
-    |> Ecto.Changeset.change(ebay_id: nil)
-    |> Repo.update()
-  end
-
-  @spec remove_hipstamp_id_from_listing(Listing.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
-  def remove_hipstamp_id_from_listing(listing) do
-    listing
-    |> Ecto.Changeset.change(hipstamp_id: nil)
-    |> Repo.update()
-  end
-
   @doc false
   @impl true
   @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
@@ -232,13 +218,6 @@ defmodule Kamansky.Sales.Listings do
     Listing
     |> where(status: ^status)
     |> Repo.aggregate(:sum, :listing_price)
-  end
-
-  @spec update_hipstamp_listing(Listing.t, map) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
-  def update_hipstamp_listing(%Listing{} = listing, params) do
-    listing
-    |> Listing.hipstamp_changeset(params)
-    |> Repo.update()
   end
 
   @spec update_listing_selling_fees(Listing.t, Decimal.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}

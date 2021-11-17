@@ -1,7 +1,6 @@
 defmodule Kamansky.Services.Hipstamp.Listing do
   alias Kamansky.Attachments.Attachment
-  alias Kamansky.Sales.Listings
-  alias Kamansky.Sales.Listings.Listing
+  alias Kamansky.Sales.Listings.{Listing, Platforms}
   alias Kamansky.Services.Hipstamp
   alias Kamansky.Stamps.Stamp
 
@@ -44,10 +43,11 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     |> Map.get("results")
     |> hd()
     |> then(
-      &Listings.update_hipstamp_listing(
+      &Platforms.create_external_listing(
+        :hipstamp,
         listing,
         %{
-          inserted_at:
+          start_time:
             &1["created_at"]
             |> NaiveDateTime.from_iso8601!()
             |> DateTime.from_naive!("America/New_York")
@@ -61,10 +61,7 @@ defmodule Kamansky.Services.Hipstamp.Listing do
   end
 
   @spec maybe_remove_listing(Listing.t) :: :ok | {:error, Ecto.Changeset.t} | {:ok, Listing.t}
-  def maybe_remove_listing(%Listing{hipstamp_id: hipstamp_id} = listing) when not is_nil(hipstamp_id) do
-    remove_listing(listing)
-    Listings.remove_hipstamp_id_from_listing(listing)
-  end
+  def maybe_remove_listing(%Listing{hipstamp_id: hipstamp_id} = listing) when not is_nil(hipstamp_id), do: remove_listing(listing)
   def maybe_remove_listing(%Listing{} = _listing), do: :ok
 
   @spec remove_listing(Listing.t) :: :ok

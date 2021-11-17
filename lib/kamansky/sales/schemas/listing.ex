@@ -45,11 +45,6 @@ defmodule Kamansky.Sales.Listings.Listing do
     |> Enum.at(column)
   end
 
-  @spec hipstamp_changeset(Listing.t, map) :: Ecto.Changeset.t
-  def hipstamp_changeset(%Listing{} = listing, attrs) do
-    cast(listing, attrs, [:inserted_at, :hipstamp_id])
-  end
-
   @spec net_profit(Listing.t) :: Decimal.t
   def net_profit(%Listing{} = listing), do: Decimal.sub(listing.sale_price, Stamp.total_cost(listing.stamp))
 end
