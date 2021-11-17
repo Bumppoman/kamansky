@@ -58,7 +58,7 @@ defmodule Kamansky.Services.Ebay.Order do
       |> Enum.flat_map(
         fn(ebay_order) ->
           with order <- Orders.get_or_initialize_order(ebay_id: ebay_order.ebay_order_id),
-            ordered_at <- parse_ordered_at(ebay_order.ordered_at),
+            ordered_at <- Ebay.parse_time(ebay_order.ordered_at),
             customer_name <- normalize_name(ebay_order.customer.name),
             country <- determine_country(ebay_order.customer.country),
             {:ok, %{id: customer_id}} <-
@@ -143,14 +143,6 @@ defmodule Kamansky.Services.Ebay.Order do
     name
     |> String.split(" ")
     |> Enum.map_join(" ", &String.capitalize/1)
-  end
-
-  @spec parse_ordered_at(String.t) :: DateTime.t
-  defp parse_ordered_at(ordered_at) do
-    ordered_at
-    |> DateTime.from_iso8601()
-    |> elem(1)
-    |> DateTime.truncate(:second)
   end
 
   @spec update_order_listings([map], integer) :: [Kamansky.Sales.Listings.Listing.t]

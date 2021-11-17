@@ -115,8 +115,8 @@ defmodule Kamansky.Services.Ebay.Listing do
         listing,
         %{
           ebay_id: ebay_listing.ebay_id,
-          start_time: DateTime.from_iso8601(ebay_listing.start_time),
-          end_time: DateTime.from_iso8601(ebay_listing.end_time)
+          start_time: Ebay.parse_time(ebay_listing.start_time),
+          end_time: Ebay.parse_time(ebay_listing.end_time)
         }
       )
   end

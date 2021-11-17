@@ -8,6 +8,14 @@ defmodule Kamansky.Services.Ebay do
     {"Content-Type", "text/xml"}
   ]
 
+  @spec parse_time(String.t) :: DateTime.t
+  def parse_time(time) do
+    time
+    |> DateTime.from_iso8601()
+    |> elem(1)
+    |> DateTime.truncate(:second)
+  end
+
   @spec requester_credentials :: String.t
   def requester_credentials do
     """
