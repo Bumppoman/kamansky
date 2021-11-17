@@ -67,4 +67,7 @@ defmodule KamanskyWeb.LiveHelpers do
       }
     ]
   end
+
+  @spec refresh_datatable(String.t, keyword) :: :ok
+  def refresh_datatable(table_id, options \\ []), do: Phoenix.LiveView.send_update(KamanskyWeb.Components.DataTable, id: table_id, options: options)
 end
