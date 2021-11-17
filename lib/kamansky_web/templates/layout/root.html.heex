@@ -13,6 +13,9 @@
   <body class="bg-gray-200 text-gray-700 text-sm">
     <%= @inner_content %>
     <KamanskyWeb.Components.Page.confirmation_modal />
+    <%= if @current_user do %>
+      <%= live_render @conn, KamanskyWeb.NotificationLive.Notifications %>
+    <% end %>
     <footer class="font-extralight text-center text-xs">
       © 2021 Brendon Stanton and Bumppoman Industries.
     </footer>
