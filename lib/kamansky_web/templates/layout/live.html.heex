@@ -8,4 +8,4 @@
   <KamanskyWeb.Components.Page.success_message flash={@flash} />
   <%= @inner_content %>
 </main>
-<%= live_render @conn, KamanskyWeb.NotificationLive.Notifications %>
+<%= live_render @socket, KamanskyWeb.NotificationLive.Notifications %>
