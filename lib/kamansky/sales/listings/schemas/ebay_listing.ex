@@ -14,7 +14,7 @@ defmodule Kamansky.Sales.Listings.Platforms.EbayListing do
     end_time: DateTime.t
   }
 
-  schema "ebay_listing" do
+  schema "ebay_listings" do
     field :start_time, :utc_datetime
     field :end_time, :utc_datetime
 

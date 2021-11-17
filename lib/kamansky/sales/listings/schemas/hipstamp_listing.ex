@@ -13,7 +13,7 @@ defmodule Kamansky.Sales.Listings.Platforms.HipstampListing do
     start_time: DateTime.t
   }
 
-  schema "hipstamp_listing" do
+  schema "hipstamp_listings" do
     field :start_time, :utc_datetime
 
     belongs_to :listing, Kamansky.Sales.Listings.Listing
