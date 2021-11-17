@@ -134,6 +134,7 @@ defmodule Kamansky.Services.Ebay.Listing do
         <EntriesPerPage>200</EntriesPerPage>
       </Pagination>
       <OutputSelector>BidCount</OutputSelector>
+      <OutputSelector>CurrentPrice</OutputSelector>
       <OutputSelector>ItemID</OutputSelector>
       <OutputSelector>SKU</OutputSelector>
     </GetSellerListRequest>
@@ -144,6 +145,7 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> xpath(
       ~x"//Item"l,
       bid_count: ~x".//BidCount/text()"s,
+      current_bid: ~x".//CurrentPrice/text()"s,
       inventory_key: ~x".//SKU/text()"s,
       ebay_id: ~x".//ItemID/text()"s
     )
