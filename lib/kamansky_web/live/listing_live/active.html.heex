@@ -15,8 +15,8 @@
         "Grade",
         "Price",
         "Listing Date",
-        "Listed",
-        %{text: "Actions", sort: :disabled}
+        %{text: "Listed", sort: :disabled, align: "text-center"},
+        %{text: "Actions", sort: :disabled, align: "text-center"}
       ]
     }
     options=
@@ -54,7 +54,7 @@
     <td><%= format_decimal_as_currency(listing.listing_price) %></td>
     <td><%= formatted_date(listing.inserted_at) %></td>
     <td>
-      <div class="flex gap-2">
+      <div class="flex gap-2 justify-center">
         <%= if Listing.ebay?(listing) do %>
           <a
             href={"https://www.ebay.com/itm/#{listing.ebay_listing.ebay_id}"}
@@ -87,7 +87,7 @@
       </div>
     </td>
     <td>
-      <div class="flex gap-2">
+      <div class="flex gap-2 justify-center">
         <a
           class="action-icon"
           title="Add Listing to Order"

@@ -40,10 +40,14 @@
               <tr>
                 <%= for {header, index} <- Enum.with_index(@headers) do %>
                   <%= case header do %>
-                    <% %{sort: :disabled} when is_map(header) -> %>
+                    <% header when is_map(header) -> %>
                       <th 
-                        class="cursor-disabled px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      ><%= header[:text] %></th>
+                        class={
+                          "cursor-disabled px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider " <>
+                          (if Map.get(header, :align), do: header.align, else: "") <>
+                          (if Map.get(header, :sort) == :disabled, do: " cursor-disabled", else: "")
+                        }
+                      ><%= header.text %></th>
                     <% _ -> %>
                       <th
                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
