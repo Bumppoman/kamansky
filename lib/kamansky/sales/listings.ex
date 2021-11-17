@@ -131,9 +131,10 @@ defmodule Kamansky.Sales.Listings do
   @spec list_listings_with_bids(Kamansky.Paginate.params) :: [Listing.t]
   def list_listings_with_bids(params) do
     Listing
-    |> join(:inner, [l], el in assoc(l, :ebay_listings))
-    |> where([l, el], el.bid_count > 0)
-    |> preload([l, el], ebay_listing: el)
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> join(:inner, [l], el in assoc(l, :ebay_listing))
+    |> where([l, ..., el], el.bid_count > 0)
+    |> preload([l, s, el], stamp: s, ebay_listing: el)
     |> then(&Paginate.list(Listings, &1, params))
   end
 

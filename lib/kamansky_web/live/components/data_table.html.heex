@@ -79,19 +79,8 @@
                       <div class="flex-1 flex justify-between sm:hidden">
                         <a 
                           class={
-                            "relative 
-                            inline-flex 
-                            items-center 
-                            px-4 
-                            py-2 
-                            border 
-                            border-gray-300 
-                            text-sm 
-                            font-medium 
-                            rounded-md 
-                            text-gray-700 
-                            bg-white 
-                            hover:bg-gray-50" <> (if @current_page == 1, do: " disabled", else: "")
+                            "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <> 
+                              (if @current_page == 1, do: " disabled", else: "")
                           }
                           phx-click="go_to_page"
                           phx-value-page={@current_page - 1}
@@ -99,20 +88,8 @@
                         >Previous</a>
                         <a 
                           class={
-                            "ml-3 
-                            relative 
-                            inline-flex 
-                            items-center 
-                            px-4 
-                            py-2 
-                            border 
-                            border-gray-300 
-                            text-sm 
-                            font-medium 
-                            rounded-md 
-                            text-gray-700 
-                            bg-white 
-                            hover:bg-gray-50" <> (if @current_page == @total_pages, do: " disabled", else: "")
+                            "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <> 
+                              (if @current_page == @total_pages, do: " disabled", else: "")
                           }
                           phx-click="go_to_page"
                           phx-value-page={@current_page + 1}
@@ -137,18 +114,9 @@
                               <a 
                                 href="#" 
                                 class={
-                                  "relative 
-                                  inline-flex 
-                                  items-center 
-                                  px-2 
-                                  py-2 
-                                  rounded-l-md 
-                                  border 
-                                  border-gray-300 
-                                  bg-white text-sm 
-                                  font-medium 
-                                  text-gray-500 
-                                  hover:bg-gray-50" <> (if @current_page == 1, do: " disabled", else: "")}
+                                  "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <> 
+                                    (if @current_page == 1, do: " disabled", else: "")
+                                }
                                 phx-click="go_to_page"
                                 phx-value-page={@current_page - 1}
                                 phx-target={@myself}
@@ -160,18 +128,9 @@
                               <a 
                                 href="#" 
                                 class={
-                                  "relative 
-                                  inline-flex 
-                                  items-center 
-                                  px-2 
-                                  py-2 
-                                  rounded-r-md 
-                                  border 
-                                  border-gray-300 
-                                  bg-white text-sm 
-                                  font-medium 
-                                  text-gray-500 
-                                  hover:bg-gray-50" <> (if @current_page == @total_pages, do: " disabled", else: "")}
+                                  "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <> 
+                                    (if @current_page == @total_pages, do: " disabled", else: "")
+                                }
                                 phx-click="go_to_page"
                                 phx-value-page={@current_page + 1}
                                 phx-target={@myself}

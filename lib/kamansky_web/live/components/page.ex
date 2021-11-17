@@ -1,6 +1,100 @@
 defmodule KamanskyWeb.Components.Page do
   use Phoenix.Component
 
+  @spec confirmation_modal(map) :: Phoenix.LiveView.Rendered.t
+  def confirmation_modal(assigns) do
+    ~H"""
+    <div
+      class="fixed z-10 inset-0 overflow-y-auto"
+      x-data="{detail: {action: null, content: null, title: null, values: null}, open: false}"
+      x-on:keydown.window.escape="open = false"
+      x-on:kamansky:open-confirmation-modal.camel.window="() => {
+        open = true;
+        detail = $event.detail;
+
+        if ($event.detail.values) {
+          for (value of $event.detail.values) {
+            $refs.success.setAttribute(`phx-value-${value.key}`, value.value);
+          }
+        }
+      }"
+      x-on:phx:kamansky:close-confirmation-modal.camel.window="open = false"
+      x-show="open"
+      aria-labelledby="modal-title"
+      aria-modal="true"
+    >
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div
+          class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          x-on:click="open = false"
+          x-show="open"
+          x-transition:enter="ease-out duration-300"
+          x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100"
+          x-transition:leave="ease-in duration-200"
+          x-transition:leave-start="opacity-100"
+          x-transition:leave-end="opacity-0"
+          aria-hidden="true"
+        > </div>
+        <!-- This element is to trick the browser into centering the modal contents. -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
+        <div
+          class="align-bottom bg-white inline-block overflow-hidden pb-4 pt-5 px-4 rounded-lg shadow-xl text-left transform transition-all sm:align-middle sm:max-w-lg sm:my-8 sm:p-6 sm:w-full"
+          x-show="open"
+          x-transition:enter="ease-out duration-300"
+          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+          x-transition:leave="ease-in duration-200"
+          x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                <svg
+                  class="h-6 text-blue-600 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title" x-text="detail.title" />
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500" x-text="detail.content" />
+                </div>
+              </div>
+            </div>
+            <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+              <button
+                type="button"
+                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                :phx-click="detail.action"
+                x-ref="success"
+                x-text="detail.title"
+              />
+              <button
+                type="button"
+                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                x-on:click="open = false"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+      </div>
+    </div>
+    """
+  end
+
   @spec link_with_confirmation(map) :: Phoenix.LiveView.Rendered.t
   def link_with_confirmation(assigns) do
     ~H"""
@@ -78,6 +172,54 @@ defmodule KamanskyWeb.Components.Page do
     """
   end
 
+  @spec success_message(map) :: Phoenix.LiveView.Rendered.t
+  def success_message(assigns) do
+    ~H"""
+    <%= if live_flash(@flash, :info) do %>
+      <div
+        id="kamansky-success-message"
+        class="bg-green-50 flex items-center mx-auto px-4 py-4 w-9/12"
+        phx-hook="successMessage"
+        phx-value-timestamp={live_flash(@flash, :info).timestamp}
+        x-data="{show: true}"
+        x-init="setTimeout(() => show = false, 3000)"
+        x-show="show"
+        x-transition:enter="transition-all ease-out duration-500"
+        x-transition:enter-start="max-h-0 py-0"
+        x-transition:enter-end="max-h-14 py-4"
+        x-transition:leave="transition-all ease-in duration-500"
+        x-transition:leave-start="max-h-14 py-4"
+        x-transition:leave-end="max-h-0 py-0"
+        x-on:kamansky:success-message-updated.camel="show = true; setTimeout(() => show = false, 3000)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 mr-4 text-green-400 w-4"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          x-show="show"
+          x-transition:leave="transition-all ease-in duration-500"
+          x-transition:leave-start="max-h-4 scale-y-100"
+          x-transition:leave-end="max-h-0 scale-y-0"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <div
+          class="inline-block text-green-700"
+          x-show="show"
+          x-transition:leave="transition-all ease-in duration-500"
+          x-transition:leave-start="max-h-14 scale-y-100"
+          x-transition:leave-end="max-h-0 scale-y-0"
+        ><%= live_flash(@flash, :info).message %></div>
+      </div>
+    <% end %>
+    """
+  end
+
   @spec button_color(atom) :: String.t
   defp button_color(:blue), do: " bg-indigo-600 border-transparent text-white hover:bg-indigo-700"
   defp button_color(:gray), do: " bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -100,21 +242,10 @@ defmodule KamanskyWeb.Components.Page do
     ~H"""
     <button
       type="button"
-      class={"
-        inline-flex
-        items-center
-        ml-3
-        px-4
-        py-2
-        border
-        rounded-md
-        shadow-sm
-        text-sm
-        font-medium
-        focus:outline-none
-        focus:ring-2
-        focus:ring-offset-2
-        focus:ring-indigo-500" <> button_color(Map.get(assigns, :color, :blue))}
+      class={
+        "inline-flex items-center ml-3 px-4 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" <>
+          button_color(Map.get(assigns, :color, :blue))
+      }
       x-data
       x-on:click={confirmation_dispatch(@options.confirmation.action, @options.confirmation.content, @title, @options.confirmation.values)}
     >
@@ -127,21 +258,10 @@ defmodule KamanskyWeb.Components.Page do
     ~H"""
     <button
       type="button"
-      class={"
-        inline-flex
-        items-center
-        ml-3
-        px-4
-        py-2
-        border
-        rounded-md
-        shadow-sm
-        text-sm
-        font-medium
-        focus:outline-none
-        focus:ring-2
-        focus:ring-offset-2
-        focus:ring-indigo-500" <> button_color(Map.get(assigns, :color, :blue))}
+      class={
+        "inline-flex items-center ml-3 px-4 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" <>
+          button_color(Map.get(assigns, :color, :blue))
+      }
       { @options }
     >
       <%= @title %>
