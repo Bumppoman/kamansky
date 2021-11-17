@@ -12,7 +12,7 @@ defmodule KamanskyWeb.OrderLive.Index do
   def handle_event("load_new_orders", _value, socket) do
     with _orders <- Hipstamp.Order.load_new_orders(),
       _orders <- Ebay.Order.load_new_orders(),
-      {:phoenix, :send_update, _update} <- refresh_datatable()
+      {:phoenix, :send_update, _update} <- refresh_datatable("order-kamansky-data-table")
     do
       {:noreply, socket}
     end
@@ -83,7 +83,7 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   @spec close_modal_with_success(Phoenix.LiveView.Socket.t, :confirmation | :form, String.t, pos_integer | nil) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp close_modal_with_success(socket, modal, message, order_id \\ nil) do
-    with _ <- refresh_datatable([go_to_record: order_id]) do
+    with _ <- refresh_datatable("orders-kamansky-data-table", [go_to_record: order_id]) do
       {
         :noreply,
         socket
@@ -96,7 +96,4 @@ defmodule KamanskyWeb.OrderLive.Index do
   @spec modal_event(:confirmation | :form) :: String.t
   defp modal_event(:confirmation), do: "kamansky:closeConfirmationModal"
   defp modal_event(:form), do: "kamansky:closeModal"
-
-  @spec refresh_datatable(list) :: any
-  defp refresh_datatable(options \\ []), do: send_update(KamanskyWeb.Components.DataTable, id: "orders-kamansky-data-table", options: options)
 end

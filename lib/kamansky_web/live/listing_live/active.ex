@@ -24,7 +24,7 @@ defmodule KamanskyWeb.ListingLive.Active do
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("list_on_ebay", %{"listing-id" => listing_id}, socket) do
     with listing <- Listings.get_listing_to_list(listing_id),
-      {:ok, ebay_listing} <- Ebay.Listing.list(listing)
+      {:ok, _ebay_listing} <- Ebay.Listing.list(listing)
     do
       refresh_datatable("listings-kamansky-data-table", [])
       {:noreply, put_flash(socket, :info, %{message: "You have successfully listed this listing on eBay.", timestamp: Time.utc_now()})}
@@ -33,7 +33,7 @@ defmodule KamanskyWeb.ListingLive.Active do
 
   def handle_event("list_on_hipstamp", %{"listing-id" => listing_id}, socket) do
     with listing <- Listings.get_listing_to_list(listing_id),
-      {:ok, hipstamp_listing} <- Hipstamp.Listing.list(listing)
+      {:ok, _hipstamp_listing} <- Hipstamp.Listing.list(listing)
     do
       refresh_datatable("listings-kamansky-data-table", [])
       {:noreply, put_flash(socket, :info, %{message: "You have successfully listed this listing on Hipstamp.", timestamp: Time.utc_now()})}
