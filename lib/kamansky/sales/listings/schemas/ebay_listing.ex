@@ -19,7 +19,7 @@ defmodule Kamansky.Sales.Listings.Platforms.EbayListing do
   schema "ebay_listings" do
     field :start_time, :utc_datetime
     field :end_time, :utc_datetime
-    field :bid_count, :integer
+    field :bid_count, :integer, default: 0
     field :current_bid, :decimal
 
     belongs_to :listing, Kamansky.Sales.Listings.Listing

@@ -30,7 +30,15 @@ defmodule Kamansky.Sales.Listings do
   def count_listings(status) do
     Listing
     |> where(status: ^status)
-    |> Repo.aggregate(:count, :id)
+    |> Repo.aggregate(:count)
+  end
+
+  @spec count_listings_with_bids :: integer
+  def count_listings_with_bids do
+    Listing
+    |> join(:inner, [l], el in assoc(l, :ebay_listing))
+    |> where([l, el], el.bid_count > 0)
+    |> Repo.aggregate(:count)
   end
 
   @spec create_listing(Kamansky.Stamps.Stamp.t, map) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
@@ -50,6 +58,18 @@ defmodule Kamansky.Sales.Listings do
     Listing
     |> where(status: ^status)
     |> join(:left, [l], s in assoc(l, :stamp))
+    |> Paginate.find_row_number(
+      Listing.display_column_for_sorting(options[:sort][:column]),
+      options
+    )
+  end
+
+  @spec find_row_number_for_listing_with_bids(Paginate.params) :: integer
+  def find_row_number_for_listing_with_bids(options) do
+    Listing
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> join(:inner, [l], el in assoc(l, :ebay_listing))
+    |> where([l, ..., el], el.bid_count > 0)
     |> Paginate.find_row_number(
       Listing.display_column_for_sorting(options[:sort][:column]),
       options
@@ -105,6 +125,15 @@ defmodule Kamansky.Sales.Listings do
     |> join(:left, [l], s in assoc(l, :stamp))
     |> join(:left, [l], o in assoc(l, :order))
     |> preload([l, s, o], [stamp: s, order: {o, :listings}])  # Can't join listings twice for some reason so it's separately loaded
+    |> then(&Paginate.list(Listings, &1, params))
+  end
+
+  @spec list_listings_with_bids(Kamansky.Paginate.params) :: [Listing.t]
+  def list_listings_with_bids(params) do
+    Listing
+    |> join(:inner, [l], el in assoc(l, :ebay_listings))
+    |> where([l, el], el.bid_count > 0)
+    |> preload([l, el], ebay_listing: el)
     |> then(&Paginate.list(Listings, &1, params))
   end
 

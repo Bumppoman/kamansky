@@ -65,8 +65,9 @@ defmodule Kamansky.Services.Hipstamp.Listing do
 
   @spec maybe_remove_listing(Listing.t) :: :ok
   def maybe_remove_listing(%Listing{} = listing) do
-    with %HipstampListing{hipstamp_id: hipstamp_id} <- Platforms.get_hipstamp_listing_for_listing(listing) do
+    with %HipstampListing{hipstamp_id: hipstamp_id} = hipstamp_listing <- Platforms.get_hipstamp_listing_for_listing(listing) do
       Hipstamp.delete!("/listings/#{hipstamp_id}")
+      Platforms.delete_external_listing(hipstamp_listing)
       Logger.info("Deleted Hipstamp listing for listing #{listing.id}")
     end
 

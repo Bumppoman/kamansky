@@ -30,6 +30,8 @@ defmodule Kamansky.Sales.Listings.Listing do
 
     belongs_to :stamp, Kamansky.Stamps.Stamp
     belongs_to :order, Kamansky.Sales.Orders.Order
+
+    has_one :ebay_listing, Kamansky.Sales.Listings.Platforms.EbayListing
   end
 
   @spec changeset(Listing.t, map) :: Ecto.Changeset.t
