@@ -109,12 +109,14 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.one()
   end
 
-  @spec list_listings(atom, Kamansky.Paginate.params) :: [Listing.t]
-  def list_listings(status, params) do
+  @spec list_active_listings(Kamansky.Paginate.params) :: [Listing.t]
+  def list_active_listings(params) do
     Listing
-    |> where(status: ^status)
+    |> where(status: :active)
     |> join(:left, [l], s in assoc(l, :stamp))
-    |> preload([l, s], [stamp: s])
+    |> join(:left, [l], el in assoc(l, :ebay_listing))
+    |> join(:left, [l], hl in assoc(l, :hipstamp_listing))
+    |> preload([l, s, el, hl], [stamp: s, ebay_listing: el, hipstamp_listing: hl])
     |> then(&Paginate.list(Listings, &1, params))
   end
 

@@ -28,7 +28,7 @@ defmodule KamanskyWeb.OrderLive.Components do
     <div class="hidden sm:block sm:mt-4">
       <nav class="flex font-medium justify-center leading-6">
         <%= for status <- [:pending, :processed, :shipped, :completed] do %>
-          <%= live_redirect String.capitalize(Atom.to_string(status)),
+          <%= live_patch String.capitalize(Atom.to_string(status)),
             to: Routes.order_index_path(@socket, status),
             class: "block mr-3 px-4 py-2 text-gray-500" <> (if @live_action == status, do: " bg-blue-100 rounded-md text-blue-600", else: " text-opacity-70")
           %>

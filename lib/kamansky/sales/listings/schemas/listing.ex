@@ -6,6 +6,7 @@ defmodule Kamansky.Sales.Listings.Listing do
   import Ecto.Query, warn: false
 
   alias __MODULE__
+  alias Kamansky.Sales.Listings.Platforms.{EbayListing, HipstampListing}
   alias Kamansky.Stamps.Stamp
 
   @type t :: Ecto.Schema.t | %Listing{
@@ -32,6 +33,7 @@ defmodule Kamansky.Sales.Listings.Listing do
     belongs_to :order, Kamansky.Sales.Orders.Order
 
     has_one :ebay_listing, Kamansky.Sales.Listings.Platforms.EbayListing
+    has_one :hipstamp_listing, Kamansky.Sales.Listings.Platforms.HipstampListing
   end
 
   @spec changeset(Listing.t, map) :: Ecto.Changeset.t
@@ -46,6 +48,14 @@ defmodule Kamansky.Sales.Listings.Listing do
     [[dynamic([l, s], s.scott_number), {:asc, dynamic([l], l.id)}]]
     |> Enum.at(column)
   end
+
+  @spec ebay?(t) :: boolean
+  def ebay?(%Listing{ebay_listing: %EbayListing{}}), do: true
+  def ebay?(%Listing{}), do: false
+
+  @spec hipstamp?(t) :: boolean
+  def hipstamp?(%Listing{hipstamp_listing: %HipstampListing{}}), do: true
+  def hipstamp?(%Listing{}), do: false
 
   @spec net_profit(Listing.t) :: Decimal.t
   def net_profit(%Listing{} = listing), do: Decimal.sub(listing.sale_price, Stamp.total_cost(listing.stamp))

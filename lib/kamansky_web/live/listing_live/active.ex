@@ -4,6 +4,7 @@ defmodule KamanskyWeb.ListingLive.Active do
   import Kamansky.Helpers
 
   alias Kamansky.Sales.Listings
+  alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Stamps.Stamp
 
   @impl true
@@ -14,7 +15,7 @@ defmodule KamanskyWeb.ListingLive.Active do
       socket
       |> assign(:data_count, fn -> Listings.count_listings(:active) end)
       |> assign(:data_locator, fn options -> Listings.find_row_number_for_listing(:active, options) end)
-      |> assign(:data_source, fn options -> Listings.list_listings(:active, options) end)
+      |> assign(:data_source, fn options -> Listings.list_active_listings(options) end)
     }
   end
 
