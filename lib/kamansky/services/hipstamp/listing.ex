@@ -14,7 +14,7 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     end
   end
 
-  @spec list(Listing.t) :: :ok
+  @spec list(Listing.t) :: {:ok, HipstampListing.t}
   def list(%Listing{stamp: stamp} = listing) do
     body = %{
       listing_type: :product,
@@ -59,8 +59,6 @@ defmodule Kamansky.Services.Hipstamp.Listing do
         }
       )
     )
-
-    :ok
   end
 
   @spec maybe_remove_listing(Listing.t) :: :ok

@@ -26,8 +26,13 @@ defmodule KamanskyWeb.ListingLive.Active do
     with listing <- Listings.get_listing_to_list(listing_id),
       {:ok, _ebay_listing} <- Ebay.Listing.list(listing)
     do
-      refresh_datatable("listings-kamansky-data-table", [])
-      {:noreply, put_flash(socket, :info, %{message: "You have successfully listed this listing on eBay.", timestamp: Time.utc_now()})}
+      close_modal_with_success_and_refresh_datatable(
+        socket,
+        "listings-kamansky-data-table",
+        "kamansky:closeConfirmationModal",
+        "You have successfully listed this listing on eBay.",
+        listing.id
+      )
     end
   end
 
@@ -35,8 +40,13 @@ defmodule KamanskyWeb.ListingLive.Active do
     with listing <- Listings.get_listing_to_list(listing_id),
       {:ok, _hipstamp_listing} <- Hipstamp.Listing.list(listing)
     do
-      refresh_datatable("listings-kamansky-data-table", [])
-      {:noreply, put_flash(socket, :info, %{message: "You have successfully listed this listing on Hipstamp.", timestamp: Time.utc_now()})}
+      close_modal_with_success_and_refresh_datatable(
+        socket,
+        "listings-kamansky-data-table",
+        "kamansky:closeConfirmationModal",
+        "You have successfully listed this listing on Hipstamp.",
+        listing.id
+      )
     end
   end
 
