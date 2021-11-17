@@ -18,6 +18,45 @@ defmodule Kamansky.Sales.Listings.Platforms do
     |> Repo.insert()
   end
 
+  @spec get_ebay_listing(String.t) :: EbayListing.t | nil
+  def get_ebay_listing(ebay_id) do
+    EbayListing
+    |> where(ebay_id: ^ebay_id)
+    |> join(:left, [el], l in assoc(el, :listing))
+    |> preload([el, l], listing: l)
+    |> Repo.one()
+  end
+
+  @spec get_ebay_listing_for_listing(Listing.t) :: EbayListing.t | nil
+  def get_ebay_listing_for_listing(%Listing{id: listing_id}) do
+    EbayListing
+    |> where(listing_id: ^listing_id)
+    |> Repo.one()
+  end
+
+  @spec get_hipstamp_listing(pos_integer) :: HipstampListing.t | nil
+  def get_hipstamp_listing(hipstamp_id) do
+    HipstampListing
+    |> where(hipstamp_id: ^hipstamp_id)
+    |> join(:left, [el], l in assoc(el, :listing))
+    |> preload([el, l], listing: l)
+    |> Repo.one()
+  end
+
+  @spec get_hipstamp_listing_for_listing(Listing.t) :: HipstampListing.t | nil
+  def get_hipstamp_listing_for_listing(%Listing{id: listing_id}) do
+    HipstampListing
+    |> where(listing_id: ^listing_id)
+    |> Repo.one()
+  end
+
+  @spec update_external_listing(external_listing, map) :: {:ok, external_listing} | {:error, Ecto.Changeset.t} when external_listing: EbayListing.t | HipstampListing.t
+  def update_external_listing(external_listing, attrs) do
+    external_listing
+    |> change_external_listing(attrs)
+    |> Repo.update()
+  end
+
   defp external_listing_struct(:ebay), do: %EbayListing{}
   defp external_listing_struct(:hipstamp), do: %HipstampListing{}
 end

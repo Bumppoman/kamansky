@@ -145,7 +145,7 @@ defmodule Kamansky.Services.Ebay.Listing do
       ~x"//Item"l,
       bid_count: ~x".//BidCount/text()"s,
       inventory_key: ~x".//SKU/text()"s,
-      item_id: ~x".//ItemID/text()"s
+      ebay_id: ~x".//ItemID/text()"s
     )
     |> Enum.filter(&(String.to_integer(&1.bid_count) > 0))
   end

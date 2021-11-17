@@ -1,6 +1,9 @@
+require Logger
+
 defmodule Kamansky.Services.Hipstamp.Listing do
   alias Kamansky.Attachments.Attachment
   alias Kamansky.Sales.Listings.{Listing, Platforms}
+  alias Kamansky.Sales.Listings.Platforms.HipstampListing
   alias Kamansky.Services.Hipstamp
   alias Kamansky.Stamps.Stamp
 
@@ -60,13 +63,13 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     :ok
   end
 
-  @spec maybe_remove_listing(Listing.t) :: :ok | {:error, Ecto.Changeset.t} | {:ok, Listing.t}
-  def maybe_remove_listing(%Listing{hipstamp_id: hipstamp_id} = listing) when not is_nil(hipstamp_id), do: remove_listing(listing)
-  def maybe_remove_listing(%Listing{} = _listing), do: :ok
+  @spec maybe_remove_listing(Listing.t) :: :ok
+  def maybe_remove_listing(%Listing{} = listing) do
+    with %HipstampListing{hipstamp_id: hipstamp_id} <- Platforms.get_hipstamp_listing_for_listing(listing) do
+      Hipstamp.delete!("/listings/#{hipstamp_id}")
+      Logger.info("Deleted Hipstamp listing for listing #{listing.id}")
+    end
 
-  @spec remove_listing(Listing.t) :: :ok
-  def remove_listing(%Listing{} = listing) do
-    Hipstamp.delete!("/listings/#{listing.hipstamp_id}")
     :ok
   end
 end
