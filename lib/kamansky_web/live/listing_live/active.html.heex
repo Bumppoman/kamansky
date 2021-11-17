@@ -15,6 +15,7 @@
         "Grade",
         "Price",
         "Listing Date",
+        "Listed",
         %{text: "Actions", sort: :disabled}
       ]
     }
@@ -52,42 +53,86 @@
     </td>
     <td><%= format_decimal_as_currency(listing.listing_price) %></td>
     <td><%= formatted_date(listing.inserted_at) %></td>
-    <td class="flex">
-      <a
-        class="action-icon"
-        title="Add Listing to Order"
-        phx-click="open"
-        phx-target="#listing-add-to-order-form-modal"
-        phx-value-listing-id={listing.id}
-      >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          class="h-5 w-5" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-        >
-          <path 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" 
-          />
-        </svg>
-      </a>
-      <%= if Listing.hipstamp?(listing) do %>
-        <a
-          href={"https://www.hipstamp.com/listing/stamp/#{listing.hipstamp_listing.hipstamp_id}"}
-          class="action-icon"
-          target="_blank"
-          title="View on Hipstamp"
-        >
-          <img
-            class="h-5 w-5"
-            src={Routes.static_path(@socket, "/images/hipstamp-logo.png")} 
-          />
-        </a>
+    <td>
+      <%= cond do %>
+        <% Listing.ebay?(listing) -> %>
+          <a
+            href={"https://www.ebay.com/itm/#{listing.ebay_listing.ebay_id}"}
+            class="action-icon ml-2"
+            target="_blank"
+            title="View on eBay"
+          >
+            <img
+              class="h-5 w-5"
+              src={Routes.static_path(@socket, "/images/ebay-logo.svg")} 
+            />
+          </a>
+        <% Listing.hipstamp?(listing) -> %>
+          <a
+            href={"https://www.hipstamp.com/listing/stamp/#{listing.hipstamp_listing.hipstamp_id}"}
+            class="action-icon ml-2"
+            target="_blank"
+            title="View on Hipstamp"
+          >
+            <img
+              class="h-5 w-5"
+              src={Routes.static_path(@socket, "/images/hipstamp-logo.png")} 
+            />
+          </a>
+        <% true -> %> None
       <% end %>
+    </td>
+    <td>
+      <div class="flex">
+        <a
+          class="action-icon"
+          title="Add Listing to Order"
+          phx-click="open"
+          phx-target="#listing-add-to-order-form-modal"
+          phx-value-listing-id={listing.id}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            class="h-5 w-5" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" 
+            />
+          </svg>
+        </a>
+        <%= unless Listing.ebay?(listing) do %>
+          <KamanskyWeb.Components.Page.link_with_confirmation
+            action="list_on_ebay"
+            content="Are you sure you want to list this listing on eBay?"
+            title="List on eBay"
+            values={[{"listing-id", listing.id}]}
+          >
+            <img
+              class="h-5 w-5"
+              src={Routes.static_path(@socket, "/images/ebay-logo.svg")} 
+            />
+          </KamanskyWeb.Components.Page.link_with_confirmation>
+        <% end %>
+        <%= unless Listing.hipstamp?(listing) do %>
+          <KamanskyWeb.Components.Page.link_with_confirmation
+            action="list_on_hipstamp"
+            content="Are you sure you want to list this listing on Hipstamp?"
+            title="List on Hipstamp"
+            values={[{"listing-id", listing.id}]}
+          >
+            <img
+              class="h-5 w-5"
+              src={Routes.static_path(@socket, "/images/hipstamp-logo.png")} 
+            />
+          </KamanskyWeb.Components.Page.link_with_confirmation>
+        <% end %>
+      </div>
     </td>
   </.live_component>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
