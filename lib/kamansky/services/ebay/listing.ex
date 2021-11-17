@@ -1,6 +1,7 @@
 defmodule Kamansky.Services.Ebay.Listing do
   import SweetXml
 
+  alias Kamansky.Attachments.Attachment
   alias Kamansky.Sales.Listings
   alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Stamps.Stamp
@@ -28,6 +29,7 @@ defmodule Kamansky.Services.Ebay.Listing do
     <AddItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
       #{Ebay.requester_credentials()}
       <Item>
+        <SKU>#{stamp.inventory_key}</SKU>
         <Title>#{title(stamp)}</Title>
         <Description>
           <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -41,6 +43,14 @@ defmodule Kamansky.Services.Ebay.Listing do
           <CategoryID>#{category_id(stamp)}</CategoryID>
         </PrimaryCategory>
         <StartPrice>#{Decimal.sub(listing.listing_price, "0.01")}</StartPrice>
+        <Currency>USD</Currency>
+        <ListingDuration>Days_7</ListingDuration>
+        <PictureDetails>
+          <PictureURL>#{Attachment.full_path(stamp.front_photo)}</PictureURL>
+          <PictureURL>#{Attachment.full_path(stamp.rear_photo)}</PictureURL>
+        </PictureDetails>
+        <Country>US</Country>
+        <PostalCode>13760</PostalCode>
         <ItemSpecifics>
           <NameValueList>
             <Name>Certification</Name>
@@ -71,9 +81,19 @@ defmodule Kamansky.Services.Ebay.Listing do
             <Value>#{StampReference.era(stamp.stamp_reference)}</Value>
           </NameValueList>
         </ItemSpecifics>
+        <ShippingDetails>
+          <ShippingType>Flat</ShippingType>
+          <ShippingServiceOptions>
+            <FreeShipping>#{Decimal.gt?(listing.listing_price, "14.99")}</FreeShipping>
+            <ShippingServiceCost>#{shipping_cost(listing)}</ShippingServiceCost>
+          </ShippingServiceOptions>
+        </ShippingDetails>
       </Item>
     </AddItemRequest>
     """
+    |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "AddItem"}]))
+    |> Map.get(:body)
+    |> parse(dtd: :none)
   end
 
   @spec list_active_listings_with_bids :: [%{required(:bid_count) => String.t, required(:item_id) => String.t}]
@@ -147,10 +167,26 @@ defmodule Kamansky.Services.Ebay.Listing do
   end
 
   @spec grade(Stamp.t) :: String.t
+  def grade(%Stamp{grade: grade}) when grade in 70..74, do: "F/VF (Fine/Very Fine)"
+  def grade(%Stamp{grade: grade}) when grade in 75..79, do: "VF (Very Fine)"
+  def grade(%Stamp{grade: grade}) when grade in 80..84, do: "VF/XF (Very Fine/Extremely Fine)"
+  def grade(%Stamp{grade: grade}) when grade in 85..89, do: "XF (Extremely Fine)"
+  def grade(%Stamp{grade: grade}) when grade in 90..94, do: "XF/S (Extremely Fine/Superb"
+  def grade(%Stamp{grade: grade}) when grade in 95..97, do: "Superb"
+  def grade(%Stamp{grade: grade}) when grade in 98..100, do: "Gem"
   def grade(%Stamp{}), do: "Ungraded"
 
   @spec quality(Stamp.t) :: String.t
+  def quality(%Stamp{gum_disturbance: true}), do: "Original Gum"
+  def quality(%Stamp{hinged: true}), do: "Mint Hinged"
+  def quality(%Stamp{hinge_remnant: true}), do: "Hinge Remaining"
+  def quality(%Stamp{no_gum: true}), do: "Mint No Gum/MNG"
   def quality(%Stamp{}), do: "Mint Never Hinged/MNH"
+
+  @spec shipping_cost(Listing.t) :: String.t
+  def shipping_cost(%Listing{listing_price: listing_price}) do
+    if Decimal.lt?(listing_price, 15), do: "1.00", else: "0.00"
+  end
 
   @spec title(Stamp.t) :: String.t
   defp title(%Stamp{} = stamp) do

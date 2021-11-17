@@ -37,12 +37,22 @@
       </div>
       <div class="flex flex-col form-group required">
         <label>List On</label>
-        <div class="flex flex-grow items-center">
-          <div>
-            <%= checkbox f, :hipstamp %>
+        <div class="flex flex-grow flex-row items-center">
+          <div class="flex flex-grow">
+            <div>
+              <%= checkbox f, :hipstamp %>
+            </div>
+            <div class="ml-3">
+              <label>Hipstamp</label>
+            </div>
           </div>
-          <div class="ml-3">
-            <label>Hipstamp</label>
+          <div class="flex flex-grow">
+            <div>
+              <%= checkbox f, :ebay %>
+            </div>
+            <div class="ml-3">
+              <label>eBay</label>
+            </div>
           </div>
         </div>
       </div>
