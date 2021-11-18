@@ -206,12 +206,12 @@ defmodule Kamansky.Sales.Orders do
     |> Enum.each(&Kamansky.Services.Hipstamp.Listing.maybe_remove_listing/1)
   end
 
-  def maybe_delist_listings(%Order{ebay_id: nil, hipstamp_id: hipstamp_id} = order) when not is_nil(hipstamp_id) do
-    order
-    |> Repo.preload(:listings)
-    |> Map.get(:listings)
-    |> Enum.each(&Kamansky.Services.Ebay.Listing.maybe_remove_listing/1)
-  end
+  #def maybe_delist_listings(%Order{ebay_id: nil, hipstamp_id: hipstamp_id} = order) when not is_nil(hipstamp_id) do
+  #  order
+  #  |> Repo.preload(:listings)
+  #  |> Map.get(:listings)
+  #  |> Enum.each(&Kamansky.Services.Ebay.Listing.maybe_remove_listing/1)
+  #end
 
   def maybe_delist_listings(%Order{}), do: :ok
 

@@ -12,20 +12,17 @@ defmodule Kamansky.Sales.Listings.Listing do
   @type t :: Ecto.Schema.t | %Listing{
     listing_price: Decimal.t,
     sale_price: Decimal.t,
-    hipstamp_id: integer,
-    ebay_id: String.t,
     status: atom
   }
 
   schema "listings" do
     field :listing_price, :decimal
     field :sale_price, :decimal
-    field :hipstamp_id, :integer
-    field :ebay_id, :string
     field :status, Ecto.Enum, values: [pending: 1, active: 2, bid: 3, sold: 4, removed: 5, lost: 6], default: :active
 
     field :ebay, :boolean, virtual: true, default: false
     field :hipstamp, :boolean, virtual: true, default: true
+    field :title, :string, virtual: true
 
     timestamps(updated_at: false)
 

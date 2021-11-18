@@ -22,11 +22,22 @@ defmodule Kamansky.Sales.Listings.Platforms.EbayListing do
     field :bid_count, :integer, default: 0
     field :current_bid, :decimal
 
+    field :auction_price, :decimal, virtual: true
+    field :buy_it_now_price, :decimal, virtual: true
+    field :title, :string, virtual: true
+
     belongs_to :listing, Kamansky.Sales.Listings.Listing
   end
 
   @spec changeset(t, map) :: Ecto.Changeset.t
   def changeset(%EbayListing{} = ebay_listing, attrs) do
-    cast(ebay_listing, attrs, [:ebay_id, :start_time, :end_time, :bid_count, :current_bid])
+    cast(
+      ebay_listing,
+      attrs,
+      [
+        :auction_price, :bid_count, :buy_it_now_price, :current_bid,
+        :ebay_id, :end_time, :listing_id, :start_time, :title
+      ]
+    )
   end
 end

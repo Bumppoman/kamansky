@@ -153,10 +153,6 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> Enum.filter(&(String.to_integer(&1.bid_count) > 0))
   end
 
-  @spec maybe_remove_listing(Listing.t) :: :ok | {:error, Ecto.Changeset.t} | {:ok, Listing.t}
-  def maybe_remove_listing(%Listing{ebay_id: ebay_id} = listing) when not is_nil(ebay_id), do: remove_listing(listing)
-  def maybe_remove_listing(%Listing{} = _listing), do: :ok
-
   @spec relist(EbayListing.t) :: {:ok, EbayListing.t}
   def relist(%EbayListing{} = ebay_listing) do
     relisted_listing =
@@ -190,12 +186,12 @@ defmodule Kamansky.Services.Ebay.Listing do
   end
 
   @spec remove_listing(Listing.t) :: :ok
-  def remove_listing(%Listing{} = listing) do
+  def remove_listing(%Listing{ebay_listing: %EbayListing{ebay_id: ebay_id}}) do
     """
     <?xml version="1.0" encoding="utf-8"?>
     <EndItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
       #{Ebay.requester_credentials()}
-      <ItemID>#{listing.ebay_id}</ItemID>
+      <ItemID>#{ebay_id}</ItemID>
       <EndingReason>NotAvailable</EndingReason>
     </EndItemRequest>
     """
@@ -207,15 +203,36 @@ defmodule Kamansky.Services.Ebay.Listing do
     :ok
   end
 
+  @spec suggested_auction_price(Listing.t) :: Decimal.t
+  def suggested_auction_price(%Listing{listing_price: listing_price}), do: Decimal.sub(listing_price, "0.01")
+
+  @spec suggested_buy_it_now_price(Listing.t) :: Decimal.t
+  def suggested_buy_it_now_price(%Listing{listing_price: listing_price}) do
+    listing_price
+    |> Decimal.mult(2)
+    |> Decimal.sub("0.01")
+  end
+
+  @spec title(Stamp.t) :: String.t
+  def title(%Stamp{} = stamp) do
+    with description <- Stamp.sale_description(stamp) do
+      cond do
+        String.length(description) <= 63 -> "Bumppoman Stamps " <> description
+        String.length(description) in 64..71 -> "Bumppoman " <> description
+        true -> "Bumppoman " <> String.slice(description, 0, 70)
+      end
+    end
+  end
+
   @spec category_id(Stamp.t) :: integer
-  def category_id(%Stamp{stamp_reference: %StampReference{issue_type: :airmail}}), do: 680
-  def category_id(%Stamp{stamp_reference: %StampReference{issue_type: issue_type}}) when issue_type != :standard, do: 681
-  def category_id(%Stamp{stamp_reference: %StampReference{year_of_issue: year_of_issue}}) when year_of_issue < 1900, do: 676
-  def category_id(%Stamp{stamp_reference: %StampReference{year_of_issue: year_of_issue}}) when year_of_issue >= 1900 and year_of_issue < 1941, do: 3461
-  def category_id(%Stamp{}), do: 679
+  defp category_id(%Stamp{stamp_reference: %StampReference{issue_type: :airmail}}), do: 680
+  defp category_id(%Stamp{stamp_reference: %StampReference{issue_type: issue_type}}) when issue_type != :standard, do: 681
+  defp category_id(%Stamp{stamp_reference: %StampReference{year_of_issue: year_of_issue}}) when year_of_issue < 1900, do: 676
+  defp category_id(%Stamp{stamp_reference: %StampReference{year_of_issue: year_of_issue}}) when year_of_issue >= 1900 and year_of_issue < 1941, do: 3461
+  defp category_id(%Stamp{}), do: 679
 
   @spec denomination(Stamp.t) :: String.t
-  def denomination(%Stamp{stamp_reference: %StampReference{denomination: denomination}}) do
+  defp denomination(%Stamp{stamp_reference: %StampReference{denomination: denomination}}) do
     cond do
       Decimal.lt?(denomination, 1) -> "#{Decimal.to_integer(Decimal.mult(denomination, 100))} Cent"
       Decimal.eq?(denomination, 1) -> "1 Dollar"
@@ -226,35 +243,24 @@ defmodule Kamansky.Services.Ebay.Listing do
   end
 
   @spec grade(Stamp.t) :: String.t
-  def grade(%Stamp{grade: grade}) when grade in 70..74, do: "F/VF (Fine/Very Fine)"
-  def grade(%Stamp{grade: grade}) when grade in 75..79, do: "VF (Very Fine)"
-  def grade(%Stamp{grade: grade}) when grade in 80..84, do: "VF/XF (Very Fine/Extremely Fine)"
-  def grade(%Stamp{grade: grade}) when grade in 85..89, do: "XF (Extremely Fine)"
-  def grade(%Stamp{grade: grade}) when grade in 90..94, do: "XF/S (Extremely Fine/Superb"
-  def grade(%Stamp{grade: grade}) when grade in 95..97, do: "Superb"
-  def grade(%Stamp{grade: grade}) when grade in 98..100, do: "Gem"
-  def grade(%Stamp{}), do: "Ungraded"
+  defp grade(%Stamp{grade: grade}) when grade in 70..74, do: "F/VF (Fine/Very Fine)"
+  defp grade(%Stamp{grade: grade}) when grade in 75..79, do: "VF (Very Fine)"
+  defp grade(%Stamp{grade: grade}) when grade in 80..84, do: "VF/XF (Very Fine/Extremely Fine)"
+  defp grade(%Stamp{grade: grade}) when grade in 85..89, do: "XF (Extremely Fine)"
+  defp grade(%Stamp{grade: grade}) when grade in 90..94, do: "XF/S (Extremely Fine/Superb"
+  defp grade(%Stamp{grade: grade}) when grade in 95..97, do: "Superb"
+  defp grade(%Stamp{grade: grade}) when grade in 98..100, do: "Gem"
+  defp grade(%Stamp{}), do: "Ungraded"
 
   @spec quality(Stamp.t) :: String.t
-  def quality(%Stamp{gum_disturbance: true}), do: "Original Gum"
-  def quality(%Stamp{hinged: true}), do: "Mint Hinged"
-  def quality(%Stamp{hinge_remnant: true}), do: "Hinge Remaining"
-  def quality(%Stamp{no_gum: true}), do: "Mint No Gum/MNG"
-  def quality(%Stamp{}), do: "Mint Never Hinged/MNH"
+  defp quality(%Stamp{gum_disturbance: true}), do: "Original Gum"
+  defp quality(%Stamp{hinged: true}), do: "Mint Hinged"
+  defp quality(%Stamp{hinge_remnant: true}), do: "Hinge Remaining"
+  defp quality(%Stamp{no_gum: true}), do: "Mint No Gum/MNG"
+  defp quality(%Stamp{}), do: "Mint Never Hinged/MNH"
 
   @spec shipping_cost(Listing.t) :: String.t
-  def shipping_cost(%Listing{listing_price: listing_price}) do
+  defp shipping_cost(%Listing{listing_price: listing_price}) do
     if Decimal.lt?(listing_price, 15), do: "1.00", else: "0.00"
-  end
-
-  @spec title(Stamp.t) :: String.t
-  defp title(%Stamp{} = stamp) do
-    with description <- Stamp.sale_description(stamp) do
-      cond do
-        String.length(description) <= 63 -> "Bumppoman Stamps " <> description
-        String.length(description) in 64..71 -> "Bumppoman " <> description
-        true -> "Bumppoman " <> String.slice(description, 0, 70)
-      end
-    end
   end
 end

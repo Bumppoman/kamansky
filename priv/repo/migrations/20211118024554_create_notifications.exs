@@ -3,11 +3,11 @@ defmodule Kamansky.Repo.Migrations.CreateNotifications do
 
   def change do
     create table(:notifications) do
-      add :user_id, references(:users)
+      add :topic, :integer
+      add :title, :string
       add :body, :string
-      add :status, :integer
 
-      timestamps()
+      timestamps(updated_at: false)
     end
   end
 end

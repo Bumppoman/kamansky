@@ -7,16 +7,17 @@ defmodule Kamansky.Services.Hipstamp.Listing do
   alias Kamansky.Services.Hipstamp
   alias Kamansky.Stamps.Stamp
 
-  @spec get(%Listing{hipstamp_id: integer}) :: %{required(String.t) => any}
-  def get(%Listing{hipstamp_id: id}) do
-    with {:ok, response} <- Hipstamp.get("/listings/#{id}") do
-      hd(response.body["results"])
-    end
+  @spec get(%Listing{hipstamp_listing: %HipstampListing{}}) :: %{required(String.t) => any}
+  def get(%Listing{hipstamp_listing: %HipstampListing{hipstamp_id: hipstamp_id}}) do
+    "/listings/#{hipstamp_id}"
+    |> Hipstamp.get!()
+    |> Map.get(:body)
+    |> Map.get("results")
   end
 
   @spec list(Listing.t) :: {:ok, HipstampListing.t}
   def list(%Listing{stamp: stamp} = listing) do
-    body = %{
+    %{
       listing_type: :product,
       name: String.slice(Stamp.sale_description(stamp), 0, 79),
       description: Stamp.sale_description(stamp) <> ".\n\n" <> "See photo for detail. Actual stamp shown.  Bumppoman Stamps does not use stock images on any listing...we wouldn't buy for our collection sight unseen so why should you?!\n\nAdditional stamps in the same order ship for 10¢ each, unless otherwise marked.  We strive for SAME or NEXT DAY shipping.",
@@ -39,9 +40,7 @@ defmodule Kamansky.Services.Hipstamp.Listing do
       item_specifics_05_stamp_format: Hipstamp.format(stamp),
       item_specifics_07_year_of_issue: stamp.stamp_reference.year_of_issue
     }
-
-    "/listings"
-    |> Hipstamp.post!(body)
+    |> then(&Hipstamp.post!("/listings", &1))
     |> Map.get(:body)
     |> Map.get("results")
     |> hd()

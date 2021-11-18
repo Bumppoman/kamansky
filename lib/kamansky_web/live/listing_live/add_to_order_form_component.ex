@@ -7,8 +7,7 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
   alias Kamansky.Sales.Orders.Order
 
   @impl true
-  @spec update(%{required(:listing) => Kamansky.Sales.Listings.Listing.t, optional(any) => any}, Phoenix.LiveView.Socket.t)
-    :: {:ok, Phoenix.LiveView.Socket.t}
+  @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{trigger_params: %{"listing-id" => listing_id}} = assigns, socket) do
     with listing <- Listings.get_listing!(listing_id) do
       {
