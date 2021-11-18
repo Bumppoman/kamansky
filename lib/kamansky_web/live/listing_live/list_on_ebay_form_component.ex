@@ -21,7 +21,7 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
             %{
               auction_price: Ebay.Listing.suggested_auction_price(listing),
               buy_it_now_price: Ebay.Listing.suggested_buy_it_now_price(listing),
-              title: Ebay.Listing.title(listing.stamp)
+              title: Ebay.Listing.suggested_title(listing)
             }
           )
         )
@@ -43,8 +43,8 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
   end
 
   def handle_event("submit", %{"ebay_listing" => ebay_listing_params}, socket) do
-    :ebay
-    |> Platforms.create_external_listing(socket.assigns.listing, ebay_listing_params)
+    socket.assigns.listing
+    |> Kamansky.Services.Stamp.create_new_external_listing_for_existing_listing(:ebay, ebay_listing_params)
     |> case do
       {:ok, %EbayListing{listing_id: listing_id}} ->
         close_modal_with_success_and_refresh_datatable(
@@ -54,7 +54,6 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
           "You have successfully listed this stamp on eBay.",
           listing_id
         )
-      {:error, %Ecto.Changeset{} = changeset} -> assign(socket, :changeset, changeset)
     end
   end
 end

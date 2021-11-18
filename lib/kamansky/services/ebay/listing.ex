@@ -22,8 +22,8 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> xpath(~x"//ListingStatus/text()")
   end
 
-  @spec list(Listing.t) :: {:ok, EbayListing.t}
-  def list(%Listing{stamp: stamp} = listing) do
+  @spec list(Listing.t, map) :: {:ok, EbayListing.t}
+  def list(%Listing{stamp: stamp} = listing, opts \\ %{}) do
     ebay_listing =
       """
       <?xml version="1.0" encoding="utf-8"?>
@@ -31,11 +31,11 @@ defmodule Kamansky.Services.Ebay.Listing do
         #{Ebay.requester_credentials()}
         <Item>
           <SKU>#{stamp.inventory_key}</SKU>
-          <Title>#{title(stamp)}</Title>
+          <Title>#{title(stamp, opts)}</Title>
           <Description>
             <![CDATA[
               <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-              <div style="width:75% !important; margin:0 auto;">
+              <div style="width: 75% !important; margin: 0 auto;">
                 <h1>Bumppoman Stamps</h1>
                 <p>#{Stamp.sale_description(stamp)}. Item ##{stamp.inventory_key}.</p>
                 <p>See photo for detail. Actual stamp shown. Bumppoman Stamps does not use stock images on any listing...we wouldn't buy for our collection sight unseen so why should you?! <span style="font-size:1rem;">Ships with USPS First Class.</span></p>
@@ -45,8 +45,8 @@ defmodule Kamansky.Services.Ebay.Listing do
           <PrimaryCategory>
             <CategoryID>#{category_id(stamp)}</CategoryID>
           </PrimaryCategory>
-          <StartPrice>#{Decimal.sub(listing.listing_price, "0.01")}</StartPrice>
-          <BuyItNowPrice>#{Decimal.sub(Decimal.mult(listing.listing_price, 2), "0.01")}</BuyItNowPrice>
+          <StartPrice>#{auction_price(listing, opts)}</StartPrice>
+          <BuyItNowPrice>#{buy_it_now_price(listing, opts)}</BuyItNowPrice>
           <Currency>USD</Currency>
           <ListingDuration>Days_7</ListingDuration>
           <DispatchTimeMax>3</DispatchTimeMax>
@@ -93,8 +93,8 @@ defmodule Kamansky.Services.Ebay.Listing do
             <ShippingType>Flat</ShippingType>
             <ShippingServiceOptions>
               <ShippingService>USPSFirstClass</ShippingService>
-              <FreeShipping>#{Decimal.gt?(listing.listing_price, "14.99")}</FreeShipping>
-              <ShippingServiceCost>#{shipping_cost(listing)}</ShippingServiceCost>
+              <FreeShipping>#{free_shipping?(listing, opts)}</FreeShipping>
+              <ShippingServiceCost>#{shipping_cost(listing, opts)}</ShippingServiceCost>
             </ShippingServiceOptions>
           </ShippingDetails>
           <Site>US</Site>
@@ -213,8 +213,8 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> Decimal.sub("0.01")
   end
 
-  @spec title(Stamp.t) :: String.t
-  def title(%Stamp{} = stamp) do
+  @spec suggested_title(Listing.t) :: String.t
+  def suggested_title(%Listing{stamp: %Stamp{} = stamp}) do
     with description <- Stamp.sale_description(stamp) do
       cond do
         String.length(description) <= 63 -> "Bumppoman Stamps " <> description
@@ -223,6 +223,14 @@ defmodule Kamansky.Services.Ebay.Listing do
       end
     end
   end
+
+  @spec auction_price(Listing.t, map) :: Decimal.t
+  defp auction_price(%Listing{}, %{auction_price: auction_price}), do: auction_price
+  defp auction_price(%Listing{} = listing, _opts), do: suggested_auction_price(listing)
+
+  @spec buy_it_now_price(Listing.t, map) :: Decimal.t
+  defp buy_it_now_price(%Listing{}, %{buy_it_now_price: buy_it_now_price}), do: buy_it_now_price
+  defp buy_it_now_price(%Listing{} = listing, _opts), do: suggested_buy_it_now_price(listing)
 
   @spec category_id(Stamp.t) :: integer
   defp category_id(%Stamp{stamp_reference: %StampReference{issue_type: :airmail}}), do: 680
@@ -242,6 +250,9 @@ defmodule Kamansky.Services.Ebay.Listing do
     end
   end
 
+  @spec free_shipping?(Listing.t, map) :: boolean
+  def free_shipping?(%Listing{listing_price: listing_price}, opts \\ %{}), do: Decimal.gt?(Map.get(opts, :auction_price, listing_price), "14.99")
+
   @spec grade(Stamp.t) :: String.t
   defp grade(%Stamp{grade: grade}) when grade in 70..74, do: "F/VF (Fine/Very Fine)"
   defp grade(%Stamp{grade: grade}) when grade in 75..79, do: "VF (Very Fine)"
@@ -259,8 +270,12 @@ defmodule Kamansky.Services.Ebay.Listing do
   defp quality(%Stamp{no_gum: true}), do: "Mint No Gum/MNG"
   defp quality(%Stamp{}), do: "Mint Never Hinged/MNH"
 
-  @spec shipping_cost(Listing.t) :: String.t
-  defp shipping_cost(%Listing{listing_price: listing_price}) do
-    if Decimal.lt?(listing_price, 15), do: "1.00", else: "0.00"
+  @spec shipping_cost(Listing.t, map) :: String.t
+  defp shipping_cost(%Listing{listing_price: listing_price}, opts) do
+    if Decimal.lt?(Map.get(opts, :auction_price, listing_price), 15), do: "1.00", else: "0.00"
   end
+
+  @spec title(Listing.t, map) :: String.t
+  defp title(%Listing{stamp: %Stamp{}}, %{title: title}), do: title
+  defp title(%Listing{stamp: %Stamp{}} = listing, _opts), do: suggested_title(listing)
 end
