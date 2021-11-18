@@ -7,11 +7,17 @@
     phx_change="validate"
     phx_submit="submit"
   >
-    <div class="form-group required">
+    <div class="form-group required" x-data="{count: 0}">
       <%= label f, :title %>
       <div class="form-input">
-        <%= text_input f, :title %>
+        <%= text_input f, 
+          :title, 
+          maxlength: 80,
+          "x-init": "count = $el.value.length",
+          "x-on:change": "count = $el.value.length"
+        %>
       </div>
+      <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
     </div>
     <div class="grid grid-cols-2">
       <div class="form-group required">

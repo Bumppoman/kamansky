@@ -37,7 +37,7 @@ defmodule Kamansky.Services.Ebay.Listing do
               <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
               <div style="width: 75% !important; margin: 0 auto;">
                 <h1>Bumppoman Stamps</h1>
-                <p>#{Stamp.sale_description(stamp)}. Item ##{stamp.inventory_key}.</p>
+                <p>#{Stamp.sale_description(stamp)}.</p>
                 <p>See photo for detail. Actual stamp shown. Bumppoman Stamps does not use stock images on any listing...we wouldn't buy for our collection sight unseen so why should you?! <span style="font-size:1rem;">Ships with USPS First Class.</span></p>
               </div>
             ]]>
