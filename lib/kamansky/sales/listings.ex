@@ -84,7 +84,7 @@ defmodule Kamansky.Sales.Listings do
     Listing
     |> join(:left, [l], s in assoc(l, :stamp))
     |> join(:inner, [l], el in assoc(l, :ebay_listing))
-    |> where(ebay_id: ^ebay_id)
+    |> where([l, ..., el], el.ebay_id == ^ebay_id)
     |> preload([l, s, el], [stamp: s, ebay_listing: el])
     |> Repo.one()
   end

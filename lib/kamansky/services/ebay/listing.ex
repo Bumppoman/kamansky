@@ -31,7 +31,7 @@ defmodule Kamansky.Services.Ebay.Listing do
         #{Ebay.requester_credentials()}
         <Item>
           <SKU>#{stamp.inventory_key}</SKU>
-          <Title>#{title(stamp, opts)}</Title>
+          <Title>#{title(listing, opts)}</Title>
           <Description>
             <![CDATA[
               <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
