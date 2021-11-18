@@ -53,6 +53,13 @@ defmodule Kamansky.Sales.Listings.Platforms do
     |> Repo.one()
   end
 
+  @spec list_expired_ebay_listings :: [Listing.t]
+  def list_expired_ebay_listings do
+    EbayListing
+    |> where([el], el.end_time < ^DateTime.utc_now() and el.bid_count == 0)
+    |> Repo.all()
+  end
+
   @spec update_external_listing(external_listing, map) :: {:ok, external_listing} | {:error, Ecto.Changeset.t} when external_listing: EbayListing.t | HipstampListing.t
   def update_external_listing(external_listing, attrs) do
     external_listing

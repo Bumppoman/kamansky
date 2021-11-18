@@ -3,6 +3,7 @@ defmodule Kamansky.Services.Ebay.Listing do
 
   alias Kamansky.Attachments.Attachment
   alias Kamansky.Sales.Listings.{Listing, Platforms}
+  alias Kamansky.Sales.Listings.Platforms.EbayListing
   alias Kamansky.Stamps.Stamp
   alias Kamansky.Stamps.StampReferences.StampReference
   alias Kamansky.Services.Ebay
@@ -21,7 +22,7 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> xpath(~x"//ListingStatus/text()")
   end
 
-  @spec list(Listing.t) :: {:ok, Platforms.EbayListing.t}
+  @spec list(Listing.t) :: {:ok, EbayListing.t}
   def list(%Listing{stamp: stamp} = listing) do
     ebay_listing =
       """
@@ -110,15 +111,15 @@ defmodule Kamansky.Services.Ebay.Listing do
         end_time: ~x".//EndTime/text()"s
       )
 
-      Platforms.create_external_listing(
-        :ebay,
-        listing,
-        %{
-          ebay_id: ebay_listing.ebay_id,
-          start_time: Ebay.parse_time(ebay_listing.start_time),
-          end_time: Ebay.parse_time(ebay_listing.end_time)
-        }
-      )
+    Platforms.create_external_listing(
+      :ebay,
+      listing,
+      %{
+        ebay_id: ebay_listing.ebay_id,
+        start_time: Ebay.parse_time(ebay_listing.start_time),
+        end_time: Ebay.parse_time(ebay_listing.end_time)
+      }
+    )
   end
 
   @spec list_active_listings_with_bids :: [%{required(:bid_count) => String.t, required(:item_id) => String.t}]
@@ -155,6 +156,38 @@ defmodule Kamansky.Services.Ebay.Listing do
   @spec maybe_remove_listing(Listing.t) :: :ok | {:error, Ecto.Changeset.t} | {:ok, Listing.t}
   def maybe_remove_listing(%Listing{ebay_id: ebay_id} = listing) when not is_nil(ebay_id), do: remove_listing(listing)
   def maybe_remove_listing(%Listing{} = _listing), do: :ok
+
+  @spec relist(EbayListing.t) :: {:ok, EbayListing.t}
+  def relist(%EbayListing{} = ebay_listing) do
+    relisted_listing =
+      """
+      <?xml version="1.0" encoding="utf-8"?>
+      <RelistItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+        #{Ebay.requester_credentials()}
+        <Item>
+          <ItemID>#{ebay_listing.ebay_id}</ItemID>
+        </Item>
+      </RelistItemRequest>
+      """
+      |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "RelistItem"}]))
+      |> Map.get(:body)
+      |> parse(dtd: :none)
+      |> xpath(
+        ~x"//RelistItemResponse",
+        ebay_id: ~x".//ItemID/text()"s,
+        start_time: ~x".//StartTime/text()"s,
+        end_time: ~x".//EndTime/text()"s
+      )
+
+    Platforms.update_external_listing(
+      ebay_listing,
+      %{
+        ebay_id: relisted_listing.ebay_id,
+        start_time: Ebay.parse_time(relisted_listing.start_time),
+        end_time: Ebay.parse_time(relisted_listing.end_time)
+      }
+    )
+  end
 
   @spec remove_listing(Listing.t) :: :ok
   def remove_listing(%Listing{} = listing) do

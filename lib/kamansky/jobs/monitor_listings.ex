@@ -14,7 +14,6 @@ defmodule Kamansky.Jobs.MonitorListings do
   @impl true
   @spec init(any) :: {:ok, any}
   def init(state) do
-    work()
     schedule()
     {:ok, state}
   end
@@ -22,16 +21,18 @@ defmodule Kamansky.Jobs.MonitorListings do
   @impl true
   @spec handle_info(:work, any) :: {:noreply, any}
   def handle_info(:work, state) do
-    work()
+    load_new_ebay_bids()
+    relist_ebay_listings()
+    schedule()
     {:noreply, state}
   end
 
   @spec schedule :: reference
   defp schedule do
-    Process.send_after(self(), :work, 300000)
+    Process.send_after(self(), :work, 120000)
   end
 
-  defp work do
+  defp load_new_ebay_bids do
     Enum.each(
       Ebay.Listing.list_active_listings_with_bids(),
       fn ebay_listing ->
@@ -47,6 +48,14 @@ defmodule Kamansky.Jobs.MonitorListings do
 
           Hipstamp.Listing.maybe_remove_listing(listing.listing)
         end
-    end)
+      end
+    )
+  end
+
+  defp relist_ebay_listings do
+    Enum.each(
+      Platforms.list_expired_ebay_listings(),
+      &Ebay.Listing.relist/1
+    )
   end
 end
