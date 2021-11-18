@@ -37,10 +37,9 @@ defmodule KamanskyWeb.ListingLive.Active do
   end
 
   def handle_event("list_on_hipstamp", %{"listing-id" => listing_id}, socket) do
-    with listing <- Listings.get_listing_to_list(listing_id)#,
-      #{:ok, _hipstamp_listing} <- Hipstamp.Listing.list(listing)
+    with listing <- Listings.get_listing_to_list(listing_id),
+      {:ok, _hipstamp_listing} <- Hipstamp.Listing.list(listing)
     do
-      Process.sleep(10000)
       close_modal_with_success_and_refresh_datatable(
         socket,
         "listings-kamansky-data-table",
