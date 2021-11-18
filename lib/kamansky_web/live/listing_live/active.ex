@@ -5,7 +5,6 @@ defmodule KamanskyWeb.ListingLive.Active do
 
   alias Kamansky.Sales.Listings
   alias Kamansky.Sales.Listings.Listing
-  alias Kamansky.Services.{Ebay, Hipstamp}
   alias Kamansky.Stamps.Stamp
 
   @impl true
@@ -21,40 +20,34 @@ defmodule KamanskyWeb.ListingLive.Active do
   end
 
   @impl true
-  @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_event("list_on_ebay", %{"listing-id" => listing_id}, socket) do
-    with listing <- Listings.get_listing_to_list(listing_id),
-      {:ok, _ebay_listing} <- Ebay.Listing.list(listing)
-    do
-      close_modal_with_success_and_refresh_datatable(
-        socket,
-        "listings-kamansky-data-table",
-        "kamansky:closeConfirmationModal",
-        "You have successfully listed this listing on eBay.",
-        listing.id
-      )
-    end
-  end
-
-  def handle_event("list_on_hipstamp", %{"listing-id" => listing_id}, socket) do
-    with listing <- Listings.get_listing_to_list(listing_id),
-      {:ok, _hipstamp_listing} <- Hipstamp.Listing.list(listing)
-    do
-      close_modal_with_success_and_refresh_datatable(
-        socket,
-        "listings-kamansky-data-table",
-        "kamansky:closeConfirmationModal",
-        "You have successfully listed this listing on Hipstamp.",
-        listing.id
-      )
-    end
-  end
-
-  @impl true
-  @spec handle_info({:listing_added_to_order, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_info({atom, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:listing_added_to_order, _listing_id}, socket) do
-    refresh_datatable("listings-kamansky-data-table", [])
-    {:noreply, put_flash(socket, :info, %{message: "You have successfully added this listing to an order.", timestamp: Time.utc_now()})}
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      "listings-kamansky-data-table",
+      "kamansky:closeModal",
+      "You have successfully added this listing to an order."
+    )
+  end
+
+  def handle_info({:listing_listed_on_ebay, listing_id}, socket) do
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      "listings-kamansky-data-table",
+      "kamansky:closeModal",
+      "You have successfully listed this listing on eBay.",
+      listing_id
+    )
+  end
+
+  def handle_info({:listing_listed_on_hipstamp, listing_id}, socket) do
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      "listings-kamansky-data-table",
+      "kamansky:closeModal",
+      "You have successfully listed this listing on Hipstamp.",
+      listing_id
+    )
   end
 
   @impl true

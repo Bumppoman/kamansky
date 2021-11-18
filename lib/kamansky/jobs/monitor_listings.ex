@@ -42,7 +42,7 @@ defmodule Kamansky.Jobs.MonitorListings do
           listing
           |> Platforms.update_external_listing(ebay_listing)
           |> case do
-            {:ok, _listing} -> Logger.info("Kamansky.Jobs.MonitorListings: new eBay bid received for listing #{listing.id}")
+            {:ok, _listing} -> Logger.info("Kamansky.Jobs.MonitorListings: new eBay bid received for listing #{listing.listing_id}")
             {:error, _changeset} -> Logger.error("Kamansky.Jobs.MonitorListings: error with eBay bid")
           end
 

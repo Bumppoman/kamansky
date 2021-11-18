@@ -47,13 +47,8 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
     |> Kamansky.Services.Stamp.create_new_external_listing_for_existing_listing(:ebay, ebay_listing_params)
     |> case do
       {:ok, %EbayListing{listing_id: listing_id}} ->
-        close_modal_with_success_and_refresh_datatable(
-          socket,
-          "listings-kamansky-data-table",
-          "kamansky:closeModal",
-          "You have successfully listed this stamp on eBay.",
-          listing_id
-        )
+        send self(), {:listing_listed_on_ebay, listing_id}
+        {:noreply, socket}
     end
   end
 end

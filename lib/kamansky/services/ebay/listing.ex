@@ -225,11 +225,11 @@ defmodule Kamansky.Services.Ebay.Listing do
   end
 
   @spec auction_price(Listing.t, map) :: Decimal.t
-  defp auction_price(%Listing{}, %{auction_price: auction_price}), do: auction_price
+  defp auction_price(%Listing{}, %{"auction_price" => auction_price}), do: auction_price
   defp auction_price(%Listing{} = listing, _opts), do: suggested_auction_price(listing)
 
   @spec buy_it_now_price(Listing.t, map) :: Decimal.t
-  defp buy_it_now_price(%Listing{}, %{buy_it_now_price: buy_it_now_price}), do: buy_it_now_price
+  defp buy_it_now_price(%Listing{}, %{"buy_it_now_price" => buy_it_now_price}), do: buy_it_now_price
   defp buy_it_now_price(%Listing{} = listing, _opts), do: suggested_buy_it_now_price(listing)
 
   @spec category_id(Stamp.t) :: integer
@@ -251,7 +251,7 @@ defmodule Kamansky.Services.Ebay.Listing do
   end
 
   @spec free_shipping?(Listing.t, map) :: boolean
-  def free_shipping?(%Listing{listing_price: listing_price}, opts \\ %{}), do: Decimal.gt?(Map.get(opts, :auction_price, listing_price), "14.99")
+  def free_shipping?(%Listing{listing_price: listing_price}, opts \\ %{}), do: Decimal.gt?(Map.get(opts, "auction_price", listing_price), "14.99")
 
   @spec grade(Stamp.t) :: String.t
   defp grade(%Stamp{grade: grade}) when grade in 70..74, do: "F/VF (Fine/Very Fine)"
@@ -272,10 +272,10 @@ defmodule Kamansky.Services.Ebay.Listing do
 
   @spec shipping_cost(Listing.t, map) :: String.t
   defp shipping_cost(%Listing{listing_price: listing_price}, opts) do
-    if Decimal.lt?(Map.get(opts, :auction_price, listing_price), 15), do: "1.00", else: "0.00"
+    if Decimal.lt?(Map.get(opts, "auction_price", listing_price), 15), do: "1.00", else: "0.00"
   end
 
   @spec title(Listing.t, map) :: String.t
-  defp title(%Listing{stamp: %Stamp{}}, %{title: title}), do: title
+  defp title(%Listing{stamp: %Stamp{}}, %{"title" => title}), do: title
   defp title(%Listing{stamp: %Stamp{}} = listing, _opts), do: suggested_title(listing)
 end
