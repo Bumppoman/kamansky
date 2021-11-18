@@ -126,29 +126,27 @@
     }
   }
 
-  #kamansky-confirmation-modal {
-    #kamansky-confirmation-modal-button-loading {
+  button .kamansky-button-loading {
+    @apply hidden;
+  }
+
+  button .kamansky-button-normal {
+    @apply inline;
+  }
+
+  button.phx-click-loading, button.phx-click-loading + button, button.phx-submit-loading, button.phx-submit-loading + button {
+    @apply cursor-not-allowed opacity-50;
+
+    &:active {
+      @apply pointer-events-none;
+    }
+
+    .kamansky-button-loading {
+      @apply flex;
+    }
+
+    .kamansky-button-normal {
       @apply hidden;
-    }
-  
-    #kamansky-confirmation-modal-button-normal {
-      @apply inline;
-    }
-  
-    .phx-click-loading, .phx-click-loading + button {
-      @apply cursor-not-allowed opacity-50;
-
-      &:active {
-        @apply pointer-events-none;
-      }
-
-      #kamansky-confirmation-modal-button-loading {
-        @apply flex;
-      }
-  
-      #kamansky-confirmation-modal-button-normal {
-        @apply hidden;
-      }
     }
   }
 }
