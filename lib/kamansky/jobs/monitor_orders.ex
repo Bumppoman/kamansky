@@ -12,7 +12,6 @@ defmodule Kamansky.Jobs.MonitorOrders do
   @impl true
   @spec init(any) :: {:ok, any}
   def init(state) do
-    work()
     schedule()
 
     {:ok, state}
@@ -22,12 +21,13 @@ defmodule Kamansky.Jobs.MonitorOrders do
   @spec handle_info(:work, any) :: {:noreply, any}
   def handle_info(:work, state) do
     work()
+    schedule()
 
     {:noreply, state}
   end
 
   @spec schedule :: reference
-  defp schedule, do: Process.send_after(self(), :work, 300000)
+  defp schedule, do: Process.send_after(self(), :work, 120000)
 
   defp work do
     Enum.each(Ebay.Order.load_new_orders(), &(Orders.maybe_delist_listings(&1)))

@@ -82,9 +82,10 @@ defmodule Kamansky.Sales.Listings do
   @spec get_listing_by_ebay_id(pos_integer) :: Listing.t
   def get_listing_by_ebay_id(ebay_id) do
     Listing
-    |> where(ebay_id: ^ebay_id)
     |> join(:left, [l], s in assoc(l, :stamp))
-    |> preload([l, s], [stamp: s])
+    |> join(:inner, [l], el in assoc(l, :ebay_listing))
+    |> where(ebay_id: ^ebay_id)
+    |> preload([l, s, el], [stamp: s, ebay_listing: el])
     |> Repo.one()
   end
 
