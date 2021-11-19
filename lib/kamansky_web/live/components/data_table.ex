@@ -168,22 +168,8 @@ defmodule KamanskyWeb.Components.DataTable do
   end
 
   @spec assign_data(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
-  defp assign_data(%{assigns: %{search: nil}} = socket) do
-    assign(
-      socket,
-      :data,
-      load_data_for_page(
-        %{
-          data_source: socket.assigns.data_source,
-          current_page: socket.assigns.current_page,
-          per_page: socket.assigns.per_page,
-          search: socket.assigns.search,
-          sort: socket.assigns.sort
-        }
-      )
-    )
-  end
-
+  defp assign_data(%{assigns: %{options: [go_to_record: go_to_record]}} = socket) when not is_nil(go_to_record), do: assign_data_without_search(socket)
+  defp assign_data(%{assigns: %{search: nil}} = socket), do: assign_data_without_search(socket)
   defp assign_data(socket) do
     with(
       {count, data} <-
@@ -203,6 +189,23 @@ defmodule KamanskyWeb.Components.DataTable do
       |> assign(total_items: count)
       |> assign(total_pages: total_pages(count, socket.assigns.per_page))
     end
+  end
+
+  @spec assign_data_without_search(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
+  defp assign_data_without_search(socket) do
+    assign(
+      socket,
+      :data,
+      load_data_for_page(
+        %{
+          data_source: socket.assigns.data_source,
+          current_page: socket.assigns.current_page,
+          per_page: socket.assigns.per_page,
+          search: nil,
+          sort: socket.assigns.sort
+        }
+      )
+    )
   end
 
   @spec build_sort(map | pos_integer | nil) :: %{column: pos_integer, direction: :asc | :desc}
