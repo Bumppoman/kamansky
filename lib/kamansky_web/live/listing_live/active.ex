@@ -25,7 +25,7 @@ defmodule KamanskyWeb.ListingLive.Active do
     {
       :noreply,
       socket
-      |> put_flash(:info, %{type: :error, message: "An error occurred while attempting to list this listing on eBay."})
+      |> put_flash(:info, %{type: :error, message: "An error occurred while attempting to list this listing on eBay.", timestamp: DateTime.utc_now()})
       |> push_event("kamansky:closeModal", %{})
     }
   end
