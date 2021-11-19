@@ -110,15 +110,24 @@ defmodule KamanskyWeb.Components.Page do
   @spec flash(map) :: Phoenix.LiveView.Rendered.t
   def flash(assigns) do
     ~H"""
-    <%= if live_flash(@flash, :info) do %>
+    <%= if @flash do %>
       <div
         id="kamansky-flash"
-        class={"flex items-center mx-auto px-4 py-4 w-9/12 " <> flash_background_color(live_flash(@flash, :info).type)}
+        class={"mx-auto px-4 py-4 rounded-md w-9/12 " <> flash_background_color(@flash.type)}
         phx-hook="flash"
-        phx-value-type={live_flash(@flash, :info).type}
-        phx-value-timestamp={live_flash(@flash, :info).timestamp}
-        x-data="{show: true}"
-        x-init={flash_duration(live_flash(@flash, :info))}
+        phx-value-type={@flash.type}
+        x-data={
+          "{
+            init () {
+              this.show = true;
+              if($el.getAttribute('phx-value-type') == 'success') {
+                setTimeout(() => this.show = false, 3000);
+              }
+            },
+            show: true
+          }"
+        }
+        x-on:kamansky:flash-updated.camel="init"
         x-show="show"
         x-transition:enter="transition-all ease-out duration-500"
         x-transition:enter-start="max-h-0 py-0"
@@ -127,14 +136,38 @@ defmodule KamanskyWeb.Components.Page do
         x-transition:leave-start="max-h-14 py-4"
         x-transition:leave-end="max-h-0 py-0"
       >
-        <.flash_icon type={live_flash(@flash, :info).type} />
-        <div
-          class={"inline-block " <> flash_text_color(live_flash(@flash, :info).type)}
-          x-show="show"
-          x-transition:leave="transition-all ease-in duration-500"
-          x-transition:leave-start="max-h-14 scale-y-100"
-          x-transition:leave-end="max-h-0 scale-y-0"
-        ><%= live_flash(@flash, :info).message %></div>
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <.flash_icon type={@flash.type} />
+          </div>
+          <div
+            class="ml-3 "
+            x-show="show"
+            x-transition:leave="transition-all ease-in duration-500"
+            x-transition:leave-start="max-h-14 scale-y-100"
+            x-transition:leave-end="max-h-0 scale-y-0"
+          >
+            <p class={"text-sm font-medium " <> flash_text_color(@flash.type)}><%= @flash.message %></p>
+          </div>
+          <div class="ml-auto pl-3">
+            <div class="-mx-1.5 -my-1.5">
+              <button
+                type="button"
+                class={"inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 " <> flash_button_style(@flash.type)}
+                x-on:click="show = false"
+              >
+                <span class="sr-only">Dismiss</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     <% end %>
     """
@@ -235,19 +268,19 @@ defmodule KamanskyWeb.Components.Page do
     )"
   end
 
-  @spec flash_background_color(atom) :: String.t
+  @spec flash_background_color(flash_type) :: String.t
   defp flash_background_color(:error), do: "bg-red-50"
   defp flash_background_color(:success), do: "bg-green-50"
 
-  @spec flash_duration(%{required(:type) => flash_type, optional(atom) => any}) :: String.t
-  defp flash_duration(%{type: :error} = flash), do: ""
-  defp flash_duration(%{type: :success} = flash), do: "setTimeout(() => show = false, 3000)"
+  @spec flash_button_style(flash_type) :: String.t
+  defp flash_button_style(:error), do: "bg-red-50 text-red-600 hover:bg-red-50 focus:ring-offset-red-50 focus:ring-red-700"
+  defp flash_button_style(:success), do: "bg-green-50 text-green-500 hover:bg-green-100 focus:ring-offset-green-50 focus:ring-green-600"
 
   @spec flash_icon(%{required(:type) => flash_type}) :: Phoenix.LiveView.Rendered.t()
   def flash_icon(%{type: :error} = assigns) do
     ~H"""
     <svg
-      class="h-4 mr-4 text-red-400 w-4"
+      class="h-5 text-red-500 w-5"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
@@ -269,7 +302,7 @@ defmodule KamanskyWeb.Components.Page do
     ~H"""
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      class="h-4 mr-4 text-green-400 w-4"
+      class="h-5 text-green-400 w-5"
       viewBox="0 0 20 20"
       fill="currentColor"
       x-show="show"

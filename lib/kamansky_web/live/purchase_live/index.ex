@@ -6,6 +6,8 @@ defmodule KamanskyWeb.PurchaseLive.Index do
   alias Kamansky.Operations.Purchases
   alias Kamansky.Operations.Purchases.Purchase
 
+  @data_table "purchases-kamansky-data-table"
+
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(_params, _session, socket) do
@@ -20,22 +22,27 @@ defmodule KamanskyWeb.PurchaseLive.Index do
 
   @impl true
   @spec handle_info({:purchase_added | :purchase_updated, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_info({:purchase_added, purchase_id}, socket), do: update_datatable(socket, "You have successfully added this purchase.", purchase_id)
-  def handle_info({:purchase_updated, purchase_id}, socket), do: update_datatable(socket, "You have successfully updated this purchase.", purchase_id)
+  def handle_info({:purchase_added, purchase_id}, socket) do
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      @data_table,
+      "kamansky:closeModal",
+      "You have successfully added this purchase.",
+      purchase_id
+    )
+  end
+
+  def handle_info({:purchase_updated, purchase_id}, socket) do
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      @data_table,
+      "kamansky:closeModal",
+      "You have successfully updated this purchase.",
+      purchase_id
+    )
+  end
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Purchases")}
-
-  @spec update_datatable(Phoenix.LiveView.Socket.t, String.t, pos_integer) :: {:noreply, Phoenix.LiveView.Socket.t}
-  defp update_datatable(socket, message, purchase_id) do
-    send_update KamanskyWeb.Components.DataTable, id: "purchases-kamansky-data-table", options: [go_to_record: purchase_id]
-
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
-    }
-  end
 end

@@ -21,14 +21,13 @@ defmodule KamanskyWeb.CustomerLive.Index do
   @impl true
   @spec handle_info({:customer_updated, integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:customer_updated, customer_id}, socket) do
-    send_update KamanskyWeb.Components.DataTable, id: "customers-kamansky-data-table", options: [go_to_record: customer_id]
-
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{message: "You have successfully updated this customer.", timestamp: Time.utc_now()})
-    }
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      "customers-kamansky-data-table",
+      "kamansky:closeModal",
+      "You have successfully updated this customer.",
+      customer_id
+    )
   end
 
   @impl true

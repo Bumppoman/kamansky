@@ -1,5 +1,6 @@
 import { dataTableInit } from './datatable';
 import { fileUpload } from './fileUpload';
+import { flash } from './flash';
 import { modalInit } from './modal';
 import { format, grade, hingeQuality } from './trends';
 
@@ -17,6 +18,7 @@ export interface Hook {
 export const Hooks = {
   dataTableInit,
   fileUpload,
+  flash,
   format,
   grade,
   hingeQuality,

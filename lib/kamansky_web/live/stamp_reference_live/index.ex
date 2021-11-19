@@ -4,14 +4,28 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
   alias Kamansky.Stamps.StampReferences
   alias Kamansky.Stamps.StampReferences.StampReference
 
+  @data_table "stamp-references-kamansky-data-table"
+
   @impl true
   @spec handle_info({atom, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:stamp_reference_added, stamp_reference_id}, socket) do
-    refresh_data_table(socket, stamp_reference_id, "You have successfully added this stamp reference.")
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      @data_table,
+      "kamansky:closeModal",
+      "You have successfully added this stamp reference.",
+      stamp_reference_id
+    )
   end
 
   def handle_info({:stamp_reference_updated, stamp_reference_id}, socket) do
-    refresh_data_table(socket, stamp_reference_id, "You have successfully updated this stamp reference.")
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      @data_table,
+      "kamansky:closeModal",
+      "You have successfully updated this stamp reference.",
+      stamp_reference_id
+    )
   end
 
   @impl true
@@ -52,17 +66,5 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
     |> assign(:data_count, &StampReferences.count_stamp_references/0)
     |> assign(:data_locator, fn options -> StampReferences.find_row_number_for_stamp_reference(options) end)
     |> assign(:data_source, fn options -> StampReferences.list_stamp_references(options) end)
-  end
-
-  @spec refresh_data_table(Phoenix.LiveView.Socket.t, pos_integer, String.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  defp refresh_data_table(socket, id, message) do
-    send_update KamanskyWeb.Components.DataTable, id: "stamp_references-kamansky-data-table", options: [go_to_record: id]
-
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{message: message, timestamp: Time.utc_now()})
-    }
   end
 end

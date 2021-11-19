@@ -6,20 +6,19 @@ defmodule KamanskyWeb.StampLive.Index do
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
 
+  @data_table "stamps-kamansky-data-table"
+
   @impl true
   @spec handle_event(String.t, any, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("move_to_stock", %{"stamp-id" => stamp_id}, socket) do
     case Stamps.move_stamp_to_stock(stamp_id) do
       {:ok, _stamp} ->
-        send_update KamanskyWeb.Components.DataTable, id: "stamps-kamansky-data-table", options: []
-
-        {
-          :noreply,
-          socket
-          |> push_event("kamansky:closeConfirmationModal", %{})
-          |> put_flash(:info, %{message: "You have successfully moved this stamp to stock.", timestamp: Time.utc_now()})
-        }
-
+        close_modal_with_success_and_refresh_datatable(
+          socket,
+          @data_table,
+          "kamansky:closeConfirmationModal",
+          "You have successfully moved this stamp to stock."
+        )
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
@@ -31,20 +30,19 @@ defmodule KamanskyWeb.StampLive.Index do
       :noreply,
       socket
       |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{message: "You have successfully added this stamp", timestamp: Time.utc_now()})
+      |> put_flash(:info, %{type: :success, message: "You have successfully added this stamp", timestamp: Time.utc_now()})
       |> push_redirect(to: Routes.stamp_index_path(socket, stamp.status, go_to_record: stamp.id))
     }
   end
 
   def handle_info({:stamp_updated, stamp_id}, socket) do
-    send_update KamanskyWeb.Components.DataTable, id: "stamps-kamansky-data-table", options: [go_to_record: stamp_id]
-
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{message: "You have successfully updated this stamp.", timestamp: Time.utc_now()})
-    }
+    close_modal_with_success_and_refresh_datatable(
+      socket,
+      @data_table,
+      "kamansky:closeModal",
+      "You have successfully updated this stamp.",
+      stamp_id
+    )
   end
 
   @impl true
