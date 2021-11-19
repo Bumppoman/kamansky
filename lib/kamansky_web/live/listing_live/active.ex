@@ -19,9 +19,6 @@ defmodule KamanskyWeb.ListingLive.Active do
     }
   end
 
-  def handle_event("error", _, socket), do: {:noreply, put_flash(socket, :info, %{type: :error, message: "Lorem ipsum dolor sit amet.", timestamp: DateTime.utc_now()})}
-  def handle_event("success", _, socket), do: {:noreply, put_flash(socket, :info, %{type: :success, message: "Lorem ipsum dolor sit amet.", timestamp: DateTime.utc_now()})}
-
   @impl true
   @spec handle_info({atom, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:error, _error}, socket) do
