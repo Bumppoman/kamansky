@@ -20,4 +20,10 @@ defmodule KamanskyWeb.OrderLive.Show do
       }
     end
   end
+
+  @spec order_status_width(Order.t) :: String.t
+  defp order_status_width(%Order{status: :pending}), do: "w-[2.5%]"
+  defp order_status_width(%Order{status: :processed}), do: "w-[37.5%]"
+  defp order_status_width(%Order{status: :shipped}), do: "w-[62.5%]"
+  defp order_status_width(%Order{status: :completed}), do: "w-full"
 end

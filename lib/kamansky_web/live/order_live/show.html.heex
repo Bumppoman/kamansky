@@ -111,4 +111,19 @@
       </div>
     </div>
   </section>
+  <div class="mt-4">
+    <h4 class="sr-only">Status</h4>
+    <p class="text-sm font-medium text-gray-900">Status</p>
+    <div class="mt-6" aria-hidden="true">
+      <div class="bg-gray-200 rounded-full overflow-hidden">
+        <div class={"h-2 bg-indigo-600 rounded-full " <> order_status_width(@order)} />
+      </div>
+      <div class="hidden sm:grid grid-cols-4 text-sm font-medium text-gray-600 mt-6">
+        <div>Ordered<br /><%= formatted_date(@order.ordered_at) %></div>
+        <div class="text-center">Processed<br /><%= formatted_date(@order.processed_at) %></div>
+        <div class="text-center">Shipped<br /><%= formatted_date(@order.shipped_at) %></div>
+        <div class="text-right">Completed<br /><%= formatted_date(@order.completed_at) %></div>
+      </div>
+    </div>
+  </div>
 </div>
