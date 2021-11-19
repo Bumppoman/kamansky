@@ -133,9 +133,7 @@ defmodule Kamansky.Paginate do
   end
 
   @spec make_query_column(atom | list, :asc | :desc) :: keyword
-  def make_query_column(sort_column, direction) when is_list(sort_column) do
-    Enum.map(sort_column, &(sort_direction(direction, &1)))
-  end
+  def make_query_column(sort_column, direction) when is_list(sort_column), do: Enum.map(sort_column, &(sort_direction(direction, &1)))
   def make_query_column(sort_column, direction), do: [{direction, dynamic([q], field(q, ^sort_column))}]
 
   @spec sort_and_limit(atom, Ecto.Queryable.t, params) :: Ecto.Query.t

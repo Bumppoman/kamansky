@@ -243,7 +243,7 @@ defmodule KamanskyWeb.Components.DataTable do
   defp record_location(socket, record_id) do
     %{
       record_id: record_id,
-      search: Map.get(socket.assigns, :search),
+      search: nil,
       sort: socket.assigns.sort
     }
     |> socket.assigns.data_locator.()
