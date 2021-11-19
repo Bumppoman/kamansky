@@ -3,6 +3,8 @@
 @import "tailwindcss/utilities";
 
 @layer base {
+  [x-cloak] { display: none !important; }
+  
   form {
     div.grid {
       @apply gap-x-3;  

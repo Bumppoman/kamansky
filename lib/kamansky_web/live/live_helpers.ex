@@ -12,7 +12,7 @@ defmodule KamanskyWeb.LiveHelpers do
         :noreply,
         socket
         |> Phoenix.LiveView.push_event(modal_event, %{})
-        |> Phoenix.LiveView.put_flash(:info, %{message: success_message, timestamp: Time.utc_now()})
+        |> Phoenix.LiveView.put_flash(:info, %{type: :success, message: success_message, timestamp: Time.utc_now()})
       }
     end
   end

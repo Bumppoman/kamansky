@@ -46,9 +46,10 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
     socket.assigns.listing
     |> Kamansky.Services.Stamp.create_new_external_listing_for_existing_listing(:ebay, ebay_listing_params)
     |> case do
-      {:ok, %EbayListing{listing_id: listing_id}} ->
-        send self(), {:listing_listed_on_ebay, listing_id}
-        {:noreply, socket}
+      {:ok, %EbayListing{listing_id: listing_id}} -> send self(), {:listing_listed_on_ebay, listing_id}
+      {:error, error} -> send self(), {:error, error}
     end
+
+    {:noreply, socket}
   end
 end

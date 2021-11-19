@@ -21,6 +21,15 @@ defmodule KamanskyWeb.ListingLive.Active do
 
   @impl true
   @spec handle_info({atom, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_info({:error, _error}, socket) do
+    {
+      :noreply,
+      socket
+      |> put_flash(:info, %{type: :error, message: "An error occurred while attempting to list this listing on eBay."})
+      |> push_event("kamansky:closeModal", %{})
+    }
+  end
+
   def handle_info({:listing_added_to_order, _listing_id}, socket) do
     close_modal_with_success_and_refresh_datatable(
       socket,

@@ -1,4 +1,6 @@
 defmodule KamanskyWeb.Components.Page do
+  @type flash_type :: :alert | :error | :success
+
   use Phoenix.Component
 
   @spec confirmation_modal(map) :: Phoenix.LiveView.Rendered.t
@@ -7,6 +9,7 @@ defmodule KamanskyWeb.Components.Page do
     <div
       id="kamansky-confirmation-modal"
       class="fixed z-10 inset-0 overflow-y-auto"
+      x-cloak
       x-data="{detail: {action: null, content: null, title: null, values: null}, open: false}"
       x-on:keydown.window.escape="open = false"
       x-on:kamansky:open-confirmation-modal.camel.window="() => {
@@ -104,6 +107,39 @@ defmodule KamanskyWeb.Components.Page do
     """
   end
 
+  @spec flash(map) :: Phoenix.LiveView.Rendered.t
+  def flash(assigns) do
+    ~H"""
+    <%= if live_flash(@flash, :info) do %>
+      <div
+        id="kamansky-flash"
+        class={"flex items-center mx-auto px-4 py-4 w-9/12 " <> flash_background_color(live_flash(@flash, :info).type)}
+        phx-hook="flash"
+        phx-value-type={live_flash(@flash, :info).type}
+        phx-value-timestamp={live_flash(@flash, :info).timestamp}
+        x-data="{show: true}"
+        x-init={flash_duration(live_flash(@flash, :info))}
+        x-show="show"
+        x-transition:enter="transition-all ease-out duration-500"
+        x-transition:enter-start="max-h-0 py-0"
+        x-transition:enter-end="max-h-14 py-4"
+        x-transition:leave="transition-all ease-in duration-500"
+        x-transition:leave-start="max-h-14 py-4"
+        x-transition:leave-end="max-h-0 py-0"
+      >
+        <.flash_icon type={live_flash(@flash, :info).type} />
+        <div
+          class={"inline-block " <> flash_text_color(live_flash(@flash, :info).type)}
+          x-show="show"
+          x-transition:leave="transition-all ease-in duration-500"
+          x-transition:leave-start="max-h-14 scale-y-100"
+          x-transition:leave-end="max-h-0 scale-y-0"
+        ><%= live_flash(@flash, :info).message %></div>
+      </div>
+    <% end %>
+    """
+  end
+
   @spec link_with_confirmation(map) :: Phoenix.LiveView.Rendered.t
   def link_with_confirmation(assigns) do
     ~H"""
@@ -181,54 +217,6 @@ defmodule KamanskyWeb.Components.Page do
     """
   end
 
-  @spec success_message(map) :: Phoenix.LiveView.Rendered.t
-  def success_message(assigns) do
-    ~H"""
-    <%= if live_flash(@flash, :info) do %>
-      <div
-        id="kamansky-success-message"
-        class="bg-green-50 flex items-center mx-auto px-4 py-4 w-9/12"
-        phx-hook="successMessage"
-        phx-value-timestamp={live_flash(@flash, :info).timestamp}
-        x-data="{show: true}"
-        x-init="setTimeout(() => show = false, 3000)"
-        x-show="show"
-        x-transition:enter="transition-all ease-out duration-500"
-        x-transition:enter-start="max-h-0 py-0"
-        x-transition:enter-end="max-h-14 py-4"
-        x-transition:leave="transition-all ease-in duration-500"
-        x-transition:leave-start="max-h-14 py-4"
-        x-transition:leave-end="max-h-0 py-0"
-        x-on:kamansky:success-message-updated.camel="show = true; setTimeout(() => show = false, 3000)"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 mr-4 text-green-400 w-4"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          x-show="show"
-          x-transition:leave="transition-all ease-in duration-500"
-          x-transition:leave-start="max-h-4 scale-y-100"
-          x-transition:leave-end="max-h-0 scale-y-0"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-            clip-rule="evenodd"
-          />
-        </svg>
-        <div
-          class="inline-block text-green-700"
-          x-show="show"
-          x-transition:leave="transition-all ease-in duration-500"
-          x-transition:leave-start="max-h-14 scale-y-100"
-          x-transition:leave-end="max-h-0 scale-y-0"
-        ><%= live_flash(@flash, :info).message %></div>
-      </div>
-    <% end %>
-    """
-  end
-
   @spec button_color(atom) :: String.t
   defp button_color(:blue), do: " bg-indigo-600 border-transparent text-white hover:bg-indigo-700"
   defp button_color(:gray), do: " bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -247,6 +235,62 @@ defmodule KamanskyWeb.Components.Page do
     )"
   end
 
+  @spec flash_background_color(atom) :: String.t
+  defp flash_background_color(:error), do: "bg-red-50"
+  defp flash_background_color(:success), do: "bg-green-50"
+
+  @spec flash_duration(%{required(:type) => flash_type, optional(atom) => any}) :: String.t
+  defp flash_duration(%{type: :error} = flash), do: ""
+  defp flash_duration(%{type: :success} = flash), do: "setTimeout(() => show = false, 3000)"
+
+  @spec flash_icon(%{required(:type) => flash_type}) :: Phoenix.LiveView.Rendered.t()
+  def flash_icon(%{type: :error} = assigns) do
+    ~H"""
+    <svg
+      class="h-4 mr-4 text-red-400 w-4"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      x-show="show"
+      x-transition:leave="transition-all ease-in duration-500"
+      x-transition:leave-start="max-h-4 scale-y-100"
+      x-transition:leave-end="max-h-0 scale-y-0"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    """
+  end
+
+  def flash_icon(%{type: :success} = assigns) do
+    ~H"""
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-4 mr-4 text-green-400 w-4"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      x-show="show"
+      x-transition:leave="transition-all ease-in duration-500"
+      x-transition:leave-start="max-h-4 scale-y-100"
+      x-transition:leave-end="max-h-0 scale-y-0"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    """
+  end
+
+  @spec flash_text_color(atom) :: String.t
+  defp flash_text_color(:error), do: "text-red-800"
+  defp flash_text_color(:success), do: "text-green-700"
+
+  @spec header_button(map) :: Phoenix.LiveView.Rendered.t
   defp header_button(%{with_confirmation: true} = assigns) do
     ~H"""
     <button

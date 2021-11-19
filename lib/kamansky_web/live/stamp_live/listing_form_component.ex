@@ -47,7 +47,10 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
             :noreply,
             socket
             |> push_event("kamansky:closeModal", %{})
-            |> put_flash(:info, %{message: "You have successfully listed this stamp for sale (inventory key: ##{inventory_key}).", timestamp: Time.utc_now()})
+            |> put_flash(
+              :info,
+              %{type: :success, message: "You have successfully listed this stamp for sale (inventory key: ##{inventory_key}).", timestamp: Time.utc_now()}
+            )
             |> push_redirect(to: Routes.listing_active_path(socket, :index, go_to_record: listing_id))
           }
         end

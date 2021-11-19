@@ -1,3 +1,5 @@
+require Logger
+
 defmodule Kamansky.Services.Ebay.Listing do
   import SweetXml
 
@@ -22,9 +24,9 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> xpath(~x"//ListingStatus/text()")
   end
 
-  @spec list(Listing.t, map) :: {:ok, EbayListing.t}
+  @spec list(Listing.t, map) :: {:ok, EbayListing.t} | {:error, any}
   def list(%Listing{stamp: stamp} = listing, opts \\ %{}) do
-    ebay_listing =
+    with response <-
       """
       <?xml version="1.0" encoding="utf-8"?>
       <AddItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
@@ -103,23 +105,33 @@ defmodule Kamansky.Services.Ebay.Listing do
       """
       |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "AddItem"}]))
       |> Map.get(:body)
+    do
+      response
       |> parse(dtd: :none)
       |> xpath(
         ~x"//AddItemResponse",
+        outcome: ~x".//Ack/text()"s,
         ebay_id: ~x".//ItemID/text()"s,
         start_time: ~x".//StartTime/text()"s,
         end_time: ~x".//EndTime/text()"s
       )
+      |> case do
+        %{outcome: "Success"} = ebay_listing ->
+          Platforms.create_external_listing(
+            :ebay,
+            listing,
+            %{
+              ebay_id: ebay_listing.ebay_id,
+              start_time: Ebay.parse_time(ebay_listing.start_time),
+              end_time: Ebay.parse_time(ebay_listing.end_time)
+            }
+          )
 
-    Platforms.create_external_listing(
-      :ebay,
-      listing,
-      %{
-        ebay_id: ebay_listing.ebay_id,
-        start_time: Ebay.parse_time(ebay_listing.start_time),
-        end_time: Ebay.parse_time(ebay_listing.end_time)
-      }
-    )
+        _ ->
+          Logger.log(:error, response)
+          {:error, %{code: :ebay_add_listing_error, dump: response}}
+      end
+    end
   end
 
   @spec list_active_listings_with_bids :: [%{required(:bid_count) => String.t, required(:item_id) => String.t}]
