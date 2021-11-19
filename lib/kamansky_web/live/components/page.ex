@@ -10,7 +10,7 @@ defmodule KamanskyWeb.Components.Page do
       id="kamansky-confirmation-modal"
       class="fixed z-10 inset-0 overflow-y-auto"
       x-cloak
-      x-data="{detail: {action: null, content: null, title: null, values: null}, open: false}"
+      x-data="{detail: {action: null, content: null, external: false, title: null, values: null}, open: false}"
       x-on:keydown.window.escape="open = false"
       x-on:kamansky:open-confirmation-modal.camel.window="() => {
         open = true;
@@ -81,6 +81,7 @@ defmodule KamanskyWeb.Components.Page do
               <button
                 type="button"
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white transition ease-in-out duration-150 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                :class="external && 'kamansky-external'"
                 :phx-click="detail.action"
                 x-ref="success"
               >
@@ -180,7 +181,7 @@ defmodule KamanskyWeb.Components.Page do
       class="action-icon"
       title={@title}
       x-data
-      x-on:click={confirmation_dispatch(@action, @content, @title, @values)}
+      x-on:click={confirmation_dispatch(@action, @content, Map.get(assigns, :external, false), @title, @values)}
     >
       <%= render_slot(@inner_block) %>
     </a>
@@ -255,13 +256,14 @@ defmodule KamanskyWeb.Components.Page do
   defp button_color(:gray), do: " bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
   defp button_color(:secondary), do: " bg-indigo-100 border-transparent text-indigo-700 hover:bg-indigo-200"
 
-  @spec confirmation_dispatch(String.t, String.t, String.t, [{String.t, String.t}]) :: String.t
-  defp confirmation_dispatch(action, content, title, values) do
+  @spec confirmation_dispatch(String.t, String.t, boolean, String.t, [{String.t, String.t}]) :: String.t
+  defp confirmation_dispatch(action, content, external, title, values) do
     "$dispatch(
       'kamansky:openConfirmationModal',
       {
         action: '#{action}',
         content: '#{content}',
+        external: #{external},
         title: '#{title}',
         values: [#{Enum.map_join(values, ",", &("{key:'#{elem(&1, 0)}',value:'#{elem(&1, 1)}'}"))}]
       }
@@ -333,7 +335,15 @@ defmodule KamanskyWeb.Components.Page do
           button_color(Map.get(assigns, :color, :blue))
       }
       x-data
-      x-on:click={confirmation_dispatch(@options.confirmation.action, @options.confirmation.content, @title, @options.confirmation.values)}
+      x-on:click={
+        confirmation_dispatch(
+          @options.confirmation.action,
+          @options.confirmation.content,
+          Map.get(@options.confirmation, :external, false),
+          @title,
+          @options.confirmation.values
+        )
+      }
     >
       <%= @title %>
     </button>

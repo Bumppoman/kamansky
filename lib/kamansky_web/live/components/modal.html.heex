@@ -5,7 +5,7 @@
       id={"kamansky-modal-#{@id}"}
       phx-hook="modalInit"
       phx-target={"##{@id}"}
-      x-data="{buttonText: null, open: false, title: null}"
+      x-data={"{buttonText: null, external: #{Keyword.get(@opts, :external, false)}, open: false, title: null}"}
       x-init={
         "() => {
           $nextTick(() => open = true);
@@ -64,6 +64,7 @@
               <button
                 type="submit"
                 class="btn btn-blue ml-1"
+                :class="external && 'kamansky-external'"
                 form={Keyword.get(@opts, :form_id)}
                 phx-click={Keyword.get(@opts, :button_action)}
               >

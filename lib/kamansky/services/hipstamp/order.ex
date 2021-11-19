@@ -81,10 +81,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
             order
             |> Orders.update_order_fees(
               selling_fees: selling_fees,
-              shipping_cost: Decimal.add(
-                Administration.get_setting!(:shipping_cost),
-                Decimal.mult(Administration.get_setting!(:additional_ounce), Decimal.from_float(Float.floor(Enum.count(listings) / 6)))
-              )
+              shipping_cost: tentative_shipping_cost(listings)
             )
             |> elem(1)
             |> List.wrap()
@@ -152,6 +149,18 @@ defmodule Kamansky.Services.Hipstamp.Order do
     ) do
       "#{first_name} #{last_name}"
     end
+  end
+
+  @spec tentative_shipping_cost([Listing.t]) :: Decimal.t
+  defp tentative_shipping_cost(listings) do
+    listings
+    |> Enum.count()
+    |> Kernel./(6)
+    |> Float.floor()
+    |> Decimal.from_float()
+    |> Decimal.mult(Administration.get_setting!(:additional_ounce))
+    |> Decimal.add(Administration.get_setting!(:shipping_cost))
+    |> Decimal.round(2)
   end
 
   @spec parse_ordered_at(String.t) :: DateTime.t

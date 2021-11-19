@@ -136,7 +136,7 @@
     @apply inline;
   }
 
-  button.phx-click-loading, button.phx-click-loading + button, button.phx-submit-loading, button.phx-submit-loading + button {
+  button.phx-click-loading.kamansky-external, button.phx-click-loading.kamansky-external + button, button.phx-submit-loading.kamansky-external, button.phx-submit-loading.kamansky-external + button {
     @apply cursor-not-allowed opacity-50;
 
     &:active {
