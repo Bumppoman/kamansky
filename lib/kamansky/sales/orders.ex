@@ -114,18 +114,11 @@ defmodule Kamansky.Sales.Orders do
     end
   end
 
-  @spec insert_or_update_order(Order.t, map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
-  def insert_or_update_order(order, attrs) do
+  @spec insert_order(Order.t, map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
+  def insert_order(order, attrs) do
     order
-    |> Ecto.Changeset.change(attrs)
-    |> Repo.insert_or_update()
-  end
-
-  @spec insert_or_update_hipstamp_order(Order.t, map) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
-  def insert_or_update_hipstamp_order(order, attrs) do
-    order
-    |> Ecto.Changeset.change(attrs)
-    |> Repo.insert_or_update()
+    |> change_order(attrs)
+    |> Repo.insert()
   end
 
   @spec list_orders(keyword) :: [Order.t]

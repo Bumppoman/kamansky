@@ -55,7 +55,13 @@ defmodule Kamansky.Sales.Orders.Order do
   @spec changeset(Order.t, map) :: Ecto.Changeset.t
   def changeset(order, attrs) do
     order
-    |> cast(attrs, [])
+    |> cast(attrs,
+      [
+        :ordered_at, :item_price, :shipping_price, :selling_fees,
+        :shipping_cost, :status, :ebay_id, :hipstamp_id,
+        :processed_at, :shipped_at, :completed_at, :existing_customer, :platform
+      ]
+    )
     |> validate_required([])
   end
 

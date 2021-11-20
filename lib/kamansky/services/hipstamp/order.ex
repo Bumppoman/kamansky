@@ -67,7 +67,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
             shipping_price <- Decimal.from_float(hipstamp_order["postage_amount"] / 1),
             selling_fees <- calculate_selling_fees(item_price, shipping_price),
             {:ok, order} <-
-              Orders.insert_or_update_hipstamp_order(
+              Orders.insert_order(
                 order,
                 %{
                   customer_id: customer_id,
@@ -81,7 +81,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
             order
             |> Orders.update_order_fees(
               selling_fees: selling_fees,
-              shipping_cost: tentative_shipping_cost(listings)
+              shipping_cost: tentative_shipping_cost(listings, country)
             )
             |> elem(1)
             |> List.wrap()
@@ -151,8 +151,9 @@ defmodule Kamansky.Services.Hipstamp.Order do
     end
   end
 
-  @spec tentative_shipping_cost([Listing.t]) :: Decimal.t
-  defp tentative_shipping_cost(listings) do
+  @spec tentative_shipping_cost([Listing.t], String.t | nil) :: Decimal.t
+  defp tentative_shipping_cost(_listings, country) when not is_nil(country), do: Decimal.new("1.30")
+  defp tentative_shipping_cost(listings, _country) do
     listings
     |> Enum.count()
     |> Kernel./(6)

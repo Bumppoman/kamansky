@@ -82,7 +82,7 @@ defmodule Kamansky.Services.Ebay.Order do
                 }
               ),
             {:ok, order} <-
-              Orders.insert_or_update_order(
+              Orders.insert_order(
                 order,
                 %{
                   customer_id: customer_id,
