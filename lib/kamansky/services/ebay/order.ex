@@ -57,7 +57,7 @@ defmodule Kamansky.Services.Ebay.Order do
       |> Enum.reverse()
       |> Enum.flat_map(
         fn(ebay_order) ->
-          with order <- Orders.initialize_order(ebay_id: ebay_order.ebay_order_id),
+          with %Order{} = order <- Orders.initialize_order(ebay_id: ebay_order.ebay_order_id),
             ordered_at <- Ebay.parse_time(ebay_order.ordered_at),
             customer_name <- normalize_name(ebay_order.customer.name),
             country <- determine_country(ebay_order.customer.country),
