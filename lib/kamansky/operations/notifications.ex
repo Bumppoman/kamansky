@@ -18,16 +18,17 @@ defmodule Kamansky.Operations.Notifications do
       end
     )
     |> Repo.all()
+    |> Enum.map(&Notification.display/1)
   end
 
-  @spec send_notification(String.t, String.t, String.t) :: Notification.t
-  def send_notification(topic, title, body) do
-    with %Notification{} = notification <-
+  @spec send_notification(atom, pos_integer) :: Notification.t
+  def send_notification(topic, associated_record) do
+    with {:ok, notification} <-
       %Notification{}
-      |> Notification.changeset(%{body: body, title: title, topic: topic})
-      |> Repo.insert!()
+      |> Notification.changeset(%{topic: topic, associated_record: associated_record})
+      |> Repo.insert()
     do
-      Phoenix.PubSub.broadcast(Kamansky.PubSub, topic, {:new, notification})
+      Phoenix.PubSub.broadcast(Kamansky.PubSub, Atom.to_string(topic), {:new, notification})
     end
   end
 end

@@ -17,6 +17,7 @@
             confirmation: %{
               action: "mark_all_processed_shipped",
               content: "Are you sure you want to mark all processed orders as shipped?",
+              external: true,
               values: []
             }
           },
@@ -94,6 +95,7 @@
           <KamanskyWeb.Components.Page.link_with_confirmation
             action="mark_shipped"
             content="Are you sure you want to mark this order as shipped?"
+            external={true}
             title="Mark Shipped"
             values={[{"order-id", order.id}]}
           >
