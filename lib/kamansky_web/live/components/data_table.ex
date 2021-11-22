@@ -209,7 +209,7 @@ defmodule KamanskyWeb.Components.DataTable do
   end
 
   @spec build_sort(map | pos_integer | nil, atom | nil) :: %{action: atom | nil, column: pos_integer, direction: :asc | :desc}
-  defp build_sort(sort_parameters, parent_action) when is_map(sort_parameters), do: %{sort_parameters | action: parent_action}
+  defp build_sort(sort_parameters, parent_action) when is_map(sort_parameters), do: Map.put(sort_parameters, :action, parent_action)
   defp build_sort(sort_column, parent_action) when is_integer(sort_column), do: %{action: parent_action, column: sort_column, direction: :asc}
   defp build_sort(nil, parent_action), do: %{action: parent_action, column: 0, direction: :asc}
 

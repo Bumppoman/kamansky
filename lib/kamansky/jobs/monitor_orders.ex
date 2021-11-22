@@ -41,7 +41,7 @@ defmodule Kamansky.Jobs.MonitorOrders do
       Ebay.Order.load_new_orders() ++ Hipstamp.Order.load_new_orders(),
       fn order ->
         Orders.maybe_delist_listings(order)
-        notification =
+        {:ok, notification} =
           Notifications.send_notification(
             notification_topic(order),
             order.id
