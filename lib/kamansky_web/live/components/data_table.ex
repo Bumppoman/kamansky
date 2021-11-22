@@ -157,7 +157,7 @@ defmodule KamanskyWeb.Components.DataTable do
         socket
         |> assign(assigns)
         |> assign(:per_page, Keyword.get(assigns.options, :per_page, 10))
-        |> assign_new(:sort, fn -> build_sort(assigns.options[:sort]) end),
+        |> assign_new(:sort, fn -> build_sort(assigns.options[:sort], Map.get(assigns, :parent_action)) end),
       socket <- assign(socket, :current_page, record_location(socket, assigns.options[:go_to_record])),
       socket <- assign_data(socket),
       socket <- assign(socket, :total_items, total_items(socket.assigns)),
@@ -208,10 +208,10 @@ defmodule KamanskyWeb.Components.DataTable do
     )
   end
 
-  @spec build_sort(map | pos_integer | nil) :: %{column: pos_integer, direction: :asc | :desc}
-  defp build_sort(sort_parameters) when is_map(sort_parameters), do: sort_parameters
-  defp build_sort(sort_column) when is_integer(sort_column), do: %{column: sort_column, direction: :asc}
-  defp build_sort(nil), do: %{column: 0, direction: :asc}
+  @spec build_sort(map | pos_integer | nil, atom | nil) :: %{action: atom | nil, column: pos_integer, direction: :asc | :desc}
+  defp build_sort(sort_parameters, parent_action) when is_map(sort_parameters), do: %{sort_parameters | action: parent_action}
+  defp build_sort(sort_column, parent_action) when is_integer(sort_column), do: %{action: parent_action, column: sort_column, direction: :asc}
+  defp build_sort(nil, parent_action), do: %{action: parent_action, column: 0, direction: :asc}
 
   defp dummy_page_link do
     Phoenix.HTML.Tag.content_tag(

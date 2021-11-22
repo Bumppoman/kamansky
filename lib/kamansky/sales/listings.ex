@@ -231,7 +231,7 @@ defmodule Kamansky.Sales.Listings do
   end
 
   def sort(query, %{action: :active, column: 4, direction: direction}), do: order_by(query, {^direction, :inserted_at})
-
+  def sort(query, %{action: :bid, column: 4, direction: direction}), do: order_by(query, [l, s, el], [{^direction, el.end_time}, {:asc, s.scott_number}])
   def sort(query, %{action: :sold, column: 4, direction: direction}) do
     order_by(
       query,

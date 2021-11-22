@@ -59,7 +59,8 @@ defmodule Kamansky.Sales.Orders.Order do
       [
         :ordered_at, :item_price, :shipping_price, :selling_fees,
         :shipping_cost, :status, :ebay_id, :hipstamp_id,
-        :processed_at, :shipped_at, :completed_at, :existing_customer, :platform
+        :processed_at, :shipped_at, :completed_at, :existing_customer,
+        :customer_id, :platform
       ]
     )
     |> validate_required([])

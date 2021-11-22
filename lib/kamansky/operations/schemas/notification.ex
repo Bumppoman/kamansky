@@ -2,6 +2,7 @@ defmodule Kamansky.Operations.Notifications.Notification do
   use Ecto.Schema
 
   import Ecto.Changeset
+  import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
 
   alias __MODULE__
   alias Kamansky.Sales.Orders
@@ -51,8 +52,13 @@ defmodule Kamansky.Operations.Notifications.Notification do
   end
 
   @spec body(t, struct) :: String.t
-  def body(%Notification{topic: :ebay_new_order}, order), do: "eBay order ##{order.ebay_id} for #{Order.total_paid(order)} is ready for processing"
-  def body(%Notification{topic: :hipstamp_new_order}, order), do: "Hipstamp order ##{order.hipstamp_id} for #{Order.total_paid(order)} is ready for processing"
+  def body(%Notification{topic: :ebay_new_order}, order) do
+    "eBay order ##{order.ebay_id} for #{format_decimal_as_currency(Order.total_paid(order))} is ready for processing"
+  end
+
+  def body(%Notification{topic: :hipstamp_new_order}, order) do
+    "Hipstamp order ##{order.hipstamp_id} for #{format_decimal_as_currency(Order.total_paid(order))} is ready for processing"
+  end
 
   @spec changeset(t, map) :: Ecto.Changeset.t
   def changeset(notification, attrs \\ %{}) do
