@@ -75,6 +75,8 @@ defmodule KamanskyWeb.Router do
       live "/stamps/:id/sell", StampLive.Index, :sell
 
       live "/trends", TrendLive.Index, :index
+
+      live "/user/settings", UserLive.Settings, :index
     end
   end
 
@@ -131,9 +133,9 @@ defmodule KamanskyWeb.Router do
 
     get "/users/ebay_auth/auth_code", UserEbayAuthController, :auth_code
     get "/users/ebay_auth/new", UserEbayAuthController, :new
-    get "/users/settings", UserSettingsController, :edit
-    put "/users/settings", UserSettingsController, :update
-    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+    #get "/users/settings", UserSettingsController, :edit
+    #put "/users/settings", UserSettingsController, :update
+    #get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
   end
 
   scope "/", KamanskyWeb do

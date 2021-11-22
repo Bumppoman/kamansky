@@ -9,8 +9,7 @@ defmodule Kamansky.Operations.Accounts.User do
     email: String.t,
     hashed_password: String.t,
     initials: String.t,
-    ebay_token: String.t,
-    notifications: [Kamansky.Operations.Accounts.Notifications.Notification.t]
+    ebay_token: String.t
   }
 
   schema "users" do
@@ -21,7 +20,7 @@ defmodule Kamansky.Operations.Accounts.User do
     field :initials, :string
     field :ebay_token, :string
 
-    has_many :notifications, Kamansky.Operations.Accounts.Notifications.Notification
+    has_many :subscriptions, Kamansky.Operations.Accounts.Subscriptions.Subscription, on_replace: :delete
 
     timestamps()
   end
@@ -154,7 +153,13 @@ defmodule Kamansky.Operations.Accounts.User do
     end
   end
 
-  def ebay_token_changeset(user, attrs) do
+  @spec ebay_token_changeset(t, map) :: Ecto.Changeset.t
+  def ebay_token_changeset(%User{} = user, attrs) do
     cast(user, attrs, [:ebay_token])
+  end
+
+  @spec settings_changeset(t, map) :: Ecto.Changeset.t
+  def settings_changeset(%User{} = user, attrs) do
+    cast(user, attrs, [])
   end
 end

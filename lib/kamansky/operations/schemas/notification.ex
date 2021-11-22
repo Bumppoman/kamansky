@@ -15,6 +15,29 @@ defmodule Kamansky.Operations.Notifications.Notification do
     hipstamp_new_order: 4
   ]
 
+  @topic_details [
+    %{
+      code: :ebay_bid_received,
+      description: "New bids received on eBay listings",
+      title: "eBay bid received"
+    },
+    %{
+      code: :ebay_new_order,
+      description: "New orders finalized on eBay",
+      title: "eBay order received"
+    },
+    %{
+      code: :ebay_listing_relisted,
+      description: "eBay listings relisted after expiration",
+      title: "eBay listing relisted"
+    },
+    %{
+      code: :hipstamp_new_order,
+      description: "New orders received on Hipstamp",
+      title: "Hipstamp order received"
+    }
+  ]
+
   @type t :: Ecto.Schema.t | %Notification{
     topic: pos_integer,
     associated_record: integer
@@ -57,11 +80,14 @@ defmodule Kamansky.Operations.Notifications.Notification do
     end
   end
 
-  @spec topics :: keyword
-  def topics, do: @topics
+  @spec list_topics :: keyword
+  def list_topics, do: @topics
+
+  @spec list_topic_details :: [%{required(:code) => atom, required(:description) => String.t, required(:title) => String.t}]
+  def list_topic_details, do: @topic_details
 
   @spec associated_record(t) :: struct
-  def associated_record(%Notification{topic: topic, associated_record: order_id}) when topic in [:ebay_new_order, :hipstamp_new_order], do: Orders.get_order!(order_id)
+  defp associated_record(%Notification{topic: topic, associated_record: order_id}) when topic in [:ebay_new_order, :hipstamp_new_order], do: Orders.get_order!(order_id)
 
   @spec route(t, struct) :: {fun, atom, integer}
   defp route(%Notification{topic: :ebay_new_order}, order), do: {&Routes.order_show_path/3, :show, order.id}

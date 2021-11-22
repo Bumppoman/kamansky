@@ -81,7 +81,7 @@ defmodule KamanskyWeb.Components.Page do
               <button
                 type="button"
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white transition ease-in-out duration-150 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                :class="external && 'kamansky-external'"
+                :class="detail.external && 'kamansky-external'"
                 :phx-click="detail.action"
                 x-ref="success"
               >
@@ -122,7 +122,10 @@ defmodule KamanskyWeb.Components.Page do
             init () {
               this.show = true;
               if($el.getAttribute('phx-value-type') == 'success') {
-                setTimeout(() => this.show = false, 3000);
+                setTimeout(() => {
+                  this.show = false;
+                  setTimeout(() => $dispatch('kamansky:clear-flash'), 600);
+                }, 3000);
               }
             },
             show: true
@@ -155,7 +158,10 @@ defmodule KamanskyWeb.Components.Page do
               <button
                 type="button"
                 class={"inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 " <> flash_button_style(@flash.type)}
-                x-on:click="show = false"
+                x-on:click="() => {
+                  this.show = false;
+                  setTimeout(() => $dispatch('kamansky:clear-flash'), 600);
+                }"
               >
                 <span class="sr-only">Dismiss</span>
                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -278,7 +284,7 @@ defmodule KamanskyWeb.Components.Page do
   defp flash_button_style(:error), do: "bg-red-50 text-red-600 hover:bg-red-50 focus:ring-offset-red-50 focus:ring-red-700"
   defp flash_button_style(:success), do: "bg-green-50 text-green-500 hover:bg-green-100 focus:ring-offset-green-50 focus:ring-green-600"
 
-  @spec flash_icon(%{required(:type) => flash_type}) :: Phoenix.LiveView.Rendered.t()
+  @spec flash_icon(%{required(:type) => flash_type}) :: Phoenix.LiveView.Rendered.t
   def flash_icon(%{type: :error} = assigns) do
     ~H"""
     <svg

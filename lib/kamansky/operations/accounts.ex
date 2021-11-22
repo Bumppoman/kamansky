@@ -354,4 +354,23 @@ defmodule Kamansky.Operations.Accounts do
     |> User.ebay_token_changeset(%{token: token})
     |> Repo.update()
   end
+
+  @spec change_user_settings(User.t, map) :: Ecto.Changeset.t
+  def change_user_settings(%User{} = user, attrs \\ %{}), do: User.settings_changeset(user, attrs)
+
+  @spec change_user_subscriptions(User.t, [map]) :: Ecto.Changeset.t
+  def change_user_subscriptions(%User{} = user, subscriptions) do
+    user
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(
+      :subscriptions,
+      Enum.map(subscriptions, &Ecto.build_assoc(user, :subscriptions, %{topic: String.to_existing_atom(&1)}))
+    )
+  end
+
+  @spec load_subscriptions_for_user(User.t) :: User.t
+  def load_subscriptions_for_user(%User{} = user), do: Repo.preload(user, :subscriptions)
+
+  @spec update_user(Ecto.Changeset.t) :: {:ok, User.t} | {:error, Ecto.Changeset.t}
+  def update_user(changeset), do: Repo.update(changeset)
 end

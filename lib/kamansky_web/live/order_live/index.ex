@@ -48,7 +48,7 @@ defmodule KamanskyWeb.OrderLive.Index do
     |> Orders.get_order!()
     |> Orders.mark_order_as_processed()
     |> case do
-      {:ok, _order} -> advance_order(socket, "completed")
+      {:ok, _order} -> advance_order(socket, "processed")
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end
   end
