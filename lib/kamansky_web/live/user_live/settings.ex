@@ -55,7 +55,12 @@ defmodule KamanskyWeb.UserLive.Settings do
   end
 
   def handle_params(params, _uri, socket) do
-    {:noreply, assign(socket, :section, Map.get(params, "section", "account"))}
+    {
+      :noreply,
+      socket
+      |> assign(:changeset, Accounts.change_user_settings(socket.assigns.current_user))
+      |> assign(:section, Map.get(params, "section", "account"))
+    }
   end
 
   @spec load_user_subscriptions(User.t) :: [String.t]
