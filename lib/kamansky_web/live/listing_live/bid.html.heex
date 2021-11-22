@@ -41,7 +41,7 @@
     <td>#<%= listing.stamp.inventory_key %></td>
     <td><%= listing.ebay_listing.bid_count %></td>
     <td><%= format_decimal_as_currency(listing.ebay_listing.current_bid) %></td>
-    <td><%= formatted_date(listing.ebay_listing.end_time) %></td>
+    <td><%= formatted_date(listing.ebay_listing.end_time, "%B %-d, %Y %-I:%M %p") %></td>
     <td></td>
   </.live_component>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />

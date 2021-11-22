@@ -185,13 +185,13 @@
                   x-transition:leave-end="opacity-0 scale-95 transform"
                 >
                   <%= live_redirect "Settings",
-                    class: "block px-4 py-2 text-sm text-gray-700",
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900",
                     role: "menuitem",
                     tabindex: -1,
                     to: Routes.user_settings_path(@socket, :index)
                   %>
                   <%= link "Sign out",
-                    class: "block px-4 py-2 text-sm text-gray-700",
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900",
                     method: :delete,
                     role: "menuitem",
                     tabindex: -1,
