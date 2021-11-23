@@ -4,10 +4,12 @@ defmodule KamanskyWeb.UserSessionController do
   alias Kamansky.Operations.Accounts
   alias KamanskyWeb.UserAuth
 
+  @spec new(Plug.Conn.t, map) :: Plug.Conn.t
   def new(conn, _params) do
-    render(conn, "new.html", error_message: nil)
+    render(conn, "new.html", page_title: "Login", error_message: nil)
   end
 
+  @spec create(Plug.Conn.t, map) :: Plug.Conn.t
   def create(conn, %{"user" => user_params}) do
     %{"email" => email, "password" => password} = user_params
 
@@ -15,10 +17,11 @@ defmodule KamanskyWeb.UserSessionController do
       UserAuth.log_in_user(conn, user, user_params)
     else
       # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
-      render(conn, "new.html", error_message: "Invalid email or password")
+      render(conn, "new.html", page_title: "Login", error_message: "Invalid email or password")
     end
   end
 
+  @spec delete(Plug.Conn.t, map) :: Plug.Conn.t
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "Logged out successfully.")
