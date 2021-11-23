@@ -3,6 +3,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
 
   alias Kamansky.Operations.Administration
   alias Kamansky.Sales.{Customers, Listings, Orders}
+  alias Kamansky.Sales.Listings.Platforms
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.Hipstamp
   alias Kamansky.Stamps
@@ -111,16 +112,16 @@ defmodule Kamansky.Services.Hipstamp.Order do
       hipstamp_fees <-
         item_price
         |> Decimal.add(shipping_price)
-        |> Decimal.mult(hipstamp_coefficient),
+        |> Decimal.mult(hipstamp_coefficient)
+        |> Decimal.round(2),
       paypal_fees <-
         item_price
         |> Decimal.add(shipping_price)
         |> Decimal.mult(paypal_coefficient)
         |> Decimal.add(paypal_flat_fee)
+        |> Decimal.round(2)
     do
-      hipstamp_fees
-      |> Decimal.add(paypal_fees)
-      |> Decimal.round(2)
+      Decimal.add(hipstamp_fees, paypal_fees)
     end
   end
 
@@ -185,7 +186,8 @@ defmodule Kamansky.Services.Hipstamp.Order do
               listing,
               order_id: order_id,
               sale_price: Decimal.new(sale_listing["price"]), # comes in as a string instead of float
-            )
+            ),
+          {:ok, _hipstamp_listing} <- Platforms.delete_external_listing(listing.hipstamp_listing)
         ) do
           listing
         end

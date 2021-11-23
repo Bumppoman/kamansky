@@ -18,8 +18,8 @@ defmodule Kamansky.Sales.Listings.Platforms do
     |> Repo.insert()
   end
 
-  @spec delete_external_listing(external_listing) :: external_listing when external_listing: EbayListing.t | HipstampListing.t
-  def delete_external_listing(external_listing), do: Repo.delete!(external_listing)
+  @spec delete_external_listing(external_listing) :: {:ok, external_listing} when external_listing: EbayListing.t | HipstampListing.t
+  def delete_external_listing(external_listing), do: Repo.delete(external_listing)
 
   @spec get_ebay_listing(String.t) :: EbayListing.t | nil
   def get_ebay_listing(ebay_id) do

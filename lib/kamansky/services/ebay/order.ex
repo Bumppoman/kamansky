@@ -6,7 +6,7 @@ defmodule Kamansky.Services.Ebay.Order do
 
   alias Kamansky.Operations.Administration
   alias Kamansky.Sales.{Customers, Listings, Orders}
-  alias Kamansky.Sales.Listings.Listing
+  alias Kamansky.Sales.Listings.{Listing, Platforms}
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.Ebay
   alias Kamansky.Stamps
@@ -158,7 +158,8 @@ defmodule Kamansky.Services.Ebay.Order do
               listing,
               order_id: order_id,
               sale_price: Decimal.new(sale_listing.item_price)
-            )
+            ),
+          {:ok, _ebay_listing} <- Platforms.delete_external_listing(listing.ebay_listing)
         ) do
           listing
         end
