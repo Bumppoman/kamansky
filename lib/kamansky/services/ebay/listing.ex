@@ -165,9 +165,9 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> Enum.filter(&(String.to_integer(&1.bid_count) > 0))
   end
 
-  @spec relist(EbayListing.t) :: {:ok, EbayListing.t}
+  @spec relist(EbayListing.t) :: {:ok, EbayListing.t} | {:error, %{code: :ebay_relist_listing_error, dump: String.t}}
   def relist(%EbayListing{} = ebay_listing) do
-    relisted_listing =
+    with response <-
       """
       <?xml version="1.0" encoding="utf-8"?>
       <RelistItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
@@ -179,22 +179,32 @@ defmodule Kamansky.Services.Ebay.Listing do
       """
       |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "RelistItem"}]))
       |> Map.get(:body)
+    do
+      response
       |> parse(dtd: :none)
       |> xpath(
         ~x"//RelistItemResponse",
+        outcome: ~x".//Ack/text()"s,
         ebay_id: ~x".//ItemID/text()"s,
         start_time: ~x".//StartTime/text()"s,
         end_time: ~x".//EndTime/text()"s
       )
+      |> case do
+        %{outcome: "Success"} = relisted_listing ->
+          Platforms.update_external_listing(
+            ebay_listing,
+            %{
+              ebay_id: relisted_listing.ebay_id,
+              start_time: Ebay.parse_time(relisted_listing.start_time),
+              end_time: Ebay.parse_time(relisted_listing.end_time)
+            }
+          )
 
-    Platforms.update_external_listing(
-      ebay_listing,
-      %{
-        ebay_id: relisted_listing.ebay_id,
-        start_time: Ebay.parse_time(relisted_listing.start_time),
-        end_time: Ebay.parse_time(relisted_listing.end_time)
-      }
-    )
+        _ ->
+          Logger.log(:error, response)
+          {:error, %{code: :ebay_relist_listing_error, dump: response}}
+      end
+    end
   end
 
   @spec remove_listing(Listing.t) :: :ok

@@ -1,6 +1,6 @@
 defmodule KamanskyWeb.ListingLive.Bid do
   use KamanskyWeb, :live_view
-  use KamanskyWeb.Paginate, sort: {3, :asc}
+  use KamanskyWeb.Paginate, sort: {4, :asc}
 
   import Kamansky.Helpers
 

@@ -1,4 +1,3 @@
-import { dataTableInit } from './datatable';
 import { fileUpload } from './fileUpload';
 import { flash } from './flash';
 import { modalInit } from './modal';
@@ -16,7 +15,6 @@ export interface Hook {
 }
 
 export const Hooks = {
-  dataTableInit,
   fileUpload,
   flash,
   format,
