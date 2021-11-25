@@ -16,12 +16,10 @@ defmodule KamanskyWeb.ReportLive.Index do
       reports <- Map.get(socket.assigns.report_months, socket.assigns.year),
       {{:totals, totals}, reports} <- List.pop_at(reports, 0)
     do
-      {
-        :noreply,
-        socket
-        |> assign(:reports, reports)
-        |> assign(:totals, totals)
-      }
+      socket
+      |> assign(:reports, reports)
+      |> assign(:totals, totals)
+      |> noreply()
     end
   end
 end

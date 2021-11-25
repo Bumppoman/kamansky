@@ -5,24 +5,22 @@ defmodule KamanskyWeb.LiveHelpers do
 
   @spec close_modal_with_success_and_reload_data(Phoenix.LiveView.Socket.t, String.t, String.t, pos_integer | nil) :: {:noreply, Phoenix.LiveView.Socket.t}
   def close_modal_with_success_and_reload_data(socket, modal_event, success_message, item_id \\ nil) do
-    {
-      :noreply,
-      socket
-      |> Phoenix.LiveView.push_event(modal_event, %{})
-      |> Phoenix.LiveView.put_flash(:info, %{type: :success, message: success_message, timestamp: Time.utc_now()})
-      |> Phoenix.LiveView.push_patch(
-        to: apply(
-          socket.view,
-          :self_path,
-          [
-            socket,
-            socket.assigns.live_action,
-            socket.assigns.pagination,
-            %{show: item_id}
-          ]
-        )
+    socket
+    |> Phoenix.LiveView.push_event(modal_event, %{})
+    |> Phoenix.LiveView.put_flash(:info, %{type: :success, message: success_message, timestamp: Time.utc_now()})
+    |> Phoenix.LiveView.push_patch(
+      to: apply(
+        socket.view,
+        :self_path,
+        [
+          socket,
+          socket.assigns.live_action,
+          socket.assigns.pagination,
+          %{show: item_id}
+        ]
       )
-    }
+    )
+    |> noreply()
   end
 
   @spec live_confirmation_modal(keyword) :: Phoenix.LiveView.Component.t
@@ -89,6 +87,9 @@ defmodule KamanskyWeb.LiveHelpers do
     ]
   end
 
-  @spec refresh_datatable(String.t, keyword) :: {:phoenix, :send_update, any}
-  def refresh_datatable(table_id, options \\ []), do: Phoenix.LiveView.send_update(KamanskyWeb.Components.DataTable, id: table_id, options: options)
+  @spec noreply(Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def noreply(%Phoenix.LiveView.Socket{} = socket), do: {:noreply, socket}
+
+  @spec ok(Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
+  def ok(%Phoenix.LiveView.Socket{} = socket), do: {:ok, socket}
 end

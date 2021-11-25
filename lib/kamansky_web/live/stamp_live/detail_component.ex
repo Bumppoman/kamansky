@@ -15,13 +15,14 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
       stamp <- Stamps.get_stamp_detail!(stamp_id),
       socket <- assign(socket, :stamp, stamp)
     do
-      {:ok, assign(socket, :current_photo, current_photo("front", socket))}
+      socket
+      |> assign(:current_photo, current_photo("front", socket))
+      |> ok()
     end
   end
 
   @impl true
-  @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t)
-    :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("change_photo", %{"display" => display}, socket), do: {:noreply, assign(socket, :current_photo, current_photo(display, socket))}
 
   @spec current_photo(

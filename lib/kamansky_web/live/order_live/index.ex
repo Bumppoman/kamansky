@@ -14,7 +14,9 @@ defmodule KamanskyWeb.OrderLive.Index do
     with _orders <- Hipstamp.Order.load_new_orders(),
       _orders <- Ebay.Order.load_new_orders()
     do
-      {:noreply, push_patch(socket, to: self_path(socket, :pending, %{}))}
+      socket
+      |> push_patch(to: self_path(socket, :pending, %{}))
+      |> noreply()
     end
   end
 
@@ -79,12 +81,10 @@ defmodule KamanskyWeb.OrderLive.Index do
   end
 
   def handle_info({:update_new_order_step, %{step: 2, customer: customer}}, socket) do
-    {
-      :noreply,
-      socket
-      |> assign(:button_text, "Create Order")
-      |> assign(:customer, customer)
-    }
+    socket
+    |> assign(:button_text, "Create Order")
+    |> assign(:customer, customer)
+    |> noreply()
   end
 
   @impl true
@@ -101,16 +101,18 @@ defmodule KamanskyWeb.OrderLive.Index do
   end
 
   @impl true
-  @spec count_data(:completed | :pending | :processed | :shipped, String.t | nil) :: integer
-  def count_data(status, search), do: Orders.count_orders(status, search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(%Phoenix.LiveView.Socket{assigns: %{live_action: status}}, search), do: Orders.count_orders(status, search)
 
   @impl true
-  @spec find_item_in_data(:completed | :pending | :processed | :shipped, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
-  def find_item_in_data(status, item_id, sort, direction), do: Orders.find_row_number_for_order(status, item_id, sort, direction)
+  @spec find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(%Phoenix.LiveView.Socket{assigns: %{live_action: status}}, item_id, sort, direction) do
+    Orders.find_row_number_for_order(status, item_id, sort, direction)
+  end
 
   @impl true
-  @spec load_data(:completed | :pending | :processed | :shipped, Kamansky.Paginate.params) :: [Order.t]
-  def load_data(status, params), do: Orders.list_orders(:display, status, params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Order.t]
+  def load_data(%Phoenix.LiveView.Socket{assigns: %{live_action: status}}, params), do: Orders.list_orders(:display, status, params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :completed | :pending | :processed | :shipped, map) :: String.t

@@ -28,7 +28,7 @@ defmodule KamanskyWeb.NotificationLive.Notifications do
       |> Subscriptions.get_subscription_for_user!(notification.topic)
       |> Subscriptions.update_subscription(%{last_read: notification.inserted_at})
 
-      {:noreply, socket}
+      noreply(socket)
     end
   end
 

@@ -11,12 +11,12 @@ defmodule KamanskyWeb.TrendLive.Sold do
   def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Stamps Sold by Scott Number")}
 
   @impl true
-  @spec count_data(:index, String.t | nil) :: integer
-  def count_data(_action, search), do: StampReferences.count_stamp_references_with_sales(search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(_socket, search), do: StampReferences.count_stamp_references_with_sales(search)
 
   @impl true
-  @spec load_data(:index, Kamansky.Paginate.params) :: [Order.t]
-  def load_data(_action, params), do: StampReferences.list_stamp_references_with_sales(params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Order.t]
+  def load_data(_socket, params), do: StampReferences.list_stamp_references_with_sales(params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t

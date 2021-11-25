@@ -38,18 +38,22 @@ defmodule KamanskyWeb.StampReferenceLive.Index do
   end
 
   @impl true
-  @spec count_data(:index | :missing_from_collection, String.t | nil) :: integer
-  def count_data(:index, search), do: StampReferences.count_stamp_references(search)
-  def count_data(:missing_from_collection, search), do: StampReferences.count_stamp_references_missing_from_collection(search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(%Phoenix.LiveView.Socket{assigns: %{live_action: :index}}, search), do: StampReferences.count_stamp_references(search)
+  def count_data(%Phoenix.LiveView.Socket{assigns: %{live_action: :missing_from_collection}}, search) do
+    StampReferences.count_stamp_references_missing_from_collection(search)
+  end
 
   @impl true
-  @spec find_item_in_data(:index, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
-  def find_item_in_data(:index, item_id, sort, direction), do: StampReferences.find_row_number_for_stamp_reference(item_id, sort, direction)
+  @spec find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(_socket, item_id, sort, direction), do: StampReferences.find_row_number_for_stamp_reference(item_id, sort, direction)
 
   @impl true
-  @spec load_data(:index | :missing_from_collection, Kamansky.Paginate.params) :: [Stamp.t]
-  def load_data(:index, params), do: StampReferences.list_stamp_references(params)
-  def load_data(:missing_from_collection, params), do: StampReferences.list_stamp_references_missing_from_collection(params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Stamp.t]
+  def load_data(%Phoenix.LiveView.Socket{assigns: %{live_action: :index}}, params), do: StampReferences.list_stamp_references(params)
+  def load_data(%Phoenix.LiveView.Socket{assigns: %{live_action: :missing_from_collection}}, params) do
+    StampReferences.list_stamp_references_missing_from_collection(params)
+  end
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :index | :missing_from_collection, map) :: String.t

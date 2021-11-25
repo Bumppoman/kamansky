@@ -10,36 +10,32 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
   @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{trigger_params: %{"listing-id" => listing_id}} = assigns, socket) do
     with listing <- Listings.get_listing_to_list(listing_id) do
-      {
-        :ok,
-        socket
-        |> assign(assigns)
-        |> assign(
-          :changeset,
-          Platforms.change_external_listing(
-            %EbayListing{},
-            %{
-              auction_price: Ebay.Listing.suggested_auction_price(listing),
-              buy_it_now_price: Ebay.Listing.suggested_buy_it_now_price(listing),
-              title: Ebay.Listing.suggested_title(listing)
-            }
-          )
+      socket
+      |> assign(assigns)
+      |> assign(
+        :changeset,
+        Platforms.change_external_listing(
+          %EbayListing{},
+          %{
+            auction_price: Ebay.Listing.suggested_auction_price(listing),
+            buy_it_now_price: Ebay.Listing.suggested_buy_it_now_price(listing),
+            title: Ebay.Listing.suggested_title(listing)
+          }
         )
-        |> assign(:listing, listing)
-      }
+      )
+      |> assign(:listing, listing)
+      |> ok()
     end
   end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"ebay_listing" => ebay_listing_params}, socket) do
-    with changeset <-
-      %EbayListing{}
-      |> Platforms.change_external_listing(ebay_listing_params)
-      |> Map.put(:action, :validate)
-    do
-      {:noreply, assign(socket, :changeset, changeset)}
-    end
+    %EbayListing{}
+    |> Platforms.change_external_listing(ebay_listing_params)
+    |> Map.put(:action, :validate)
+    |> then(&assign(socket, :changeset, &1))
+    |> noreply()
   end
 
   def handle_event("submit", %{"ebay_listing" => ebay_listing_params}, socket) do
@@ -50,6 +46,6 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
       {:error, error} -> send self(), {:error, error}
     end
 
-    {:noreply, socket}
+    noreply(socket)
   end
 end

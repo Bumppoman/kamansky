@@ -15,12 +15,10 @@ defmodule KamanskyWeb.ListingLive.Active do
   @impl true
   @spec handle_info({atom, pos_integer}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:error, _error}, socket) do
-    {
-      :noreply,
-      socket
-      |> put_flash(:info, %{type: :error, message: "An error occurred while attempting to list this listing on eBay.", timestamp: DateTime.utc_now()})
-      |> push_event("kamansky:closeModal", %{})
-    }
+    socket
+    |> put_flash(:info, %{type: :error, message: "An error occurred while attempting to list this listing on eBay.", timestamp: DateTime.utc_now()})
+    |> push_event("kamansky:closeModal", %{})
+    |> then(&({:noreply, &1}))
   end
 
   def handle_info({:listing_added_to_order, _listing_id}, socket) do
@@ -50,16 +48,16 @@ defmodule KamanskyWeb.ListingLive.Active do
   end
 
   @impl true
-  @spec count_data(:index, String.t | nil) :: integer
-  def count_data(_action, search), do: Listings.count_listings(:active, search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(_socket, search), do: Listings.count_listings(:active, search)
 
   @impl true
-  @spec find_item_in_data(:index, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
-  def find_item_in_data(_action, item_id, sort, direction), do: Listings.find_row_number_for_listing(:active, item_id, sort, direction)
+  @spec find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(_socket, item_id, sort, direction), do: Listings.find_row_number_for_listing(:active, item_id, sort, direction)
 
   @impl true
-  @spec load_data(:index, Kamansky.Paginate.params) :: [Listing.t]
-  def load_data(_action, params), do: Listings.list_active_listings(params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Listing.t]
+  def load_data(_socket, params), do: Listings.list_active_listings(params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t

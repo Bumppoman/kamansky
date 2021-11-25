@@ -24,13 +24,11 @@ defmodule KamanskyWeb.StampLive.Index do
   @impl true
   @spec handle_info({atom, integer | Stamp.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:stamp_added, stamp}, socket) do
-    {
-      :noreply,
-      socket
-      |> push_event("kamansky:closeModal", %{})
-      |> put_flash(:info, %{type: :success, message: "You have successfully added this stamp", timestamp: Time.utc_now()})
-      |> push_redirect(to: Routes.stamp_index_path(socket, stamp.status, show: stamp.id))
-    }
+    socket
+    |> push_event("kamansky:closeModal", %{})
+    |> put_flash(:info, %{type: :success, message: "You have successfully added this stamp", timestamp: Time.utc_now()})
+    |> push_redirect(to: Routes.stamp_index_path(socket, stamp.status, show: stamp.id))
+    |> noreply()
   end
 
   def handle_info({:stamp_updated, stamp_id}, socket) do
@@ -55,18 +53,20 @@ defmodule KamanskyWeb.StampLive.Index do
   end
 
   @impl true
-  @spec count_data(:collection | :collection_to_replace | :stock, String.t | nil) :: integer
-  def count_data(:collection_to_replace, search), do: Stamps.count_stamps_in_collection_below_grade(85, search)
-  def count_data(status, search) when status in [:collection, :stock], do: Stamps.count_stamps(status, search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(%Phoenix.LiveView.Socket{assigns: %{live_action: :collection_to_replace}}, search), do: Stamps.count_stamps_in_collection_below_grade(85, search)
+  def count_data(%Phoenix.LiveView.Socket{assigns: %{live_action: status}}, search) when status in [:collection, :stock], do: Stamps.count_stamps(status, search)
 
   @impl true
-  @spec find_item_in_data(:collection | :collection_to_replace | :stock, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
-  def find_item_in_data(status, item_id, sort, direction) when status in [:collection, :stock], do: Stamps.find_row_number_for_stamp(status, item_id, sort, direction)
+  @spec find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(%Phoenix.LiveView.Socket{assigns: %{live_action: status}}, item_id, sort, direction) when status in [:collection, :stock] do
+    Stamps.find_row_number_for_stamp(status, item_id, sort, direction)
+  end
 
   @impl true
-  @spec load_data(:collection | :collection_to_replace | :stock, Kamansky.Paginate.params) :: [Stamp.t]
-  def load_data(:collection_to_replace, params), do: Stamps.list_stamps_in_collection_below_grade(85, params)
-  def load_data(status, params) when status in [:collection, :stock], do: Stamps.list_stamps(status, params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Stamp.t]
+  def load_data(%Phoenix.LiveView.Socket{assigns: %{live_action: :collection_to_replace}}, params), do: Stamps.list_stamps_in_collection_below_grade(85, params)
+  def load_data(%Phoenix.LiveView.Socket{assigns: %{live_action: status}}, params) when status in [:collection, :stock], do: Stamps.list_stamps(status, params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :collection | :collection_to_replace | :stock, map) :: String.t

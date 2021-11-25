@@ -23,16 +23,16 @@ defmodule KamanskyWeb.CustomerLive.Index do
   def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Customer List")}
 
   @impl true
-  @spec count_data(:index, String.t | nil) :: integer
-  def count_data(_action, search), do: Customers.count_customers(search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(_socket, search), do: Customers.count_customers(search)
 
   @impl true
-  @spec find_item_in_data(:index, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
-  def find_item_in_data(_action, customer_id, sort, direction), do: Customers.find_row_number_for_customer(customer_id, sort, direction)
+  @spec find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(_socket, customer_id, sort, direction), do: Customers.find_row_number_for_customer(customer_id, sort, direction)
 
   @impl true
-  @spec load_data(:index, Kamansky.Paginate.params) :: [Expense.t]
-  def load_data(_action, params), do: Customers.list_customers(params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Customer.t]
+  def load_data(_socket, params), do: Customers.list_customers(params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t

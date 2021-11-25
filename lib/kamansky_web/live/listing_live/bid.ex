@@ -11,14 +11,17 @@ defmodule KamanskyWeb.ListingLive.Bid do
   def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Listings with Bids")}
 
   @impl true
-  @spec count_data(:index, String.t | nil) :: integer
-  def count_data(_action, search), do: Listings.count_listings_with_bids(search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(_socket, search), do: Listings.count_listings_with_bids(search)
 
   @impl true
-  @spec load_data(:index, Kamansky.Paginate.params) :: [Expense.t]
-  def load_data(_action, params), do: Listings.list_listings_with_bids(params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Expense.t]
+  def load_data(_socket, params), do: Listings.list_listings_with_bids(params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t
   def self_path(socket, _action, opts), do: Routes.listing_bid_path(socket, :index, opts)
+
+  @spec sort_action(Phoenix.LiveView.Socket.t) :: :bid
+  def sort_action(_socket), do: :bid
 end

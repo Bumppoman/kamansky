@@ -10,29 +10,24 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   @impl true
   @spec mount(Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def mount(socket) do
-    {
-      :ok,
-      socket
-      |> allow_upload(:front_photo, accept: :any, auto_upload: true)
-      |> allow_upload(:rear_photo, accept: :any, auto_upload: true)
-    }
+    socket
+    |> allow_upload(:front_photo, accept: :any, auto_upload: true)
+    |> allow_upload(:rear_photo, accept: :any, auto_upload: true)
+    |> ok()
   end
 
   @impl true
-  @spec update(%{required(:stamp) => Stamp.t, required(:status) => atom, optional(atom) => any}, Phoenix.LiveView.Socket.t)
-    :: {:ok, Phoenix.LiveView.Socket.t}
+  @spec update(%{required(:stamp) => Stamp.t, required(:status) => atom, optional(atom) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{trigger_params: %{"action" => action, "stamp-id" => stamp_id, "status" => status}} = assigns, socket) do
     with stamp <- Stamps.get_or_initialize_stamp(stamp_id) do
-      {
-        :ok,
-        socket
-        |> assign(assigns)
-        |> assign(:action, action)
-        |> assign(:changeset, Stamps.change_stamp(stamp, %{add_to: String.to_existing_atom(status)}))
-        |> assign(:copy_in_collection, nil)
-        |> assign(:stamp, stamp)
-        |> assign(:title, (if action == "new", do: "Add New Stamp", else: "Edit Stamp"))
-      }
+      socket
+      |> assign(assigns)
+      |> assign(:action, action)
+      |> assign(:changeset, Stamps.change_stamp(stamp, %{add_to: String.to_existing_atom(status)}))
+      |> assign(:copy_in_collection, nil)
+      |> assign(:stamp, stamp)
+      |> assign(:title, (if action == "new", do: "Add New Stamp", else: "Edit Stamp"))
+      |> ok()
     end
   end
 
@@ -40,18 +35,18 @@ defmodule KamanskyWeb.StampLive.FormComponent do
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("find_in_collection", %{"value" => scott_number}, socket) do
     with copy_in_collection <- Stamps.get_stamp_in_collection_by_scott_number(scott_number) do
-      {:noreply, assign(socket, :copy_in_collection, copy_in_collection)}
+      socket
+      |> assign(:copy_in_collection, copy_in_collection)
+      |> noreply()
     end
   end
 
   def handle_event("validate", %{"stamp" => stamp_params}, socket) do
-    with changeset <-
-      socket.assigns.stamp
-      |> Stamps.change_stamp(stamp_params)
-      |> Map.put(:action, :validate)
-    do
-      {:noreply, assign(socket, :changeset, changeset)}
-    end
+    socket.assigns.stamp
+    |> Stamps.change_stamp(stamp_params)
+    |> Map.put(:action, :validate)
+    |> then(&assign(socket, :changeset, &1))
+    |> noreply()
   end
 
   def handle_event("submit", %{"stamp" => stamp_params}, socket), do: save_stamp(socket, stamp_params)

@@ -32,16 +32,16 @@ defmodule KamanskyWeb.PurchaseLive.Index do
   def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Purchases")}
 
   @impl true
-  @spec count_data(:index, String.t | nil) :: integer
-  def count_data(_action, search), do: Purchases.count_purchases(search)
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(_socket, search), do: Purchases.count_purchases(search)
 
   @impl true
-  @spec find_item_in_data(:index, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
-  def find_item_in_data(_action, item_id, sort, direction), do: Purchases.find_row_number_for_purchase(item_id, sort, direction)
+  @spec find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(_socket, item_id, sort, direction), do: Purchases.find_row_number_for_purchase(item_id, sort, direction)
 
   @impl true
-  @spec load_data(:index, Kamansky.Paginate.params) :: [Order.t]
-  def load_data(_action, params), do: Purchases.list_purchases(params)
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Order.t]
+  def load_data(_socket, params), do: Purchases.list_purchases(params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t

@@ -1,37 +1,28 @@
-<section>
+<div>
   <KamanskyWeb.Components.Page.page_header
     breadcrumbs={
       [
-        {"Customer List", Routes.customer_index_path(@socket, :index, go_to_record: @customer.id)},
+        {"Customer List", Routes.customer_index_path(@socket, :index, show: @customer.id)},
         "Customer Information"
       ]
     }
     page_title={@page_title} 
   />
-  <.live_component module={KamanskyWeb.Components.DataTable}
-    id="customer-orders-kamansky-data-table"
-    let={order}
-    headers=
-      {
-        [
-          "Order",
-          "Date",
-          "Total"
-        ]
-      }
-    data_count={@order_count}
-    data_source={@order_source}
-    empty_message="There are no orders to display.",
-    options={
-      [
-        per_page: 5,
-        sort: %{column: 1, direction: :desc}
-      ]
-    }
-    title="Orders"
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
+    empty_message="There are no orders to display."
   >
-    <td><%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %></td>
-    <td><%= formatted_date(order.ordered_at) %></td>
-    <td><%= format_decimal_as_currency(Order.total_paid(order)) %></td>
-  </.live_component>
-</section>
+    <:col let={order} label="Order">
+      <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
+    </:col>
+    <:col let={order} label="Date">
+      <time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time>
+    </:col>
+    <:col let={order} label="total">
+      <%= format_decimal_as_currency(Order.total_paid(order)) %>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
+</div>

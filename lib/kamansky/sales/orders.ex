@@ -37,9 +37,10 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec count_orders_for_customer(pos_integer) :: integer
-  def count_orders_for_customer(customer_id) do
+  @spec count_orders_for_customer(pos_integer, String.t | nil) :: integer
+  def count_orders_for_customer(customer_id, search \\ nil) do
     Order
+    |> maybe_search(search)
     |> where(customer_id: ^customer_id)
     |> Repo.aggregate(:count, :id)
   end
@@ -150,6 +151,7 @@ defmodule Kamansky.Sales.Orders do
   @spec list_orders_for_customer(pos_integer, Paginate.params) :: [Order.t]
   def list_orders_for_customer(customer_id, params) do
     Order
+    |> maybe_search(params.search)
     |> where(customer_id: ^customer_id)
     |> join(:left, [o], c in assoc(o, :customer))
     |> then(&Paginate.list(Orders, &1, params))
@@ -277,8 +279,7 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.update()
   end
 
-  @spec update_order_fees(Order.t, [selling_fees: Decimal.t, shipping_cost: Decimal.t])
-    :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
+  @spec update_order_fees(Order.t, [selling_fees: Decimal.t, shipping_cost: Decimal.t]) :: {:ok, Order.t} | {:error, Ecto.Changeset.t}
   def update_order_fees(%Order{} = order, selling_fees: selling_fees, shipping_cost: shipping_cost) do
     order
     |> Ecto.Changeset.change(selling_fees: selling_fees, shipping_cost: shipping_cost)

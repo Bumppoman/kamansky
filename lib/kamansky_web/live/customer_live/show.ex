@@ -1,5 +1,6 @@
 defmodule KamanskyWeb.CustomerLive.Show do
   use KamanskyWeb, :live_view
+  use KamanskyWeb.Paginate, sort: {1, :desc}
 
   import Kamansky.Helpers, only: [format_decimal_as_currency: 1, formatted_date: 1]
 
@@ -7,17 +8,25 @@ defmodule KamanskyWeb.CustomerLive.Show do
   alias Kamansky.Sales.Orders.Order
 
   @impl true
-  @spec mount(%{required(String.t) => String.t}, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(%{"id" => id}, _session, socket) do
-    with customer <- Customers.get_customer_detail(id) do
-      {
-        :ok,
-        socket
-        |> assign(:customer, customer)
-        |> assign(:order_count, fn -> Orders.count_orders_for_customer(customer.id) end)
-        |> assign(:order_source, fn options -> Orders.list_orders_for_customer(customer.id, options) end)
-        |> assign(:page_title, "Information for #{customer.name}")
-      }
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_params(%{"id" => customer_id}, _uri, socket) do
+    with customer <- Customers.get_customer_detail(customer_id) do
+      socket
+      |> assign(:customer, customer)
+      |> assign(:page_title, "Information for #{customer.name}")
+      |> noreply()
     end
   end
+
+  @impl true
+  @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  def count_data(socket, search), do: Orders.count_orders_for_customer(socket.assigns.customer.id, search)
+
+  @impl true
+  @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Order.t]
+  def load_data(socket, params), do: Orders.list_orders_for_customer(socket.assigns.customer.id, params)
+
+  @impl true
+  @spec self_path(Phoenix.LiveView.Socket.t, :show, map) :: String.t
+  def self_path(socket, _action, opts), do: Routes.customer_show_path(socket, :show, Map.put(opts, :id, socket.assigns.customer.id))
 end

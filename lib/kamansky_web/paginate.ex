@@ -1,9 +1,9 @@
 defmodule KamanskyWeb.Paginate do
   import Phoenix.LiveView
 
-  @callback count_data(atom, String.t | nil) :: integer
-  @callback find_item_in_data(atom, pos_integer, integer, :asc | :desc) :: integer
-  @callback load_data(atom, Kamansky.Paginate.params) :: [any]
+  @callback count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
+  @callback find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, :asc | :desc) :: integer
+  @callback load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [any]
   @callback self_path(Phoenix.LiveView.Socket.t, atom, map) :: String.t
   @optional_callbacks find_item_in_data: 4
 
@@ -15,18 +15,16 @@ defmodule KamanskyWeb.Paginate do
 
       @impl true
       def handle_event("search", %{"search" => search}, socket) do
-        {
-          :noreply,
-          push_patch(
+        socket
+        |> push_patch(
+          to: self_path(
             socket,
-            to: self_path(
-              socket,
-              socket.assigns.live_action,
-              socket.assigns.pagination,
-              %{page: 1, search: search, show: nil}
-            )
+            socket.assigns.live_action,
+            socket.assigns.pagination,
+            %{page: 1, search: search, show: nil}
           )
-        }
+        )
+        |> noreply()
       end
 
       @spec default_direction(atom) :: :asc | :desc
@@ -76,7 +74,7 @@ defmodule KamanskyWeb.Paginate do
     |> apply(
       :find_item_in_data,
       [
-        socket.assigns.live_action,
+        socket,
         String.to_integer(show),
         sort,
         direction
@@ -99,7 +97,6 @@ defmodule KamanskyWeb.Paginate do
   defp direction(%Phoenix.LiveView.Socket{} = socket, _), do: apply(socket.view, :default_direction, [socket.assigns.live_action])
 
   defp maybe_update_page(socket, %{page: page, search: search, show: show} = params, uri_page) when not is_nil(show) and (not is_nil(search) or page != uri_page) do
-    IO.inspect {page, uri_page}
     push_patch(socket, to: apply(socket.view, :self_path, [socket, socket.assigns.live_action, params, %{search: nil}]))
   end
   defp maybe_update_page(socket, _params, _uri_page), do: socket
@@ -118,7 +115,7 @@ defmodule KamanskyWeb.Paginate do
       show <- show(params),
       sort <- sort(socket, params),
       sort_action <- apply(socket.view, :sort_action, [socket]),
-      total_items <- apply(socket.view, :count_data, [socket.assigns.live_action, search]),
+      total_items <- apply(socket.view, :count_data, [socket, search]),
       total_pages <- total_pages(total_items, per_page),
       page <- current_page(socket, params, sort, direction, per_page)
     do
@@ -143,7 +140,7 @@ defmodule KamanskyWeb.Paginate do
         :cont,
         socket
         |> maybe_update_page(page_params, parse_page(params["page"]))
-        |> assign(:data, apply(socket.view, :load_data, [socket.assigns.live_action, page_params]))
+        |> assign(:data, apply(socket.view, :load_data, [socket, page_params]))
         |> assign(:pagination, page_params)
       }
     end

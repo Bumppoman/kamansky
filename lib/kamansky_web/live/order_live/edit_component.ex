@@ -8,15 +8,14 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
   @spec update(%{required(:trigger_params) => %{String.t => any}, optional(:any) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{trigger_params: %{"order-id" => id}} = assigns, socket) do
     with order <- Orders.get_order_with_customer!(id),
-      changeset <- Orders.change_new_order(order),
-      socket <-
-        socket
-        |> assign(assigns)
-        |> assign(:changeset, changeset)
-        |> assign(:customer, order.customer)
-        |> assign(:order, order)
+      changeset <- Orders.change_new_order(order)
     do
-      {:ok, socket}
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+      |> assign(:customer, order.customer)
+      |> assign(:order, order)
+      |> ok()
     end
   end
 
@@ -26,20 +25,17 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
     case Orders.update_order(socket.assigns.order, order_params) do
       {:ok, %Order{id: order_id}} ->
         send self(), {:order_updated, order_id}
-        {:noreply, socket}
+        noreply(socket)
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, :changeset, changeset)}
     end
   end
 
   def handle_event("validate", %{"order" => order_params}, socket) do
-    with(
-      changeset <-
-        socket.assigns.order
-        |> Orders.change_new_order(order_params)
-        |> Map.put(:action, :validate)
-    ) do
-      {:noreply, assign(socket, :changeset, changeset)}
-    end
+    socket.assigns.order
+    |> Orders.change_new_order(order_params)
+    |> Map.put(:action, :validate)
+    |> then(&assign(socket, :changeset, &1))
+    |> noreply()
   end
 
   @spec existing_customer(Ecto.Changeset.t) :: boolean

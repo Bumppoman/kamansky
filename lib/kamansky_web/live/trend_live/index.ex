@@ -17,17 +17,15 @@ defmodule KamanskyWeb.TrendLive.Index do
       sold_stamps_by_grade <- Enum.frequencies_by(stamps, &Stamp.letter_grade/1),
       %{false: never_hinged, true: hinged} <- Enum.frequencies_by(stamps, &Stamp.hinged?/1)
     do
-      {
-        :ok,
-        socket
-        |> assign(:era_sold_listing_data, Trends.sold_listing_data_by_era())
-        |> assign(:format_data, format_data(sold_stamps_by_format, total_sold_stamps))
-        |> assign(:hinged, (hinged / total_sold_stamps) * 100)
-        |> assign(:letter_grade_data, letter_grade_data(sold_stamps_by_grade, total_sold_stamps))
-        |> assign(:median_sold_price_data, Listings.median_price_data_for_sold_listings())
-        |> assign(:never_hinged, (never_hinged / total_sold_stamps) * 100)
-        |> assign(:page_title, "Sales Trends")
-      }
+      socket
+      |> assign(:era_sold_listing_data, Trends.sold_listing_data_by_era())
+      |> assign(:format_data, format_data(sold_stamps_by_format, total_sold_stamps))
+      |> assign(:hinged, (hinged / total_sold_stamps) * 100)
+      |> assign(:letter_grade_data, letter_grade_data(sold_stamps_by_grade, total_sold_stamps))
+      |> assign(:median_sold_price_data, Listings.median_price_data_for_sold_listings())
+      |> assign(:never_hinged, (never_hinged / total_sold_stamps) * 100)
+      |> assign(:page_title, "Sales Trends")
+      |> ok()
     end
   end
 
