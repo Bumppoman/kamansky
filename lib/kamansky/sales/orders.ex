@@ -301,7 +301,7 @@ defmodule Kamansky.Sales.Orders do
     }
   end
 
-  @spec maybe_search(Ecto.Queryable.t, String.t) :: Ecto.Queryable.t
+  @spec maybe_search(Ecto.Queryable.t, String.t | nil) :: Ecto.Queryable.t
   defp maybe_search(query, nil), do: query
   defp maybe_search(query, search), do: where(query, [o], ilike(fragment("CAST(? AS text)", o.id), ^"%#{search}%"))
 

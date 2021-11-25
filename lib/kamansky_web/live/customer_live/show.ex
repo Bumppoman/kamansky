@@ -8,15 +8,19 @@ defmodule KamanskyWeb.CustomerLive.Show do
   alias Kamansky.Sales.Orders.Order
 
   @impl true
-  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(%{"id" => customer_id}, _uri, socket) do
+  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
+  def mount(%{"id" => customer_id}, _session, socket) do
     with customer <- Customers.get_customer_detail(customer_id) do
       socket
       |> assign(:customer, customer)
       |> assign(:page_title, "Information for #{customer.name}")
-      |> noreply()
+      |> ok()
     end
   end
+
+  @impl true
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_params(_params, _uri, socket), do: noreply(socket)
 
   @impl true
   @spec count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
