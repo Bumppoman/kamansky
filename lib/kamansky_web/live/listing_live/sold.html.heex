@@ -1,33 +1,13 @@
 <section>
   <KamanskyWeb.Components.Page.page_header page_title={@page_title} />
-  <.live_component module={KamanskyWeb.Components.DataTable}
-    id="sold-listings-kamansky-data-table"
-    let={listing}
-    data_count={@data_count}
-    data_locator={@data_locator}
-    data_source={@data_source}
-    empty_message="There are no listings to display."
-    headers=
-    {
-      [
-        "Scott Number",
-        "Date of Sale",
-        "Sale Price",
-        "Stamp Cost",
-        "Net Profit/Loss"
-      ]
-    }
-    options=
-    {
-      [
-        go_to_record: Map.get(assigns, :go_to_record),
-        sort: %{action: :sold, direction: :desc, column: 1}
-      ]
-    }
-    parent_action={:sold}
-    title={@page_title}
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
+    empty_message="There are no sold listings to display."
   >
-    <td>
+    <:col let={listing} label="Scott Number">
       <a
         class="action-icon"
         phx-click="open"
@@ -36,16 +16,24 @@
       >
         <%= listing.stamp.scott_number %>
       </a>
-    </td>
-    <td><%= formatted_date(listing.order.ordered_at) %></td>
-    <td class="text-green-600"><%= format_decimal_as_currency(listing.sale_price) %></td>
-    <td class={if Decimal.eq?(Stamp.total_cost(listing.stamp), 0), do: "", else: "text-red-600"}>
-      <%= format_decimal_as_currency(Stamp.total_cost(listing.stamp)) %>
-    </td>
-    <td class={if Decimal.gt?(Listing.net_profit(listing), 0), do: "text-green-600", else: "text-red-600"}>
-      <%= format_decimal_as_currency(Listing.net_profit(listing)) %>
-    </td>
-  </.live_component>
+    </:col>
+    <:col let={listing} label="Date of Sale">
+      <time datetime={listing.order.ordered_at}><%= formatted_date(listing.order.ordered_at) %></time>
+    </:col>
+    <:col let={listing} label="Sale Price" class="text-green-600">
+      <%= format_decimal_as_currency(listing.sale_price) %>
+    </:col>
+    <:col let={listing} label="Stamp Cost">
+      <span class={if Decimal.eq?(Stamp.total_cost(listing.stamp), 0), do: "", else: "text-red-600"}>
+        <%= format_decimal_as_currency(Stamp.total_cost(listing.stamp)) %>
+      </span>
+    </:col>
+    <:col let={listing} label="Net Profit/Loss">
+      <span class={if Decimal.gt?(Listing.net_profit(listing), 0), do: "text-green-600", else: "text-red-600"}>
+        <%= format_decimal_as_currency(Listing.net_profit(listing)) %>
+      </span>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
 </section>
 <%= live_modal KamanskyWeb.StampLive.DetailComponent,

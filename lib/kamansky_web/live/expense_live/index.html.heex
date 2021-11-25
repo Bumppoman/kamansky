@@ -1,4 +1,4 @@
-<section>
+<div>
   <KamanskyWeb.Components.Page.page_header
     buttons={
       [
@@ -15,36 +15,26 @@
     }
     page_title="Expenses"
   />
-  <.live_component module={KamanskyWeb.Components.DataTable}
-    id="expenses-kamansky-data-table"
-    let={expense}
-    headers=
-    {
-      [
-        "Date",
-        "Description",
-        "Category",
-        "Amount",
-        %{text: "Actions", sort: :disabled},
-      ]
-    }
-    data_count={@data_count}
-    data_locator={@data_locator}
-    data_source={@data_source}
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
     empty_message="There are no expenses to display."
-    options={
-      [
-        go_to_record: Map.get(assigns, :go_to_record),
-        sort: 0
-      ]
-    }
-    title={@page_title}
   >
-    <td><%= formatted_date(expense.date) %></td>
-    <td><%= expense.description %></td>
-    <td><%= Expense.formatted_category(expense) %></td>
-    <td><%= format_decimal_as_currency(expense.amount) %></td>
-    <td>
+    <:col let={expense} label="Date">
+      <time datetime={expense.date}><%= formatted_date(expense.date) %></time>
+    </:col>
+    <:col let={expense} label="Description">
+      <%= expense.description %>
+    </:col>
+    <:col let={expense} label="Category">
+      <%= Expense.formatted_category(expense) %>
+    </:col>
+    <:col let={expense} label="Amount">
+      <%= format_decimal_as_currency(expense.amount) %>
+    </:col>
+    <:col let={expense} label="Actions" sort="disabled">
       <a
         class="action-icon"
         phx-click="open"
@@ -54,9 +44,9 @@
       >
         <KamanskyWeb.Components.Icons.edit />
       </a>
-    </td>
-  </.live_component>
-</section>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
+</div>
 <%= live_modal KamanskyWeb.ExpenseLive.FormComponent,
   id: "expense-form-modal",
   form_id: "expense-form"

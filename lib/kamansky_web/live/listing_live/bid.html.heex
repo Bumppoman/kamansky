@@ -1,34 +1,13 @@
-<section>
+<div>
   <KamanskyWeb.Components.Page.page_header page_title={@page_title} />
-  <.live_component module={KamanskyWeb.Components.DataTable}
-    id="bid-listings-kamansky-data-table"
-    let={listing}
-    data_count={@data_count}
-    data_locator={@data_locator}
-    data_source={@data_source}
-    empty_message="There are no listings to display."
-    headers=
-    {
-      [
-        "Scott Number",
-        "Inventory Key",
-        "Bids",
-        "Current Price",
-        "Ending Date",
-        %{text: "Actions", sort: :disabled}
-      ]
-    }
-    options=
-    {
-      [
-        go_to_record: Map.get(assigns, :go_to_record),
-        sort: 4
-      ]
-    }
-    parent_action={:bid}
-    title="Listings with Bids"
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
+    empty_message="There are no listings with bids to display."
   >
-    <td>
+    <:col let={listing} label="Scott Number">
       <a
         class="action-icon"
         phx-click="open"
@@ -37,15 +16,23 @@
       >
         <%= listing.stamp.scott_number %>
       </a>
-    </td>
-    <td>#<%= listing.stamp.inventory_key %></td>
-    <td><%= listing.ebay_listing.bid_count %></td>
-    <td><%= format_decimal_as_currency(listing.ebay_listing.current_bid) %></td>
-    <td><%= formatted_date(listing.ebay_listing.end_time, "%B %-d, %Y %-I:%M %p") %></td>
-    <td></td>
-  </.live_component>
+    </:col>
+    <:col let={listing} label="Inventory Key">
+      #<%= listing.stamp.inventory_key %>
+    </:col>
+    <:col let={listing} label="Bids">
+      <%= listing.ebay_listing.bid_count %>
+    </:col>
+    <:col let={listing} label="Current Price">
+      <%= format_decimal_as_currency(listing.ebay_listing.current_bid) %>
+    </:col>
+    <:col let={listing} label="Ending Date">
+      <time datetime={listing.ebay_listing.end_time}><%= formatted_date(listing.ebay_listing.end_time, "%B %-d, %Y %-I:%M %p") %></time>
+    </:col>
+    <:col label="Actions" sort="disabled" />
+  </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
-</section>
+</div>
 <%= live_modal KamanskyWeb.StampLive.DetailComponent,
   id: "stamp-detail-modal",
   footer: false 

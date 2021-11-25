@@ -5,8 +5,7 @@ defmodule KamanskyWeb.PurchaseLive.FormComponent do
   alias Kamansky.Operations.Purchases.Purchase
 
   @impl true
-  @spec update(%{required(:trigger_params) => %{required(String.t) => any}, optional(atom) => any}, Phoenix.LiveView.Socket.t)
-    :: {:ok, Phoenix.LiveView.Socket.t}
+  @spec update(%{required(:trigger_params) => %{required(String.t) => any}, optional(atom) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{trigger_params: %{"action" => action, "purchase-id" => purchase_id}} = assigns, socket) do
     with purchase <- Purchases.get_or_initialize_purchase(purchase_id) do
       {
@@ -22,8 +21,7 @@ defmodule KamanskyWeb.PurchaseLive.FormComponent do
   end
 
   @impl true
-  @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t)
-    :: {:noreply, Phoenix.LiveView.Socket.t}
+  @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("validate", %{"purchase" => purchase_params}, socket) do
     with(
       changeset <-
@@ -39,8 +37,8 @@ defmodule KamanskyWeb.PurchaseLive.FormComponent do
   @spec save_purchase(Phoenix.LiveView.Socket.t, map) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp save_purchase(%Phoenix.LiveView.Socket{assigns: %{action: "edit"}} = socket, purchase_params) do
     case Purchases.update_purchase(socket.assigns.purchase, purchase_params) do
-      {:ok, %Purchase{id: id}} ->
-        send self(), {:purchase_updated, id}
+      {:ok, %Purchase{id: purchase_id}} ->
+        send self(), {:purchase_updated, purchase_id}
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, :changeset, changeset)}
@@ -49,8 +47,8 @@ defmodule KamanskyWeb.PurchaseLive.FormComponent do
 
   defp save_purchase(%Phoenix.LiveView.Socket{assigns: %{action: "new"}} = socket, purchase_params) do
     case Purchases.create_purchase(purchase_params) do
-      {:ok, %Purchase{id: id}} ->
-        send self(), {:purchase_added, id}
+      {:ok, %Purchase{id: purchase_id}} ->
+        send self(), {:purchase_added, purchase_id}
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}

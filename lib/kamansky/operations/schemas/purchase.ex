@@ -6,7 +6,7 @@ defmodule Kamansky.Operations.Purchases.Purchase do
   alias __MODULE__
 
   @type t :: Ecto.Schema.t | %Purchase{
-    date: DateTime.t,
+    date: Date.t,
     description: String.t,
     quantity: pos_integer,
     cost: Decimal.t,
@@ -14,7 +14,7 @@ defmodule Kamansky.Operations.Purchases.Purchase do
   }
 
   schema "purchases" do
-    field :date, :utc_datetime
+    field :date, :date
     field :description, :string
     field :quantity, :integer
     field :cost, :decimal

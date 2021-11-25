@@ -29,8 +29,10 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.aggregate(:count, :id)
   end
 
-  def count_orders(status: status) do
+  @spec count_orders(:completed | :pending | :processed | :shipped, String.t | nil) :: integer
+  def count_orders(status, search) do
     Order
+    |> maybe_search(search)
     |> where(status: ^status)
     |> Repo.aggregate(:count, :id)
   end
@@ -50,11 +52,11 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.insert()
   end
 
-  @spec find_row_number_for_order(atom, map) :: integer
-  def find_row_number_for_order(status, options) do
+  @spec find_row_number_for_order(:completed | :pending | :processed | :shipped, pos_integer, integer, Paginate.sort_direction) :: integer | nil
+  def find_row_number_for_order(status, order_id, sort, direction) do
     Order
     |> where(status: ^status)
-    |> Paginate.find_row_number(Order.display_column_for_sorting(options[:sort][:column]), options)
+    |> Paginate.find_row_number(order_id, Order.display_column_for_sorting(sort), direction)
   end
 
   @spec get_or_initialize_order(keyword) :: Order.t
@@ -137,6 +139,7 @@ defmodule Kamansky.Sales.Orders do
         |> preload([l, s], [stamp: s])
     ) do
       Order
+      |> maybe_search(params.search)
       |> where(status: ^status)
       |> join(:left, [o], c in assoc(o, :customer))
       |> preload([o, c, l, s], [customer: c, listings: ^listings_query])
@@ -233,11 +236,6 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.one()
   end
 
-  @doc false
-  @impl true
-  @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search), do: where(query, [o], ilike(fragment("CAST(? AS text)", o.id), ^"%#{search}%"))
-
   @spec total_gross_profit(:all) :: integer
   def total_gross_profit(:all) do
     Order
@@ -301,6 +299,10 @@ defmodule Kamansky.Sales.Orders do
         end
     }
   end
+
+  @spec maybe_search(Ecto.Queryable.t, String.t) :: Ecto.Queryable.t
+  defp maybe_search(query, nil), do: query
+  defp maybe_search(query, search), do: where(query, [o], ilike(fragment("CAST(? AS text)", o.id), ^"%#{search}%"))
 
   @spec stamps_in_orders_calculation(Ecto.Queryable.t) :: integer
   defp stamps_in_orders_calculation(query) do

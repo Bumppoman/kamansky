@@ -18,12 +18,16 @@ defmodule Kamansky.Sales.Customers do
   @spec change_customer(Customer.t, map) :: Ecto.Changeset.t
   def change_customer(%Customer{} = customer, attrs \\ %{}), do: Customer.changeset(customer, attrs)
 
-  @spec count_customers :: integer
-  def count_customers, do: Repo.aggregate(Customer, :count, :id)
+  @spec count_customers(String.t | nil) :: integer
+  def count_customers(search \\ nil) do
+    Customer
+    |> maybe_search(search)
+    |> Repo.aggregate(:count, :id)
+  end
 
-  @spec find_row_number_for_customer(map) :: integer | nil
-  def find_row_number_for_customer(options) do
-    Paginate.find_row_number(Customer, Customer.display_column_for_sorting(options[:sort][:column]), options)
+  @spec find_row_number_for_customer(pos_integer, integer, Paginate.sort_direction) :: integer | nil
+  def find_row_number_for_customer(customer_id, sort, direction) do
+    Paginate.find_row_number(Customer, customer_id, Customer.display_column_for_sorting(sort), direction)
   end
 
   @spec get_customer!(integer) :: Customer.t
@@ -69,7 +73,7 @@ defmodule Kamansky.Sales.Customers do
     |> Repo.insert_or_update()
   end
 
-  @spec list_customers(map) :: [Customer.t] | {integer, Customer.t}
+  @spec list_customers(Paginate.params) :: [Customer.t]
   def list_customers(params) do
     with(
       most_recent_order <-
@@ -80,6 +84,7 @@ defmodule Kamansky.Sales.Customers do
       customers <-
         Customer
         |> from(as: :customer)
+        |> maybe_search(params.search)
         |> join(:left, [c], o in assoc(c, :orders))
         |> join(:left_lateral, [c], lo in subquery(most_recent_order))
         |> group_by([c, o, lo], [c.id, lo.ordered_at])
@@ -102,15 +107,14 @@ defmodule Kamansky.Sales.Customers do
     |> Repo.all()
   end
 
-  @doc false
-  @impl true
-  @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search), do: where(query, [c], ilike(c.name, ^"%#{search}%"))
-
   @spec update_customer(Customer.t, map) :: {:ok, Customer.t} | {:error, Ecto.Changeset.t}
   def update_customer(%Customer{} = customer, attrs) do
     customer
     |> Customer.changeset(attrs)
     |> Repo.update()
   end
+
+  @spec maybe_search(Ecto.Queryable.t, String.t | nil) :: Ecto.Queryable.t
+  defp maybe_search(query, nil), do: query
+  defp maybe_search(query, search), do: where(query, [c], ilike(c.name, ^"%#{search}%"))
 end

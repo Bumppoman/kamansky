@@ -1,4 +1,4 @@
-<section>
+<div>
   <KamanskyWeb.Components.Page.page_header
     buttons={
       [
@@ -16,29 +16,14 @@
     }
     page_title={@page_title}
   />
-  <.live_component module={KamanskyWeb.Components.DataTable}
-    id="stamps-kamansky-data-table"
-    let={stamp}
-    data_count={@data_count}
-    data_locator={@data_locator}
-    data_source={@data_source}
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
     empty_message="There are no stamps to display."
-    headers={
-      [
-        "Scott Number",
-        "Grade",
-        "Price Paid",
-        %{text: "Flaws", sort: :disabled},
-        %{text: "Actions", sort: :disabled},
-      ]}
-    options={
-      [
-        go_to_record: Map.get(assigns, :go_to_record),
-        sort: 0
-      ]}
-    title={@page_title}
   >
-    <td>
+    <:col let={stamp} label="Scott Number">
       <a
         class="action-icon"
         phx-click="open"
@@ -47,11 +32,17 @@
       >
         <%= stamp.scott_number %>
       </a>
-    </td>
-    <td><%= Stamp.formatted_grade(stamp) %></td>
-    <td><%= format_decimal_as_currency(Stamp.total_cost(stamp)) %></td>
-    <td><%= Stamp.formatted_flaws(stamp) %></td>
-    <td>
+    </:col>
+    <:col let={stamp} label="Grade">
+      <%= Stamp.formatted_grade(stamp) %>
+    </:col>
+    <:col let={stamp} label="Price Paid">
+      <%= format_decimal_as_currency(Stamp.total_cost(stamp)) %>
+    </:col>
+    <:col let={stamp} label="Flaws" sort="disabled">
+      <%= Stamp.formatted_flaws(stamp) %>
+    </:col>
+    <:col let={stamp} label="Actions" sort="disabled">
       <a
         class="action-icon"
         phx-click="open"
@@ -82,15 +73,15 @@
           <KamanskyWeb.Components.Icons.money />
         </a>
       <% end %>
-    </td>
-  </.live_component>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
   <%= if @live_action in [:collection, :collection_to_replace] do %>
     <KamanskyWeb.StampLive.CollectionComponents.types_footer 
       socket={@socket}
       live_action={@live_action}
     />
   <% end %>
-</section>
+</div>
 <%= live_modal KamanskyWeb.StampLive.DetailComponent,
   id: "stamp-detail-modal",
   footer: false

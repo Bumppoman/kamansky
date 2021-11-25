@@ -11,8 +11,12 @@ defmodule Kamansky.Operations.Purchases do
   @spec change_purchase(Purchase.t, map) :: Ecto.Changeset.t
   def change_purchase(%Purchase{} = purchase, attrs \\ %{}), do: Purchase.changeset(purchase, attrs)
 
-  @spec count_purchases :: integer
-  def count_purchases, do: Repo.aggregate(Purchase, :count)
+  @spec count_purchases(String.t | nil) :: integer
+  def count_purchases(search \\ nil) do
+    Purchase
+    |> maybe_search(search)
+    |> Repo.aggregate(:count, :id)
+  end
 
   @spec create_purchase(map) :: {:ok, Purchase.t} | {:error, Ecto.Changeset.t}
   def create_purchase(attrs) do
@@ -21,9 +25,9 @@ defmodule Kamansky.Operations.Purchases do
     |> Repo.insert()
   end
 
-  @spec find_row_number_for_purchase(map) :: integer
-  def find_row_number_for_purchase(options) do
-    Paginate.find_row_number(Purchase, Purchase.display_column_for_sorting(options[:sort][:column]), options)
+  @spec find_row_number_for_purchase(pos_integer, integer, Paginate.sort_direction) :: integer | nil
+  def find_row_number_for_purchase(purchase_id, sort, direction) do
+    Paginate.find_row_number(Purchase, purchase_id, Purchase.display_column_for_sorting(sort), direction)
   end
 
   @spec get_or_initialize_purchase(String.t) :: Purchase.t
@@ -34,12 +38,11 @@ defmodule Kamansky.Operations.Purchases do
   def get_purchase!(id), do: Repo.get!(Purchase, id)
 
   @spec list_purchases(Paginate.params) :: [Purchase.t]
-  def list_purchases(params), do: Paginate.list(Purchases, Purchase, params)
-
-  @doc false
-  @impl true
-  @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search), do: where(query, [p], ilike(p.description, ^"%#{search}%"))
+  def list_purchases(params) do
+    Purchase
+    |> maybe_search(params.search)
+    |> then(&Paginate.list(Purchases, &1, params))
+  end
 
   @spec update_purchase(Purchase.t, map) :: {:ok, Purchase.t} | {:error, Ecto.Changeset.t}
   def update_purchase(%Purchase{} = purchase, attrs) do
@@ -47,4 +50,8 @@ defmodule Kamansky.Operations.Purchases do
     |> Purchase.changeset(attrs)
     |> Repo.update()
   end
+
+  @spec maybe_search(Ecto.Queryable.t, String.t | nil) :: Ecto.Queryable.t
+  defp maybe_search(query, nil), do: query
+  defp maybe_search(query, search), do: where(query, [p], ilike(p.description, ^"%#{search}%"))
 end

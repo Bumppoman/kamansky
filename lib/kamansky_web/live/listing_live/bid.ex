@@ -1,30 +1,24 @@
 defmodule KamanskyWeb.ListingLive.Bid do
   use KamanskyWeb, :live_view
+  use KamanskyWeb.Paginate, sort: {3, :asc}
 
   import Kamansky.Helpers
 
   alias Kamansky.Sales.Listings
 
   @impl true
-  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, _session, socket) do
-    {
-      :ok,
-      socket
-      |> assign(:data_count, &Listings.count_listings_with_bids/0)
-      |> assign(:data_locator, fn options -> Listings.find_row_number_for_listing_with_bids(options) end)
-      |> assign(:data_source, fn options -> Listings.list_listings_with_bids(options) end)
-    }
-  end
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Listings with Bids")}
 
   @impl true
-  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
-    {
-      :noreply,
-      socket
-      |> assign(:go_to_record, Map.get(params, "go_to_record"))
-      |> assign(:page_title, "Listings with Bids")
-    }
-  end
+  @spec count_data(:index, String.t | nil) :: integer
+  def count_data(_action, search), do: Listings.count_listings_with_bids(search)
+
+  @impl true
+  @spec load_data(:index, Kamansky.Paginate.params) :: [Expense.t]
+  def load_data(_action, params), do: Listings.list_listings_with_bids(params)
+
+  @impl true
+  @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t
+  def self_path(socket, _action, opts), do: Routes.listing_bid_path(socket, :index, opts)
 end

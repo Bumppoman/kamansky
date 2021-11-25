@@ -1,21 +1,19 @@
 defmodule KamanskyWeb.StampLive.Index do
   use KamanskyWeb, :live_view
+  use KamanskyWeb.Paginate, sort: {0, :asc}
 
   import Kamansky.Helpers
 
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
 
-  @data_table "stamps-kamansky-data-table"
-
   @impl true
   @spec handle_event(String.t, any, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("move_to_stock", %{"stamp-id" => stamp_id}, socket) do
     case Stamps.move_stamp_to_stock(stamp_id) do
       {:ok, _stamp} ->
-        close_modal_with_success_and_refresh_datatable(
+        close_modal_with_success_and_reload_data(
           socket,
-          @data_table,
           "kamansky:closeConfirmationModal",
           "You have successfully moved this stamp to stock."
         )
@@ -31,14 +29,13 @@ defmodule KamanskyWeb.StampLive.Index do
       socket
       |> push_event("kamansky:closeModal", %{})
       |> put_flash(:info, %{type: :success, message: "You have successfully added this stamp", timestamp: Time.utc_now()})
-      |> push_redirect(to: Routes.stamp_index_path(socket, stamp.status, go_to_record: stamp.id))
+      |> push_redirect(to: Routes.stamp_index_path(socket, stamp.status, show: stamp.id))
     }
   end
 
   def handle_info({:stamp_updated, stamp_id}, socket) do
-    close_modal_with_success_and_refresh_datatable(
+    close_modal_with_success_and_reload_data(
       socket,
-      @data_table,
       "kamansky:closeModal",
       "You have successfully updated this stamp.",
       stamp_id
@@ -47,40 +44,31 @@ defmodule KamanskyWeb.StampLive.Index do
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
-    with socket <- apply_action(socket, socket.assigns.live_action, params), do: {:noreply, load_stamps(socket)}
-  end
+  def handle_params(_params, _uri, socket), do: {:noreply, apply_action(socket, socket.assigns.live_action)}
 
-  @spec apply_action(Phoenix.LiveView.Socket.t, atom, map) :: Phoenix.LiveView.Socket.t
-  defp apply_action(socket, :collection_to_replace, params) do
+  @spec apply_action(Phoenix.LiveView.Socket.t, atom) :: Phoenix.LiveView.Socket.t
+  defp apply_action(socket, :collection_to_replace), do: assign(socket, :page_title, "Collection Below XF")
+  defp apply_action(socket, action) do
     socket
-    |> assign(:go_to_record, Map.get(params, "go_to_record"))
-    |> assign(:page_title, "Collection Below XF")
-  end
-
-  defp apply_action(socket, action, params) do
-    socket
-    |> assign(:go_to_record, Map.get(params, "go_to_record"))
     |> assign(:page_title, String.capitalize(Atom.to_string(action)))
     |> assign(:status, socket.assigns.live_action)
   end
 
-  @spec load_stamps(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
-  defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{live_action: :collection_to_replace}} = socket) do
-    socket
-    |> assign(:data_count, fn -> Stamps.count_stamps_in_collection_below_grade(85) end)
-    |> assign(:data_locator, fn options -> Stamps.find_row_number_for_stamp_in_collection_below_grade(85, options) end)
-    |> assign(:data_source, fn options -> Stamps.list_stamps_in_collection_below_grade(85, options) end)
-  end
-  defp load_stamps(%Phoenix.LiveView.Socket{assigns: %{stamp: %Stamp{status: status}}} = socket) when not is_nil(status), do: load_stamps(socket, status)
-  defp load_stamps(socket), do: load_stamps(socket, socket.assigns.live_action)
+  @impl true
+  @spec count_data(:collection | :collection_to_replace | :stock, String.t | nil) :: integer
+  def count_data(:collection_to_replace, search), do: Stamps.count_stamps_in_collection_below_grade(85, search)
+  def count_data(status, search) when status in [:collection, :stock], do: Stamps.count_stamps(status, search)
 
-  @spec load_stamps(Phoenix.LiveView.Socket.t, atom) :: Phoenix.LiveView.Socket.t
-  defp load_stamps(socket, status) do
-    socket
-    |> assign(:data_count, fn -> Stamps.count_stamps(status) end)
-    |> assign(:data_locator, fn options -> Stamps.find_row_number_for_stamp(status, options) end)
-    |> assign(:data_source, fn options -> Stamps.list_stamps(status, options) end)
-    |> assign(:status, status)
-  end
+  @impl true
+  @spec find_item_in_data(:collection | :collection_to_replace | :stock, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(status, item_id, sort, direction) when status in [:collection, :stock], do: Stamps.find_row_number_for_stamp(status, item_id, sort, direction)
+
+  @impl true
+  @spec load_data(:collection | :collection_to_replace | :stock, Kamansky.Paginate.params) :: [Stamp.t]
+  def load_data(:collection_to_replace, params), do: Stamps.list_stamps_in_collection_below_grade(85, params)
+  def load_data(status, params) when status in [:collection, :stock], do: Stamps.list_stamps(status, params)
+
+  @impl true
+  @spec self_path(Phoenix.LiveView.Socket.t, :collection | :collection_to_replace | :stock, map) :: String.t
+  def self_path(socket, action, opts), do: Routes.stamp_index_path(socket, action, opts)
 end

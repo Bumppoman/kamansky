@@ -1,217 +1,144 @@
 defmodule KamanskyWeb.Components.DataTable do
-  use KamanskyWeb, :live_component
+  use Phoenix.Component
 
-  @spec end_value(pos_integer, pos_integer, pos_integer) :: pos_integer
-  def end_value(current_page, per_page, total_items) do
-    with start_value <- start_value(current_page, per_page) do
-      if total_items < (per_page + start_value) do
-        total_items
-      else
-        (start_value + per_page) - 1
-      end
-    end
+  import Phoenix.HTML.Form
+
+  @spec table(map) :: Phoenix.LiveView.Rendered.t
+  def table(assigns) do
+    ~H"""
+    <div class="kamansky-data-table">
+      <div class="flex items-center justify-between py-2">
+        <div class="pb-2.5">
+          <label class="mb-0">
+            <%= select :kamansky_data_table,
+              :per_page,
+              [
+                [key: "5", value: 5],
+                [key: "10", value: 10],
+                [key: "20", value: 20],
+                [key: "25", value: 25]
+              ],
+              class: "border-gray-300 mr-3",
+              selected: Map.get(assigns, :per_page, 10)
+            %> items/page
+          </label>
+        </div>
+        <div class="pb-2.5">
+          <form phx-change="search">
+            <input
+              class="block border border-gray-300 leading-normal px-3 py-2.5 text-gray-600 text-sm w-full"
+              name="search"
+              placeholder="Search..."
+              value={Map.get(assigns, :search, "")}
+            />
+          </form>
+        </div>
+      </div>
+      <div class="flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <%= for {col, index} <- Enum.with_index(@col) do %>
+                      <th
+                        scope="col"
+                        class={
+                          "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" <>
+                            (if index == @pagination.sort, do: " sorting-#{@pagination.direction}", else: "")
+                        }
+                      >
+                        <%= if col[:sort] == "disabled" do %>
+                          <%= col[:label] %>
+                        <% else %>
+                          <%= live_patch col[:label],
+                            to: path(@socket, @live_action, @pagination, sort: index, direction: sort_direction(index, @pagination), show: nil)
+                          %>
+                        <% end %>
+                      </th>
+                    <% end %>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <%= if Enum.empty?(@rows) do %>
+                    <tr>
+                      <td class="text-center" colspan={Enum.count(@col)}><%= @empty_message %></td>
+                    </tr>
+                  <% else %>
+                    <%= for {row, row_index} <- Enum.with_index(@rows) do %>
+                      <tr class={if rem(row_index, 2) == 0, do: "even", else: "odd"}>
+                        <%= for {col, col_index} <- Enum.with_index(@col) do %>
+                          <td class={if col_index == @pagination.sort, do: "sorting"}><%= render_slot(col, row) %></td>
+                        <% end %>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                </tbody>
+                <%= if @pagination.total_items > 0 do %>
+                  <tfoot class={if @pagination.total_pages == 1, do: "hidden sm:table-footer-group", else: ""}>
+                    <tr>
+                      <td colspan={Enum.count(@col)}>
+                        <div class="bg-white px-4 flex items-center justify-between sm:px-6">
+                          <div class="flex-1 flex justify-between sm:hidden">
+                            <%= live_patch "Previous",
+                              to: path(@socket, @live_action, @pagination, page: @pagination.page - 1),
+                              class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <>
+                                (if assigns[:current_page] == 1, do: " disabled", else: "")
+                            %>
+                            <%= live_patch "Next",
+                              to: path(@socket, @live_action, @pagination, page: @pagination.page + 1),
+                              class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <>
+                                (if @pagination.page == @pagination.total_pages, do: " disabled", else: "")
+                            %>
+                          </div>
+                          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                              <p class="text-sm text-gray-700">
+                                Showing
+                                <span class="font-medium"><%= start_value(@pagination.page, @pagination.per_page) %></span>
+                                to
+                                <span class="font-medium"><%= end_value(@pagination.page, @pagination.per_page, @pagination.total_items) %></span>
+                                of
+                                <span class="font-medium"><%= @pagination.total_items %></span>
+                                entries
+                              </p>
+                            </div>
+                            <%= if @pagination.total_pages > 1 do %>
+                              <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                  <%= live_patch to: path(@socket, @live_action, @pagination, page: @pagination.page - 1),
+                                    class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
+                                      (if @pagination.page == 1, do: " disabled", else: "")
+                                  do %>
+                                    <span class="sr-only">Previous</span>
+                                    <KamanskyWeb.Components.Icons.chevron_left />
+                                  <% end %>
+                                  <%= page_links(@socket, @live_action, @pagination) %>
+                                  <%= live_patch to: path(@socket, @live_action, @pagination, page: @pagination.page + 1),
+                                    class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
+                                      (if @pagination.page == @pagination.total_pages, do: " disabled", else: "")
+                                  do %>
+                                    <span class="sr-only">Next</span>
+                                    <KamanskyWeb.Components.Icons.chevron_right />
+                                  <% end %>
+                                </nav>
+                              </div>
+                            <% end %>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tfoot>
+                <% end %>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
   end
-
-  @impl true
-  @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_event("go_to_page", %{"page" => page}, socket) do
-    with page <- String.to_integer(page),
-      socket <- assign(socket, current_page: page)
-    do
-      {:noreply, assign_data(socket)}
-    end
-  end
-
-  def handle_event("per_page_changed", %{"per_page" => per_page}, socket) do
-    with per_page <- String.to_integer(per_page),
-      socket <-
-        socket
-        |> assign(:current_page, 1)
-        |> assign(:per_page, per_page)
-        |> assign(:total_pages, total_pages(socket.assigns.total_items, per_page))
-    do
-      {:noreply, assign_data(socket)}
-    end
-  end
-
-  def handle_event("search", %{"search" => search}, socket) do
-    with(
-      socket <-
-        socket
-        |> assign(:current_page, 1)
-        |> assign(:search, search)
-    ) do
-      {:noreply, assign_data(socket)}
-    end
-  end
-
-  def handle_event("sort", %{"sort" => sort, "sort_direction" => sort_direction}, socket) do
-    with(
-      sort <-
-        %{
-          action: Map.get(socket.assigns, :parent_action),
-          column: String.to_integer(sort),
-          direction: invert_sort_direction(sort_direction),
-        },
-      socket <- assign(socket, :sort, sort)
-    ) do
-      {:noreply, assign_data(socket)}
-    end
-  end
-
-  @spec load_data_for_page(
-    %{
-      current_page: pos_integer,
-      data_source: (map -> [Ecto.Schema.t] | {pos_integer, [Ecto.Schema.t]}),
-      per_page: pos_integer,
-      search: String.t | nil,
-      sort: Kamansky.Paginate.sort
-    }
-  ) :: [Ecto.Schema.t] | {pos_integer, [Ecto.Schema.t]}
-  def load_data_for_page(parameters) do
-    parameters[:data_source].(
-      %{
-        limit: parameters[:per_page],
-        offset: start_value(parameters[:current_page], parameters[:per_page]) - 1,
-        search: parameters[:search],
-        sort: parameters[:sort]
-      }
-    )
-  end
-
-  @impl true
-  @spec mount(Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(socket) do
-    with socket <-
-      socket
-      |> assign(:current_page, 1)
-      |> assign(:page, 1)
-      |> assign(:search, nil)
-    do
-      {:ok, socket}
-    end
-  end
-
-  @spec page_links(pos_integer, pos_integer, String.t) :: [String.t]
-  def page_links(current_page, total_pages, target) do
-    cond do
-      total_pages < 8 ->
-        for page <- (1..total_pages) do
-          link_to_page(page, current_page, target)
-        end
-      current_page - 3 > 1 and current_page + 3 < total_pages ->
-        with(
-          pages <-
-            for page <- (current_page - 2..current_page + 2) do
-              link_to_page(page, current_page, target)
-            end
-        ) do
-          [link_to_page(1, current_page, target), dummy_page_link()]
-          ++ pages
-          ++ [dummy_page_link(), link_to_page(total_pages, current_page, target)]
-        end
-      current_page + 7 < total_pages ->
-        with(
-          pages <-
-            for page <- (1..7) do
-              link_to_page(page, current_page, target)
-            end
-        ) do
-          pages ++ [dummy_page_link(), link_to_page(total_pages, current_page, target)]
-        end
-      true ->
-        pages =
-          for page <- (total_pages - 7..total_pages) do
-            link_to_page(page, current_page, target)
-          end
-
-        [link_to_page(1, current_page, target), dummy_page_link()] ++ pages
-    end
-  end
-
-  @spec start_value(pos_integer, pos_integer) :: pos_integer
-  def start_value(current_page, per_page), do: ((current_page * per_page) - per_page) + 1
-
-  @spec sort_direction(pos_integer, %{column: pos_integer, direction: :asc | :desc}) :: String.t
-  def sort_direction(column, %{column: column, direction: :asc}), do: "asc"
-  def sort_direction(column, %{column: column, direction: :desc}), do: "desc"
-  def sort_direction(_column, _sort), do: ""
-
-  @spec total_items(%{data_count: pos_integer} | %{data: Enum.t}) :: pos_integer
-  def total_items(%{data_count: data_count}), do: data_count.()
-  def total_items(%{data: data}), do: Enum.count(data)
-
-  @spec total_pages(pos_integer, pos_integer) :: pos_integer
-  def total_pages(total_items, per_page) do
-    total_items / per_page
-    |> Float.ceil()
-    |> round()
-  end
-
-  @doc false
-  @impl true
-  @spec update(%{optional(atom) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(assigns, socket) do
-    with(
-      socket <-
-        socket
-        |> assign(assigns)
-        |> assign(:per_page, Keyword.get(assigns.options, :per_page, 10))
-        |> assign_new(:sort, fn -> build_sort(assigns.options[:sort], Map.get(assigns, :parent_action)) end),
-      socket <- assign(socket, :current_page, record_location(socket, assigns.options[:go_to_record])),
-      socket <- assign_data(socket),
-      socket <- assign(socket, :total_items, total_items(socket.assigns)),
-      socket <- assign(socket, :total_pages, total_pages(socket.assigns.total_items, socket.assigns.per_page))
-    ) do
-      {:ok, socket}
-    end
-  end
-
-  @spec assign_data(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
-  defp assign_data(%{assigns: %{options: [go_to_record: go_to_record]}} = socket) when not is_nil(go_to_record), do: assign_data_without_search(socket)
-  defp assign_data(%{assigns: %{search: nil}} = socket), do: assign_data_without_search(socket)
-  defp assign_data(socket) do
-    with(
-      {count, data} <-
-        load_data_for_page(
-          %{
-            data_source: socket.assigns.data_source,
-            current_page: socket.assigns.current_page,
-            per_page: socket.assigns.per_page,
-            search: socket.assigns.search,
-            sort: socket.assigns.sort
-          }
-        )
-    ) do
-      socket
-      |> assign(data: data)
-      |> assign(search: socket.assigns.search)
-      |> assign(total_items: count)
-      |> assign(total_pages: total_pages(count, socket.assigns.per_page))
-    end
-  end
-
-  @spec assign_data_without_search(Phoenix.LiveView.Socket.t) :: Phoenix.LiveView.Socket.t
-  defp assign_data_without_search(socket) do
-    assign(
-      socket,
-      :data,
-      load_data_for_page(
-        %{
-          data_source: socket.assigns.data_source,
-          current_page: socket.assigns.current_page,
-          per_page: socket.assigns.per_page,
-          search: nil,
-          sort: socket.assigns.sort
-        }
-      )
-    )
-  end
-
-  @spec build_sort(map | pos_integer | nil, atom | nil) :: %{action: atom | nil, column: pos_integer, direction: :asc | :desc}
-  defp build_sort(sort_parameters, parent_action) when is_map(sort_parameters), do: Map.put(sort_parameters, :action, parent_action)
-  defp build_sort(sort_column, parent_action) when is_integer(sort_column), do: %{action: parent_action, column: sort_column, direction: :asc}
-  defp build_sort(nil, parent_action), do: %{action: parent_action, column: 0, direction: :asc}
 
   defp dummy_page_link do
     Phoenix.HTML.Tag.content_tag(
@@ -221,36 +148,85 @@ defmodule KamanskyWeb.Components.DataTable do
     )
   end
 
-  @spec invert_sort_direction(String.t) :: :asc | :desc
-  defp invert_sort_direction("desc"), do: :asc
-  defp invert_sort_direction(_), do: :desc
+  @spec end_value(pos_integer, pos_integer, pos_integer) :: pos_integer
+  defp end_value(current_page, per_page, total_items) do
+    with start_value <- start_value(current_page, per_page) do
+      if total_items < (per_page + start_value) do
+        total_items
+      else
+        (start_value + per_page) - 1
+      end
+    end
+  end
 
-  @spec link_to_page(pos_integer, pos_integer, String.t) :: Phoenix.HTML.safe
-  defp link_to_page(page, current_page, target) do
-    link page,
-      to: "#",
+  @spec link_to_page(Phoenix.LiveView.Socket.t, atom, KamanskyWeb.Paginate.params, pos_integer) :: Phoenix.HTML.safe
+  defp link_to_page(socket, action, pagination, page) do
+    live_patch page,
+      to: path(socket, action, pagination, page: page, show: nil),
       class: "relative inline-flex items-center px-4 py-2 border text-sm font-medium" <> (
-        if page == current_page do
+        if page == pagination.page do
           " z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
         else
           " bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
         end
-      ),
-      "phx-click": "go_to_page",
-      "phx-value-page": page,
-      "phx-target": target
+      )
   end
 
-  @spec record_location(Phoenix.LiveView.Socket.t, pos_integer | nil) :: pos_integer
-  defp record_location(socket, nil), do: socket.assigns.current_page
-  defp record_location(socket, record_id) do
-    %{
-      record_id: record_id,
-      search: nil,
-      sort: socket.assigns.sort
-    }
-    |> socket.assigns.data_locator.()
-    |> Kernel./(socket.assigns.per_page)
-    |> Kernel.ceil()
+  @spec page_links(Phoenix.LiveView.Socket.t, atom, KamanskyWeb.Paginate.params) :: [String.t]
+  defp page_links(socket, action, pagination) do
+    cond do
+      pagination.total_pages < 8 ->
+        for page <- (1..pagination.total_pages) do
+          link_to_page(socket, action, pagination, page)
+        end
+      pagination.page - 3 > 1 and pagination.page + 3 < pagination.total_pages ->
+        with(
+          pages <-
+            for page <- (pagination.page - 2..pagination.page + 2) do
+              link_to_page(socket, action, pagination, page)
+            end
+        ) do
+          [link_to_page(socket, action, pagination, 1), dummy_page_link()]
+          ++ pages
+          ++ [dummy_page_link(), link_to_page(socket, action, pagination, pagination.total_pages)]
+        end
+      pagination.page + 7 < pagination.total_pages ->
+        with(
+          pages <-
+            for page <- (1..7) do
+              link_to_page(socket, action, pagination, page)
+            end
+        ) do
+          pages ++ [dummy_page_link(), link_to_page(socket, action, pagination, pagination.total_pages)]
+        end
+      true ->
+        pages =
+          for page <- (pagination.total_pages - 7..pagination.total_pages) do
+            link_to_page(socket, action, pagination, page)
+          end
+
+        [link_to_page(socket, action, pagination, 1), dummy_page_link()] ++ pages
+    end
   end
+
+  @spec path(Phoenix.LiveView.Socket.t, atom, Kamansky.Paginate.params, keyword) :: String.t
+  defp path(socket, action, pagination, opts) do
+    apply(
+      socket.view,
+      :self_path,
+      [
+        socket,
+        action,
+        pagination,
+        Enum.into(opts, %{})
+      ]
+    )
+  end
+
+  @spec sort_direction(integer, Kamansky.Paginate.params) :: Kamansky.Paginate.sort_direction
+  defp sort_direction(column, %{sort: column, direction: :asc}), do: :desc
+  defp sort_direction(_column, _params), do: :asc
+
+  @spec start_value(pos_integer, pos_integer) :: pos_integer
+  defp start_value(current_page, per_page), do: ((current_page * per_page) - per_page) + 1
 end

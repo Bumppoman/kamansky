@@ -17,9 +17,10 @@ defmodule Kamansky.Services.Hipstamp.Listing do
 
   @spec list(Listing.t) :: {:ok, HipstampListing.t}
   def list(%Listing{stamp: stamp} = listing) do
+
     %{
       listing_type: :product,
-      name: String.slice(Stamp.sale_description(stamp), 0, 79),
+      name: title(stamp),
       description: Stamp.sale_description(stamp) <> ".\n\n" <> "See photo for detail. Actual stamp shown.  Bumppoman Stamps does not use stock images on any listing...we wouldn't buy for our collection sight unseen so why should you?!\n\nAdditional stamps in the same order ship for 10¢ each, unless otherwise marked.  We strive for SAME or NEXT DAY shipping.",
       category_id: 12,
       private_id: stamp.inventory_key,
@@ -69,5 +70,12 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     end
 
     :ok
+  end
+
+  @spec title(Stamp.t) :: String.t
+  defp title(%Stamp{} = stamp) do
+    with description <- Stamp.sale_description(stamp) do
+      binary_part(description, 0, min(79, byte_size(description)))
+    end
   end
 end

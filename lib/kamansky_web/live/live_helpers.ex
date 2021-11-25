@@ -3,18 +3,26 @@ defmodule KamanskyWeb.LiveHelpers do
 
   alias KamanskyWeb.Router.Helpers, as: Routes
 
-  @spec close_modal_with_success_and_refresh_datatable(
-    Phoenix.LiveView.Socket.t, String.t, String.t, String.t, pos_integer | nil
-  ) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def close_modal_with_success_and_refresh_datatable(socket, datatable_id, modal_event, success_message, go_to_record \\ nil) do
-    with _ <- refresh_datatable(datatable_id, [go_to_record: go_to_record]) do
-      {
-        :noreply,
-        socket
-        |> Phoenix.LiveView.push_event(modal_event, %{})
-        |> Phoenix.LiveView.put_flash(:info, %{type: :success, message: success_message, timestamp: Time.utc_now()})
-      }
-    end
+  @spec close_modal_with_success_and_reload_data(Phoenix.LiveView.Socket.t, String.t, String.t, pos_integer | nil) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def close_modal_with_success_and_reload_data(socket, modal_event, success_message, item_id \\ nil) do
+    {
+      :noreply,
+      socket
+      |> Phoenix.LiveView.push_event(modal_event, %{})
+      |> Phoenix.LiveView.put_flash(:info, %{type: :success, message: success_message, timestamp: Time.utc_now()})
+      |> Phoenix.LiveView.push_patch(
+        to: apply(
+          socket.view,
+          :self_path,
+          [
+            socket,
+            socket.assigns.live_action,
+            socket.assigns.pagination,
+            %{show: item_id}
+          ]
+        )
+      )
+    }
   end
 
   @spec live_confirmation_modal(keyword) :: Phoenix.LiveView.Component.t

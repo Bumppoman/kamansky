@@ -1,5 +1,6 @@
 defmodule KamanskyWeb.OrderLive.Index do
   use KamanskyWeb, :live_view
+  use KamanskyWeb.Paginate, sort: {0, :desc}
 
   import Kamansky.Helpers
 
@@ -7,16 +8,13 @@ defmodule KamanskyWeb.OrderLive.Index do
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.{Ebay, Hipstamp}
 
-  @data_table "orders-kamansky-data-table"
-
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("load_new_orders", _value, socket) do
     with _orders <- Hipstamp.Order.load_new_orders(),
-      _orders <- Ebay.Order.load_new_orders(),
-      {:phoenix, :send_update, _update} <- refresh_datatable(@data_table)
+      _orders <- Ebay.Order.load_new_orders()
     do
-      {:noreply, socket}
+      {:noreply, push_patch(socket, to: self_path(socket, :pending, %{}))}
     end
   end
 
@@ -24,9 +22,8 @@ defmodule KamanskyWeb.OrderLive.Index do
     with orders <- Orders.list_orders(status: :processed),
       :ok <- Enum.each(orders, &Kamansky.Services.Order.mark_order_shipped/1)
     do
-      close_modal_with_success_and_refresh_datatable(
+      close_modal_with_success_and_reload_data(
         socket,
-        @data_table,
         "kamansky:closeConfirmationModal",
         "You have successfully marked these orders as shipped."
       )
@@ -64,9 +61,8 @@ defmodule KamanskyWeb.OrderLive.Index do
   @impl true
   @spec handle_info({atom, any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_info({:order_added, order_id}, socket) do
-    close_modal_with_success_and_refresh_datatable(
+    close_modal_with_success_and_reload_data(
       socket,
-      @data_table,
       "kamansky:closeModal",
       "You have successfully added this order.",
       order_id
@@ -74,9 +70,8 @@ defmodule KamanskyWeb.OrderLive.Index do
   end
 
   def handle_info({:order_updated, order_id}, socket) do
-    close_modal_with_success_and_refresh_datatable(
+    close_modal_with_success_and_reload_data(
       socket,
-      @data_table,
       "kamansky:closeModal",
       "You have successfully updated this order.",
       order_id
@@ -94,25 +89,30 @@ defmodule KamanskyWeb.OrderLive.Index do
 
   @impl true
   @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
-    {
-      :noreply,
-      socket
-      |> assign(:data_count, fn -> Orders.count_orders(status: socket.assigns.live_action) end)
-      |> assign(:data_locator, fn options -> Orders.find_row_number_for_order(socket.assigns.live_action, options) end)
-      |> assign(:data_source, fn options -> Orders.list_orders(:display, socket.assigns.live_action, options) end)
-      |> assign(:go_to_record, Map.get(params, "go_to_record"))
-      |> assign(:page_title, String.capitalize(Atom.to_string(socket.assigns.live_action)) <> " Orders")
-    }
-  end
+  def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, String.capitalize(Atom.to_string(socket.assigns.live_action)) <> " Orders")}
 
   @spec advance_order(Phoenix.LiveView.Socket.t, String.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def advance_order(socket, action) do
-    close_modal_with_success_and_refresh_datatable(
+    close_modal_with_success_and_reload_data(
       socket,
-      @data_table,
       "kamansky:closeConfirmationModal",
       "You have successfully marked this order as #{action}."
     )
   end
+
+  @impl true
+  @spec count_data(:completed | :pending | :processed | :shipped, String.t | nil) :: integer
+  def count_data(status, search), do: Orders.count_orders(status, search)
+
+  @impl true
+  @spec find_item_in_data(:completed | :pending | :processed | :shipped, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(status, item_id, sort, direction), do: Orders.find_row_number_for_order(status, item_id, sort, direction)
+
+  @impl true
+  @spec load_data(:completed | :pending | :processed | :shipped, Kamansky.Paginate.params) :: [Order.t]
+  def load_data(status, params), do: Orders.list_orders(:display, status, params)
+
+  @impl true
+  @spec self_path(Phoenix.LiveView.Socket.t, :completed | :pending | :processed | :shipped, map) :: String.t
+  def self_path(socket, action, opts), do: Routes.order_index_path(socket, action, opts)
 end

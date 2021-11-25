@@ -1,38 +1,33 @@
 defmodule KamanskyWeb.ListingLive.Sold do
   use KamanskyWeb, :live_view
+  use KamanskyWeb.Paginate, sort: {1, :desc}
 
   import Kamansky.Helpers
 
   alias Kamansky.Sales.Listings
   alias Kamansky.Sales.Listings.Listing
-  alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
 
   @impl true
-  @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def mount(_params, _session, socket) do
-    {
-      :ok,
-      socket
-      |> assign(:data_count, fn -> Listings.count_listings(:sold) end)
-      |> assign(:data_locator, fn options -> Listings.find_row_number_for_listing(:sold, options) end)
-      |> assign(:data_source, fn options -> Listings.list_sold_listings(options) end)
-    }
-  end
+  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
+  def handle_params(_params, _uri, socket), do: {:noreply, assign(socket, :page_title, "Sold Listings")}
 
   @impl true
-  @spec handle_params(map, String.t, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_params(params, _uri, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
+  @spec count_data(:index, String.t | nil) :: integer
+  def count_data(_action, search), do: Listings.count_listings(:sold, search)
 
-  @spec apply_action(Phoenix.LiveView.Socket.t, :index | :show, map) :: Phoenix.LiveView.Socket.t
-  defp apply_action(socket, :index, _params), do: assign(socket, :page_title, "Sold Listings")
-  defp apply_action(socket, :show, %{"id" => id}) do
-    with listing <- Listings.get_listing!(id) do
-      socket
-      |> assign(:page_title, "View Listing")
-      |> assign(:stamp, Stamps.get_stamp_detail!(listing.stamp_id))
-    end
-  end
+  @impl true
+  @spec find_item_in_data(:index, pos_integer, integer, Kamansky.Paginate.sort_direction) :: integer
+  def find_item_in_data(_action, item_id, sort, direction), do: Listings.find_row_number_for_listing(:sold, item_id, sort, direction)
+
+  @impl true
+  @spec load_data(:index, Kamansky.Paginate.params) :: [Listing.t]
+  def load_data(_action, params), do: Listings.list_sold_listings(params)
+
+  @impl true
+  @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t
+  def self_path(socket, _action, opts), do: Routes.listing_sold_path(socket, :index, opts)
+
+  @spec sort_action(Phoenix.LiveView.Socket.t) :: :sold
+  def sort_action(_socket), do: :sold
 end

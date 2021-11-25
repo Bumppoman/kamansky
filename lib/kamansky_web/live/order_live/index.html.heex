@@ -1,4 +1,4 @@
-<section>
+<div>
   <KamanskyWeb.Components.Page.page_header
     buttons={
       [
@@ -36,38 +36,31 @@
     }
     page_title={@page_title}
   />
-  <.live_component module={KamanskyWeb.Components.DataTable}
-    headers={
-      [
-        "Order Number",
-        "Customer",
-        "Date",
-        "Total",
-        "Net Profit/Loss",
-        "Actions"
-      ]}
-    id="orders-kamansky-data-table"
-    let={order}
-    data_count={@data_count}
-    data_locator={@data_locator}
-    data_source={@data_source}
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
     empty_message="There are no orders to display."
-    options={[
-      go_to_record: Map.get(assigns, :go_to_record),
-      sort: %{column: 0, direction: :desc}
-    ]}
-    title={@page_title}
   >
-    <td>
+    <:col let={order} label="Order Number">
       <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
-    </td>
-    <td><%= order.customer.name %></td>
-    <td><%= formatted_date(order.ordered_at) %></td>
-    <td><%= format_decimal_as_currency(Order.total_paid(order)) %></td>
-    <td class={if Decimal.gt?(Order.net_profit(order), 0), do: "text-green-600", else: "text-red-600"}>
-      <%= format_decimal_as_currency(Order.net_profit(order)) %>
-    </td>
-    <td>
+    </:col>
+    <:col let={order} label="Customer">
+      <%= order.customer.name %>
+    </:col>
+    <:col let={order} label="Date">
+      <time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time>
+    </:col>
+    <:col let={order} label="Total">
+      <%= format_decimal_as_currency(Order.total_paid(order)) %>
+    </:col>
+    <:col let={order} label="Net Profit/Loss">
+      <span class={if Decimal.gt?(Order.net_profit(order), 0), do: "text-green-600", else: "text-red-600"}>
+        <%= format_decimal_as_currency(Order.net_profit(order)) %>
+      </span>
+    </:col>
+    <:col let={order} label="Actions" sort="disabled">
       <%= unless Order.completed?(order) do %>
         <a
           class="action-icon"
@@ -126,10 +119,10 @@
           </KamanskyWeb.Components.Page.link_with_confirmation>
         <% true -> %>
       <% end %>
-    </td>
-  </.live_component>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.OrderLive.Components.bottom_tabs socket={@socket} live_action={@live_action} />
-</section>
+</div>
 <%= live_modal KamanskyWeb.OrderLive.NewComponent,
   id: "new-order-form-modal",
   form_id: "new-order-form"

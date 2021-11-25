@@ -40,16 +40,18 @@ defmodule Kamansky.Stamps do
     |> cost_of_stamps_for_month(month)
   end
 
-  @spec count_stamps(atom) :: integer
-  def count_stamps(status) do
+  @spec count_stamps(atom, String.t | nil) :: integer
+  def count_stamps(status, search \\ nil) do
     Stamp
+    |> maybe_search(search)
     |> where(status: ^status)
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec count_stamps_in_collection_below_grade(pos_integer) :: integer
-  def count_stamps_in_collection_below_grade(grade) do
+  @spec count_stamps_in_collection_below_grade(pos_integer, String.t | nil) :: integer
+  def count_stamps_in_collection_below_grade(grade, search \\ nil) do
     Stamp
+    |> maybe_search(search)
     |> where(status: :collection)
     |> where([s], s.grade < ^grade)
     |> Repo.aggregate(:count, :id)
@@ -69,8 +71,7 @@ defmodule Kamansky.Stamps do
     |> count_stamps_purchased_in_month(month)
   end
 
-  @spec create_stamp(%{}, Kamansky.Attachments.Attachment.t, Kamansky.Attachments.Attachment.t)
-    :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
+  @spec create_stamp(%{}, Kamansky.Attachments.Attachment.t, Kamansky.Attachments.Attachment.t) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
   def create_stamp(attrs, front_photo, rear_photo) do
     %Stamp{}
     |> Stamp.changeset(attrs)
@@ -78,19 +79,11 @@ defmodule Kamansky.Stamps do
     |> Repo.insert()
   end
 
-  @spec find_row_number_for_stamp(atom, map) :: integer
-  def find_row_number_for_stamp(status, options) do
+  @spec find_row_number_for_stamp(atom, pos_integer, integer, Paginate.sort_direction) :: integer
+  def find_row_number_for_stamp(status, item_id, sort, direction) do
     Stamp
     |> where(status: ^status)
-    |> Paginate.find_row_number(Stamp.display_column_for_sorting(options[:sort][:column]), options)
-  end
-
-  @spec find_row_number_for_stamp_in_collection_below_grade(pos_integer, Paginate.params) :: integer
-  def find_row_number_for_stamp_in_collection_below_grade(grade, options) do
-    Stamp
-    |> where(status: :collection)
-    |> where([s], s.grade < ^grade)
-    |> stamp_row_number_lookup(options[:record_id])
+    |> Paginate.find_row_number(item_id, Stamp.display_column_for_sorting(sort), direction)
   end
 
   @spec get_or_initialize_stamp(String.t) :: Stamp.t
@@ -135,6 +128,7 @@ defmodule Kamansky.Stamps do
     |> Repo.one!()
   end
 
+  @spec list_sold_stamps_raw :: [Stamp.t]
   def list_sold_stamps_raw do
     Stamp
     |> where(status: :sold)
@@ -144,6 +138,7 @@ defmodule Kamansky.Stamps do
   @spec list_stamps(atom, Paginate.params) :: [Stamp.t]
   def list_stamps(status, params) do
     Stamp
+    |> maybe_search(params.search)
     |> where(status: ^status)
     |> then(&Paginate.list(Stamps, &1, params))
   end
@@ -172,11 +167,6 @@ defmodule Kamansky.Stamps do
     |> Repo.update()
   end
 
-  @doc false
-  @impl true
-  @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search), do: where(query, [s], ilike(s.scott_number, ^"#{search}%"))
-
   @spec sell_stamp(Stamp.t, map) :: {:ok, %Stamp{status: :listed}, integer} | {:error, Ecto.Changeset.t}
   def sell_stamp(%Stamp{} = stamp, attrs) do
     with {:ok, stamp} <- set_stamp_inventory_key(stamp),
@@ -190,8 +180,7 @@ defmodule Kamansky.Stamps do
     end
   end
 
-  @spec set_stamp_inventory_key(%Stamp{scott_number: String.t, format: atom})
-    :: {:ok, %Stamp{inventory_key: String.t}} | {:error, Ecto.Changeset.t}
+  @spec set_stamp_inventory_key(%Stamp{scott_number: String.t, format: atom}) :: {:ok, %Stamp{inventory_key: String.t}} | {:error, Ecto.Changeset.t}
   def set_stamp_inventory_key(%Stamp{scott_number: scott_number, format: format} = stamp) do
     with(
       search_number <-
@@ -261,25 +250,13 @@ defmodule Kamansky.Stamps do
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec handle_photos(Ecto.Changeset.t, Kamansky.Attachments.Attachment.t | nil, Kamansky.Attachments.Attachment.t)
-    :: Ecto.Changeset.t
+  @spec handle_photos(Ecto.Changeset.t, Kamansky.Attachments.Attachment.t | nil, Kamansky.Attachments.Attachment.t) :: Ecto.Changeset.t
   defp handle_photos(changeset, nil, nil), do: changeset
   defp handle_photos(changeset, front_photo, nil), do: Ecto.Changeset.put_change(changeset, :front_photo_id, front_photo.id)
   defp handle_photos(changeset, nil, rear_photo), do: Ecto.Changeset.put_change(changeset, :rear_photo_id, rear_photo.id)
-  defp handle_photos(changeset, front_photo, rear_photo) do
-    Ecto.Changeset.change(changeset, [front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
-  end
+  defp handle_photos(changeset, front_photo, rear_photo), do: Ecto.Changeset.change(changeset, [front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
 
-  @spec stamp_row_number_lookup(Ecto.Queryable.t, pos_integer) :: integer
-  defp stamp_row_number_lookup(query, stamp_id) do
-    query
-    |> select([s], {s.id, row_number() |> over(order_by: [asc: s.scott_number, asc: s.id])})
-    |> Repo.all
-    |> Enum.find(nil, fn {id, _row} -> id == stamp_id end)
-    |> case do
-      nil -> 1
-      {_id, nil} -> 1
-      {_id, row_number} -> row_number
-    end
-  end
+  @spec maybe_search(Ecto.Queryable.t, String.t | nil) :: Ecto.Queryable.t
+  defp maybe_search(query, nil), do: query
+  defp maybe_search(query, search), do: where(query, [s], ilike(s.scott_number, ^"#{search}%"))
 end

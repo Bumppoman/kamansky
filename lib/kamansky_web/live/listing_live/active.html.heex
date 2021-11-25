@@ -1,35 +1,13 @@
-<section>
+<div>
   <KamanskyWeb.Components.Page.page_header page_title={@page_title} />
-  <.live_component module={KamanskyWeb.Components.DataTable}
-    id="listings-kamansky-data-table"
-    let={listing}
-    data_count={@data_count}
-    data_locator={@data_locator}
-    data_source={@data_source}
-    empty_message="There are no listings to display."
-    headers=
-    {
-      [
-        "Scott Number",
-        "Inventory Key",
-        "Grade",
-        "Price",
-        "Listing Date",
-        %{text: "Listed", sort: :disabled, align: "text-center"},
-        %{text: "Actions", sort: :disabled, align: "text-center"}
-      ]
-    }
-    options=
-    {
-      [
-        go_to_record: Map.get(assigns, :go_to_record),
-        sort: 0
-      ]
-    }
-    parent_action={:active}
-    title="Active Listings"
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
+    empty_message="There are no active listings to display."
   >
-    <td>
+    <:col let={listing} label="Scott Number">
       <a
         class="action-icon"
         phx-click="open"
@@ -38,9 +16,11 @@
       >
         <%= listing.stamp.scott_number %>
       </a>
-    </td>
-    <td>#<%= listing.stamp.inventory_key %></td>
-    <td>
+    </:col>
+    <:col let={listing} label="Inventory Key">
+      #<%= listing.stamp.inventory_key %>
+    </:col>
+    <:col let={listing} label="Grade">
       <span><%= Stamp.formatted_grade(listing.stamp) %></span>
       <%= if Stamp.flaws?(listing.stamp) do %>
         <sup class="fs-6">
@@ -50,10 +30,14 @@
           >*</a>
         </sup>
       <% end %>
-    </td>
-    <td><%= format_decimal_as_currency(listing.listing_price) %></td>
-    <td><%= formatted_date(listing.inserted_at) %></td>
-    <td>
+    </:col>
+    <:col let={listing} label="Price">
+      <%= format_decimal_as_currency(listing.listing_price) %>
+    </:col>
+    <:col let={listing} label="Listing Date">
+      <time datetime={listing.inserted_at}><%= formatted_date(listing.inserted_at) %></time>
+    </:col>
+    <:col let={listing} label="Listed" class="text-center" sort="disabled">
       <div class="flex gap-2 justify-center">
         <%= if Listing.ebay?(listing) do %>
           <a
@@ -85,8 +69,8 @@
           <span>None</span>
         <% end %>
       </div>
-    </td>
-    <td>
+    </:col>
+    <:col let={listing} label="Actions" class="text-center" sort="disabled">
       <div class="flex gap-2 justify-center">
         <a
           class="action-icon"
@@ -138,10 +122,10 @@
           </KamanskyWeb.Components.Page.link_with_confirmation>
         <% end %>
       </div>
-    </td>
-  </.live_component>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
-</section>
+</div>
 <%= live_modal KamanskyWeb.ListingLive.AddToOrderFormComponent,
   id: "listing-add-to-order-form-modal",
   form_id: "listing-add-to-order-form"

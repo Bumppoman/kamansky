@@ -26,16 +26,18 @@ defmodule Kamansky.Sales.Listings do
   @spec change_listing(Listing.t, map) :: Ecto.Changeset.t
   def change_listing(%Listing{} = listing, attrs \\ %{}), do: Listing.changeset(listing, attrs)
 
-  @spec count_listings(atom) :: integer | nil
-  def count_listings(status) do
+  @spec count_listings(atom, String.t | nil) :: integer
+  def count_listings(status, search \\ nil) do
     Listing
+    |> maybe_search(search)
     |> where(status: ^status)
     |> Repo.aggregate(:count)
   end
 
-  @spec count_listings_with_bids :: integer
-  def count_listings_with_bids do
+  @spec count_listings_with_bids(String.t | nil) :: integer
+  def count_listings_with_bids(search \\ nil) do
     Listing
+    |> maybe_search(search)
     |> join(:inner, [l], el in assoc(l, :ebay_listing))
     |> where([l, el], el.bid_count > 0)
     |> Repo.aggregate(:count)
@@ -49,30 +51,15 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.insert()
   end
 
-  @impl true
-  @spec exclude_from_count(Ecto.Query.t) :: Ecto.Query.t
-  def exclude_from_count(query), do: query
-
-  @spec find_row_number_for_listing(atom, map) :: integer
-  def find_row_number_for_listing(status, options) do
+  @spec find_row_number_for_listing(atom, pos_integer, integer, Paginate.sort_direction) :: integer | nil
+  def find_row_number_for_listing(status, listing_id, sort, direction) do
     Listing
     |> where(status: ^status)
     |> join(:left, [l], s in assoc(l, :stamp))
     |> Paginate.find_row_number(
-      Listing.display_column_for_sorting(options[:sort][:column]),
-      options
-    )
-  end
-
-  @spec find_row_number_for_listing_with_bids(Paginate.params) :: integer
-  def find_row_number_for_listing_with_bids(options) do
-    Listing
-    |> join(:left, [l], s in assoc(l, :stamp))
-    |> join(:inner, [l], el in assoc(l, :ebay_listing))
-    |> where([l, ..., el], el.bid_count > 0)
-    |> Paginate.find_row_number(
-      Listing.display_column_for_sorting(options[:sort][:column]),
-      options
+      listing_id,
+      Listing.display_column_for_sorting(sort),
+      direction
     )
   end
 
@@ -110,7 +97,7 @@ defmodule Kamansky.Sales.Listings do
     |> Repo.one()
   end
 
-  @spec list_active_listings(Kamansky.Paginate.params) :: [Listing.t]
+  @spec list_active_listings(Paginate.params) :: [Listing.t]
   def list_active_listings(params) do
     Listing
     |> where(status: :active)
@@ -121,7 +108,7 @@ defmodule Kamansky.Sales.Listings do
     |> then(&Paginate.list(Listings, &1, params))
   end
 
-  @spec list_sold_listings(Kamansky.Paginate.params) :: [%Listing{status: :sold}]
+  @spec list_sold_listings(Paginate.params) :: [%Listing{status: :sold}]
   def list_sold_listings(params) do
     Listing
     |> where(status: :sold)
@@ -131,21 +118,15 @@ defmodule Kamansky.Sales.Listings do
     |> then(&Paginate.list(Listings, &1, params))
   end
 
-  @spec list_listings_with_bids(Kamansky.Paginate.params) :: [Listing.t]
+  @spec list_listings_with_bids(Paginate.params) :: [Listing.t]
   def list_listings_with_bids(params) do
     Listing
+    |> maybe_search(params.search)
     |> join(:left, [l], s in assoc(l, :stamp))
     |> join(:inner, [l], el in assoc(l, :ebay_listing))
     |> where([l, ..., el], el.bid_count > 0)
     |> preload([l, s, el], stamp: s, ebay_listing: el)
     |> then(&Paginate.list(Listings, &1, params))
-  end
-
-  @spec mark_listing_bid(Listing.t) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
-  def mark_listing_bid(%Listing{} = listing) do
-    listing
-    |> Ecto.Changeset.change(status: :bid)
-    |> Repo.update()
   end
 
   @spec mark_listing_sold(Listing.t, [order_id: integer, sale_price: Decimal.t]) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
@@ -170,11 +151,6 @@ defmodule Kamansky.Sales.Listings do
     end
     |> Enum.into(%{})
   end
-
-  @doc false
-  @impl true
-  @spec search_query(Ecto.Query.t, String.t) :: Ecto.Query.t
-  def search_query(query, search), do: where(query, [l, s], ilike(s.scott_number, ^"%#{search}%"))
 
   @impl true
   @spec sort(Ecto.Query.t, Kamansky.Paginate.sort) :: Ecto.Query.t
@@ -259,4 +235,8 @@ defmodule Kamansky.Sales.Listings do
     |> Ecto.Changeset.change(selling_fees: selling_fees)
     |> Repo.update()
   end
+
+  @spec maybe_search(Ecto.Queryable.t, String.t | nil) :: Ecto.Queryable.t
+  defp maybe_search(query, nil), do: query
+  defp maybe_search(query, search), do: where(query, [l, s], ilike(s.scott_number, ^"%#{search}%"))
 end
