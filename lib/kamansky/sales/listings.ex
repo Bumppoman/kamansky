@@ -29,8 +29,9 @@ defmodule Kamansky.Sales.Listings do
   @spec count_listings(atom, String.t | nil) :: integer
   def count_listings(status, search \\ nil) do
     Listing
+    |> join(:left, [l], s in assoc(l, :stamp))
     |> maybe_search(search)
-    |> where(status: ^status)
+    |> where([l], l.status == ^status)
     |> Repo.aggregate(:count)
   end
 
@@ -104,6 +105,7 @@ defmodule Kamansky.Sales.Listings do
     |> join(:left, [l], s in assoc(l, :stamp))
     |> join(:left, [l], el in assoc(l, :ebay_listing))
     |> join(:left, [l], hl in assoc(l, :hipstamp_listing))
+    |> maybe_search(params.search)
     |> preload([l, s, el, hl], [stamp: s, ebay_listing: el, hipstamp_listing: hl])
     |> then(&Paginate.list(Listings, &1, params))
   end
@@ -114,6 +116,7 @@ defmodule Kamansky.Sales.Listings do
     |> where(status: :sold)
     |> join(:left, [l], s in assoc(l, :stamp))
     |> join(:left, [l], o in assoc(l, :order))
+    |> maybe_search(params.search)
     |> preload([l, s, o], [stamp: s, order: {o, :listings}])  # Can't join listings twice for some reason so it's separately loaded
     |> then(&Paginate.list(Listings, &1, params))
   end
@@ -121,10 +124,10 @@ defmodule Kamansky.Sales.Listings do
   @spec list_listings_with_bids(Paginate.params) :: [Listing.t]
   def list_listings_with_bids(params) do
     Listing
-    |> maybe_search(params.search)
     |> join(:left, [l], s in assoc(l, :stamp))
     |> join(:inner, [l], el in assoc(l, :ebay_listing))
     |> where([l, ..., el], el.bid_count > 0)
+    |> maybe_search(params.search)
     |> preload([l, s, el], stamp: s, ebay_listing: el)
     |> then(&Paginate.list(Listings, &1, params))
   end

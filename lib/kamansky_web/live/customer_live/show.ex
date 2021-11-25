@@ -32,5 +32,8 @@ defmodule KamanskyWeb.CustomerLive.Show do
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :show, map) :: String.t
-  def self_path(socket, _action, opts), do: Routes.customer_show_path(socket, :show, Map.put(opts, :id, socket.assigns.customer.id))
+  def self_path(%Phoenix.LiveView.Socket{assigns: %Phoenix.LiveView.Socket.AssignsNotInSocket{} = assigns} = socket, _action, opts) do
+    Routes.customer_show_path(socket, :show, assigns.__assigns__.customer.id, opts)
+  end
+  def self_path(socket, _action, opts), do: Routes.customer_show_path(socket, :show, socket.assigns.customer.id, opts)
 end

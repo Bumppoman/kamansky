@@ -44,7 +44,7 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
             :info,
             %{type: :success, message: "You have successfully listed this stamp for sale (inventory key: ##{inventory_key}).", timestamp: Time.utc_now()}
           )
-          |> push_redirect(to: Routes.listing_active_path(socket, :index, go_to_record: listing_id))
+          |> push_redirect(to: Routes.listing_active_path(socket, :index, show: listing_id))
           |> noreply()
         end
     end
