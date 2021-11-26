@@ -98,7 +98,9 @@ defmodule Kamansky.Stamps do
     Stamp
     |> where(inventory_key: ^inventory_key)
     |> join(:left, [s], l in assoc(s, :listing))
-    |> preload([s, l], [listing: l])
+    |> join(:left, [s, l], el in assoc(l, :ebay_listing))
+    |> join(:left, [s, l], hl in assoc(l, :hipstamp_listing))
+    |> preload([s, l, el, hl], [listing: {l, [ebay_listing: el, hipstamp_listing: hl]}])
     |> Repo.one()
   end
 

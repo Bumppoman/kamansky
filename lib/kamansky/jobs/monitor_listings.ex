@@ -43,7 +43,7 @@ defmodule Kamansky.Jobs.MonitorListings do
           |> Platforms.update_external_listing(ebay_listing)
           |> case do
             {:ok, _listing} -> Logger.info("Kamansky.Jobs.MonitorListings: new eBay bid received for listing #{listing.listing_id}")
-            {:error, _changeset} -> Logger.error("Kamansky.Jobs.MonitorListings: error with eBay bid")
+            {:error, _changeset} -> Logger.error("Kamansky.Jobs.MonitorListings: error loading eBay bid")
           end
 
           Hipstamp.Listing.maybe_remove_listing(listing.listing)
@@ -53,9 +53,17 @@ defmodule Kamansky.Jobs.MonitorListings do
   end
 
   defp relist_ebay_listings do
-    Enum.each(
-      Platforms.list_expired_ebay_listings(),
-      &Ebay.Listing.relist/1
-    )
+    case Platforms.list_expired_ebay_listings() do
+      [] -> Logger.info("#{__MODULE__}:  no eBay listings to relist")
+      listings ->
+        Enum.each(listings, fn listing ->
+          listing
+          |> Ebay.Listing.relist()
+          |> case do
+            {:ok, ebay_listing} -> Logger.info("#{__MODULE__}: relisted eBay listing #{ebay_listing.ebay_id}")
+            {:error, error} -> Logger.error("#{__MODULE__}: error relisting eBay listing (#{error.dump})")
+          end
+        end)
+    end
   end
 end

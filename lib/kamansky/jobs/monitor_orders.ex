@@ -37,17 +37,21 @@ defmodule Kamansky.Jobs.MonitorOrders do
   defp schedule, do: Process.send_after(self(), :work, 120000)
 
   defp work do
-    Enum.each(
-      Ebay.Order.load_new_orders() ++ Hipstamp.Order.load_new_orders(),
-      fn order ->
-        Orders.maybe_delist_listings(order)
-        {:ok, notification} =
-          Notifications.send_notification(
-            notification_topic(order),
-            order.id
-          )
-        Logger.info(Notification.body(notification, order))
-      end
-    )
+    case Ebay.Order.load_new_orders() ++ Hipstamp.Order.load_new_orders() do
+      [] -> Logger.info("#{__MODULE__}:  no new eBay or Hipstamp orders to load")
+      orders ->
+        Enum.each(
+          orders,
+          fn order ->
+            Orders.maybe_delist_listings(order)
+            {:ok, notification} =
+              Notifications.send_notification(
+                notification_topic(order),
+                order.id
+              )
+            Logger.info(Notification.body(notification, order))
+          end
+        )
+    end
   end
 end

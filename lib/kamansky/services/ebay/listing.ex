@@ -200,9 +200,7 @@ defmodule Kamansky.Services.Ebay.Listing do
             }
           )
 
-        _ ->
-          Logger.error(response)
-          {:error, %{code: :ebay_relist_listing_error, dump: response}}
+        _ -> {:error, %{code: :ebay_relist_listing_error, dump: response}}
       end
     end
   end
