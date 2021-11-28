@@ -33,6 +33,9 @@
     <:col let={purchase} label="Listed">
       <%= Purchase.stamps_listed(purchase) %>
     </:col>
+    <:col let={purchase} label="Sold">
+      <%= Purchase.stamps_sold(purchase) %>
+    </:col>
     <:col let={purchase} label="Total Cost">
       <%= format_decimal_as_currency(Purchase.total_cost(purchase)) %>
     </:col>

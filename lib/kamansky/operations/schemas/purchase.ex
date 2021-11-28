@@ -63,6 +63,9 @@ defmodule Kamansky.Operations.Purchases.Purchase do
   @spec stamps_listed(t) :: integer
   def stamps_listed(%Purchase{stamps: stamps}), do: Enum.count(stamps, &(&1.status == :listed))
 
+  @spec stamps_sold(t) :: integer
+  def stamps_sold(%Purchase{stamps: stamps}), do: Enum.count(stamps, &(&1.status == :sold))
+
   @spec total_cost(t) :: Decimal.t
   def total_cost(%Purchase{} = purchase), do: Decimal.add(purchase.cost, purchase.purchase_fees)
 

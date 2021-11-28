@@ -42,10 +42,8 @@ defmodule Kamansky.Operations.Purchases do
   def list_purchases_for_display(params) do
     Purchase
     |> maybe_search(params.search)
-    |> join(:left, [p], s in assoc(p, :stamps))
-    |> join(:left, [p, s], l in assoc(s, :listing))
-    |> preload([p, s, l], stamps: {s, listing: l})
     |> then(&Paginate.list(Purchases, &1, params))
+    |> Repo.preload([stamps: :listing])
   end
 
   @spec update_purchase(Purchase.t, map) :: {:ok, Purchase.t} | {:error, Ecto.Changeset.t}
