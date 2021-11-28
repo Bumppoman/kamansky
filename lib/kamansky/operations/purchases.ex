@@ -3,6 +3,7 @@ defmodule Kamansky.Operations.Purchases do
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
+  import Kamansky.Helpers, only: [get_value_for_ecto_enum: 3]
 
   alias __MODULE__
   alias Kamansky.Operations.Purchases.Purchase
@@ -37,10 +38,13 @@ defmodule Kamansky.Operations.Purchases do
   @spec get_purchase!(pos_integer) :: Purchase.t
   def get_purchase!(id), do: Repo.get!(Purchase, id)
 
-  @spec list_purchases(Paginate.params) :: [Purchase.t]
-  def list_purchases(params) do
+  @spec list_purchases_for_display(Paginate.params) :: [Purchase.t]
+  def list_purchases_for_display(params) do
     Purchase
     |> maybe_search(params.search)
+    |> join(:left, [p], s in assoc(p, :stamps))
+    |> join(:left, [p, s], l in assoc(s, :listing))
+    |> preload([p, s, l], stamps: {s, listing: l})
     |> then(&Paginate.list(Purchases, &1, params))
   end
 

@@ -1,21 +1,16 @@
 <div>
-  <KamanskyWeb.Components.Page.page_header
-    buttons=
-      {
-        [
-          %{
-            options: %{
-              "phx-click": "open",
-              "phx-target": "#purchase-form-modal",
-              "phx-value-action": "new",
-              "phx-value-purchase-id": ""
-            },
-            title: "Add New Purchase"
-          }
-        ]
-      }
-    page_title="Purchases"
-  />
+  <KamanskyWeb.Components.Page.page_header page_title="Purchases">
+    <:buttons>
+      <KamanskyWeb.Components.Page.header_button
+        phx-click="open"
+        phx-target="#purchase-form-modal"
+        phx-value-action="new"
+        phx-value-purchase-id=""
+      >
+        Add New Purchase
+      </KamanskyWeb.Components.Page.header_button>
+    </:buttons>
+  </KamanskyWeb.Components.Page.page_header>
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -32,8 +27,23 @@
     <:col let={purchase} label="Quantity">
       <%= purchase.quantity %>
     </:col>
+    <:col let={purchase} label="In Collection">
+      <%= Purchase.stamps_in_collection(purchase) %>
+    </:col>
+    <:col let={purchase} label="Listed">
+      <%= Purchase.stamps_listed(purchase) %>
+    </:col>
     <:col let={purchase} label="Total Cost">
       <%= format_decimal_as_currency(Purchase.total_cost(purchase)) %>
+    </:col>
+    <:col let={purchase} label="Total Listing Price">
+      <%= format_decimal_as_currency(Purchase.total_listing_price(purchase)) %>
+    </:col>
+    <:col let={purchase} label="Realized Profit/Loss">
+      <%= format_decimal_as_currency(Purchase.realized_profit(purchase)) %>
+    </:col>
+    <:col let={purchase} label="Potential Profit">
+      <%= format_decimal_as_currency(Purchase.potential_profit(purchase)) %>
     </:col>
     <:col let={purchase} label="Actions" sort="disabled">
       <a

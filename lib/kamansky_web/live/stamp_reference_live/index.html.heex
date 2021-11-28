@@ -1,21 +1,17 @@
 <div>
-  <KamanskyWeb.Components.Page.page_header
-    buttons={
-      [
-        %{
-          display: @live_action != :missing_from_collection,
-          options: %{
-            "phx-click": "open",
-            "phx-target": "#stamp_reference-form-modal",
-            "phx-value-action": "new",
-            "phx-value-stamp-reference-id": ""
-          },
-          title: "Add New Stamp Reference"
-        }
-      ]
-    }
-    page_title={@page_title}
-  />
+  <KamanskyWeb.Components.Page.page_header page_title={@page_title}>
+    <:buttons>
+      <KamanskyWeb.Components.Page.header_button
+        display={@live_action != :missing_from_collection}
+        phx-click="open"
+        phx-target="#stamp_reference-form-modal"
+        phx-value-action="new"
+        phx-value-stamp-reference-id=""
+      >
+        Add New Stamp Reference
+      </KamanskyWeb.Components.Page.header_button>
+    </:buttons>
+  </KamanskyWeb.Components.Page.page_header>
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}

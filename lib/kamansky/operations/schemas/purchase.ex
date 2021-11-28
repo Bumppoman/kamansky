@@ -19,6 +19,8 @@ defmodule Kamansky.Operations.Purchases.Purchase do
     field :quantity, :integer
     field :cost, :decimal
     field :purchase_fees, :decimal
+
+    has_many :stamps, Kamansky.Stamps.Stamp
   end
 
   @spec changeset(t, map) :: Ecto.Changeset.t
@@ -33,6 +35,45 @@ defmodule Kamansky.Operations.Purchases.Purchase do
     |> Enum.at(column)
   end
 
+  @spec potential_profit(t) :: Decimal.t
+  def potential_profit(%Purchase{stamps: stamps}) do
+    Enum.reduce(
+      stamps,
+      0,
+      fn stamp, acc ->
+        if is_nil(stamp.listing) or stamp.listing.status == :sold, do: acc, else: Decimal.add(stamp.listing.listing_price, acc)
+      end
+    )
+  end
+
+  @spec realized_profit(t) :: Decimal.t
+  def realized_profit(%Purchase{stamps: stamps}) do
+    Enum.reduce(
+      stamps,
+      0,
+      fn stamp, acc ->
+        if is_nil(stamp.listing) or stamp.listing.status != :sold, do: acc, else: Decimal.add(stamp.listing.sale_price, acc)
+      end
+    )
+  end
+
+  @spec stamps_in_collection(t) :: integer
+  def stamps_in_collection(%Purchase{stamps: stamps}), do: Enum.count(stamps, &(&1.status == :collection))
+
+  @spec stamps_listed(t) :: integer
+  def stamps_listed(%Purchase{stamps: stamps}), do: Enum.count(stamps, &(&1.status == :listed))
+
   @spec total_cost(t) :: Decimal.t
   def total_cost(%Purchase{} = purchase), do: Decimal.add(purchase.cost, purchase.purchase_fees)
+
+  @spec total_listing_price(t) :: Decimal.t
+  def total_listing_price(%Purchase{stamps: stamps}) do
+    Enum.reduce(
+      stamps,
+      0,
+      fn stamp, acc ->
+        if is_nil(stamp.listing), do: acc, else: Decimal.add(stamp.listing.listing_price, acc)
+      end
+    )
+  end
 end

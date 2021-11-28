@@ -41,7 +41,7 @@ defmodule KamanskyWeb.PurchaseLive.Index do
 
   @impl true
   @spec load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [Order.t]
-  def load_data(_socket, params), do: Purchases.list_purchases(params)
+  def load_data(_socket, params), do: Purchases.list_purchases_for_display(params)
 
   @impl true
   @spec self_path(Phoenix.LiveView.Socket.t, :index, map) :: String.t

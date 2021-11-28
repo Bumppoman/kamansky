@@ -1,20 +1,16 @@
 <div>
-  <KamanskyWeb.Components.Page.page_header
-    buttons={
-      [
-        %{
-          options: %{
-            "phx-click": "open",
-            "phx-target": "#expense-form-modal",
-            "phx-value-action": "new",
-            "phx-value-expense-id": ""
-          },
-          title: "Add New Expense"
-        }
-      ]
-    }
-    page_title="Expenses"
-  />
+  <KamanskyWeb.Components.Page.page_header page_title="Expenses">
+    <:buttons>
+      <KamanskyWeb.Components.Page.header_button
+        phx-click="open"
+        phx-target="#expense-form-modal"
+        phx-value-action="new"
+        phx-value-expense-id=""
+      >
+        Add New Expense
+      </KamanskyWeb.Components.Page.header_button>
+    </:buttons>
+  </KamanskyWeb.Components.Page.page_header>
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}

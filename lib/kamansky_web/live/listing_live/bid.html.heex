@@ -29,7 +29,7 @@
     <:col let={listing} label="Ending Date">
       <time datetime={listing.ebay_listing.end_time}><%= formatted_date(listing.ebay_listing.end_time, "%B %-d, %Y %-I:%M %p") %></time>
     </:col>
-    <:col label="Actions" sort="disabled" />
+    <:col label="Actions" sort="disabled"></:col>
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
 </div>

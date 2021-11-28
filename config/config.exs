@@ -32,7 +32,7 @@ config :swoosh, :api_client, false
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.13.10",
+  version: "0.14.0",
   default: [
     args: ~w(ts/app.ts --bundle --target=es2020 --outdir=../priv/static/assets),
     cd: Path.expand("../assets", __DIR__),
