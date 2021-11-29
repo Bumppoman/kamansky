@@ -168,7 +168,10 @@ defmodule Kamansky.Sales.Listings do
     order_by(
       query,
       [l, s],
-      [{^direction, s.scott_number}, {:asc, l.id}]
+      [
+        {^direction, s.scott_number},
+        {:asc, s.inventory_key}
+      ]
     )
   end
 
@@ -176,7 +179,10 @@ defmodule Kamansky.Sales.Listings do
     order_by(
       query,
       [l, s],
-      [{^direction, s.scott_number}, {^direction, s.inventory_key}]
+      [
+        {^direction, s.scott_number},
+        {^direction, s.inventory_key}
+      ]
     )
   end
 
@@ -184,7 +190,10 @@ defmodule Kamansky.Sales.Listings do
     order_by(
       query,
       [l, s, o],
-      [{^direction, o.ordered_at}, {:asc, s.scott_number}, {:asc, l.id}]
+      [
+        {^direction, o.ordered_at},
+        {:asc, s.inventory_key}
+      ]
     )
   end
 
@@ -199,34 +208,67 @@ defmodule Kamansky.Sales.Listings do
     )
   end
 
-  def sort(query, %{action: :sold, column: 2, direction: direction}), do: order_by(query, {^direction, :sale_price})
-  def sort(query, %{action: :active, column: 3, direction: direction}), do: order_by(query, {^direction, :listing_price})
+  def sort(query, %{action: :sold, column: 2, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [
+        {^direction, :sale_price},
+        {:asc, s.inventory_key}
+      ]
+    )
+  end
+
+  def sort(query, %{action: :active, column: 3, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [
+        {^direction, :listing_price},
+        {:asc, s.inventory_key}
+      ]
+    )
+  end
 
   def sort(query, %{action: :sold, column: 3, direction: direction}) do
     order_by(
       query,
       [l, s],
       [
-        {
-          ^direction,
-          s.cost + s.purchase_fees
-        },
+        {^direction, s.cost + s.purchase_fees},
+        {:asc, s.inventory_key}
+      ]
+    )
+  end
+
+  def sort(query, %{action: :active, column: 4, direction: direction}) do
+    order_by(
+      query,
+      [l, s],
+      [
+        {^direction, :inserted_at},
+        {:asc, s.inventory_key}
+      ]
+    )
+  end
+
+  def sort(query, %{action: :bid, column: 4, direction: direction}) do
+    order_by(
+      query,
+      [l, s, el],
+      [
+        {^direction, el.end_time},
         {:asc, s.scott_number}
       ]
     )
   end
 
-  def sort(query, %{action: :active, column: 4, direction: direction}), do: order_by(query, {^direction, :inserted_at})
-  def sort(query, %{action: :bid, column: 4, direction: direction}), do: order_by(query, [l, s, el], [{^direction, el.end_time}, {:asc, s.scott_number}])
   def sort(query, %{action: :sold, column: 4, direction: direction}) do
     order_by(
       query,
       [l, s],
       [
-        {
-          ^direction,
-          l.sale_price - (s.cost + s.purchase_fees)
-        },
+        {^direction, l.sale_price - (s.cost + s.purchase_fees)},
         {:asc, s.scott_number}
       ]
     )
