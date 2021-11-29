@@ -2,6 +2,7 @@ require Logger
 
 defmodule Kamansky.Services.Hipstamp.Listing do
   alias Kamansky.Attachments.Attachment
+  alias Kamansky.Operations.Administration
   alias Kamansky.Sales.Listings.{Listing, Platforms}
   alias Kamansky.Sales.Listings.Platforms.HipstampListing
   alias Kamansky.Services.Hipstamp
@@ -16,12 +17,12 @@ defmodule Kamansky.Services.Hipstamp.Listing do
   end
 
   @spec list(Listing.t) :: {:ok, HipstampListing.t}
-  def list(%Listing{stamp: stamp} = listing) do
+  def list(%Listing{stamp: stamp} = listing, opts \\ %{}) do
 
     %{
       listing_type: :product,
-      name: title(stamp),
-      description: Stamp.sale_description(stamp) <> ".\n\n" <> "See photo for detail. Actual stamp shown.  Bumppoman Stamps does not use stock images on any listing...we wouldn't buy for our collection sight unseen so why should you?!\n\nAdditional stamps in the same order ship for 10¢ each, unless otherwise marked.  We strive for SAME or NEXT DAY shipping.",
+      name: title(listing, opts),
+      description: description(listing, opts),
       category_id: 12,
       private_id: stamp.inventory_key,
       quantity: 1,
@@ -72,10 +73,21 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     :ok
   end
 
-  @spec title(Stamp.t) :: String.t
-  defp title(%Stamp{} = stamp) do
+  @spec suggested_description(Stamp.t) :: String.t
+  def suggested_description(%Stamp{} = stamp), do: Stamp.sale_description(stamp) <> ".\n\n" <> Administration.get_setting!(:hipstamp_description)
+
+  @spec suggested_title(Stamp.t) :: String.t
+  def suggested_title(%Stamp{} = stamp) do
     with description <- Stamp.sale_description(stamp) do
       binary_part(description, 0, min(79, byte_size(description)))
     end
   end
+
+  @spec description(Listing.t, map) :: String.t
+  defp description(%Listing{stamp: %Stamp{}}, %{"description" => description}), do: description
+  defp description(%Listing{stamp: %Stamp{} = stamp}, _opts), do: suggested_description(stamp)
+
+  @spec title(Listing.t, map) :: String.t
+  defp title(%Listing{stamp: %Stamp{}}, %{"title" => title}), do: title
+  defp title(%Listing{stamp: %Stamp{} = stamp}, _opts), do: suggested_title(stamp)
 end

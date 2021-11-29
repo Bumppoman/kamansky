@@ -130,6 +130,15 @@ defmodule Kamansky.Stamps do
     |> Repo.one!()
   end
 
+  @spec get_stamp_with_reference(pos_integer) :: Stamp.t
+  def get_stamp_with_reference(stamp_id) do
+    Stamp
+    |> where(id: ^stamp_id)
+    |> join(:left, [s], sr in assoc(s, :stamp_reference))
+    |> preload([s, sr], stamp_reference: sr)
+    |> Repo.one()
+  end
+
   @spec list_sold_stamps_raw :: [Stamp.t]
   def list_sold_stamps_raw do
     Stamp

@@ -60,8 +60,8 @@ defmodule Kamansky.Jobs.MonitorListings do
           listing
           |> Ebay.Listing.relist()
           |> case do
-            {:ok, ebay_listing} -> Logger.info("#{__MODULE__}: relisted eBay listing #{ebay_listing.ebay_id}")
-            {:error, error} -> Logger.error("#{__MODULE__}: error relisting eBay listing (#{error.dump})")
+            {:ok, ebay_listing} -> Logger.info("Kamansky.Jobs.MonitorListings: relisted eBay listing #{ebay_listing.ebay_id}")
+            {:error, error} -> Logger.error("Kamansky.Jobs.MonitorListings: error relisting eBay listing (#{error.dump})")
           end
         end)
     end

@@ -30,7 +30,7 @@ defmodule KamanskyWeb.SettingsLive.Index do
       {:ok, settings} ->
         socket
         |> assign(:settings, settings)
-        |> put_flash(:info, %{message: "You have successfully updated the application settings.", timestamp: DateTime.utc_now()})
+        |> put_flash(:info, %{type: :success, message: "You have successfully updated the application settings.", timestamp: DateTime.utc_now()})
         |> noreply()
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
     end

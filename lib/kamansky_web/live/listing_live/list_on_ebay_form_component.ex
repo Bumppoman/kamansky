@@ -19,7 +19,7 @@ defmodule KamanskyWeb.ListingLive.ListOnEbayFormComponent do
           %{
             auction_price: Ebay.Listing.suggested_auction_price(listing),
             buy_it_now_price: Ebay.Listing.suggested_buy_it_now_price(listing),
-            title: Ebay.Listing.suggested_title(listing)
+            title: Ebay.Listing.suggested_title(listing.stamp)
           }
         )
       )

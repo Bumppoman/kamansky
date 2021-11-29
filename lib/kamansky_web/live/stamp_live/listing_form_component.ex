@@ -12,12 +12,16 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
   @impl true
   @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{trigger_params: %{"stamp-id" => stamp_id}} = assigns, socket) do
-    with stamp <- Stamps.get_stamp!(stamp_id),
+    with stamp <- Stamps.get_stamp_with_reference(stamp_id),
       listing <- %Listing{}
     do
       socket
       |> assign(assigns)
       |> assign(:changeset, Listings.change_listing(listing))
+      |> assign(:ebay_description, Services.Ebay.Listing.suggested_description(stamp))
+      |> assign(:ebay_title, Services.Ebay.Listing.suggested_title(stamp))
+      |> assign(:hipstamp_description, Services.Hipstamp.Listing.suggested_description(stamp))
+      |> assign(:hipstamp_title, Services.Hipstamp.Listing.suggested_title(stamp))
       |> assign(:listing, listing)
       |> assign(:stamp, stamp)
       |> ok()

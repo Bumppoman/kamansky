@@ -1,6 +1,6 @@
 defmodule KamanskyWeb.TrendLive.Sold do
   use KamanskyWeb, :live_view
-  use KamanskyWeb.Paginate, sort: {1, :asc}
+  use KamanskyWeb.Paginate, sort: {1, :desc}
 
   import Kamansky.Helpers
 
