@@ -246,7 +246,7 @@ defmodule Kamansky.Sales.Listings do
       query,
       [l, s],
       [
-        {^direction, :inserted_at},
+        {^direction, fragment("DATE(?)", l.inserted_at)},
         {:asc, s.inventory_key}
       ]
     )
