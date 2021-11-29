@@ -1,5 +1,3 @@
-require Logger
-
 defmodule Kamansky.Services.Ebay.Listing do
   import SweetXml
 
@@ -126,7 +124,6 @@ defmodule Kamansky.Services.Ebay.Listing do
           )
 
         _ ->
-          Logger.error(response)
           {:error, %{code: :ebay_add_listing_error, dump: response}}
       end
     end
@@ -294,7 +291,7 @@ defmodule Kamansky.Services.Ebay.Listing do
   end
 
   @spec description(Listing.t, map) :: String.t
-  defp description(%Listing{stamp: %Stamp{}}, %{"description" => description}), do: description
+  defp description(%Listing{stamp: %Stamp{}}, %{"ebay_description" => description}), do: description
   defp description(%Listing{stamp: %Stamp{} = stamp}, _opts), do: suggested_description(stamp)
 
   @spec free_shipping?(Listing.t, map) :: boolean
@@ -323,6 +320,6 @@ defmodule Kamansky.Services.Ebay.Listing do
   end
 
   @spec title(Listing.t, map) :: String.t
-  defp title(%Listing{stamp: %Stamp{}}, %{"title" => title}), do: title
+  defp title(%Listing{stamp: %Stamp{}}, %{"ebay_title" => title}), do: title
   defp title(%Listing{stamp: %Stamp{} = stamp}, _opts), do: suggested_title(stamp)
 end

@@ -1,5 +1,3 @@
-require Logger
-
 defmodule Kamansky.Services.Ebay.Order do
   import SweetXml
   import Kamansky.Helpers, only: [humanize_and_capitalize: 1]

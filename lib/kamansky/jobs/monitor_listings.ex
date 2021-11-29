@@ -49,7 +49,7 @@ defmodule Kamansky.Jobs.MonitorListings do
           listing.listing
           |> Hipstamp.Listing.maybe_remove_listing()
           |> case do
-            {:hipstamp_removed, listing} -> Logger.info("Kamansky.Jobs.MonitorListings:  removed Hipstamp listing for listing #{listing.id}")
+            {:hipstamp_removed, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: removed Hipstamp listing for listing #{listing.id}")
             {:noop, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: no Hipstamp listing to remove for listing #{listing.id}")
           end
         end
@@ -59,7 +59,7 @@ defmodule Kamansky.Jobs.MonitorListings do
 
   defp relist_ebay_listings do
     case Platforms.list_expired_ebay_listings() do
-      [] -> Logger.info("#{__MODULE__}:  no eBay listings to relist")
+      [] -> Logger.info("Kamansky.Jobs.MonitorListings: no eBay listings to relist")
       listings ->
         Enum.each(listings, fn listing ->
           listing

@@ -1,5 +1,3 @@
-require Logger
-
 defmodule Kamansky.Services.Hipstamp.Listing do
   alias Kamansky.Attachments.Attachment
   alias Kamansky.Operations.Administration
@@ -83,10 +81,10 @@ defmodule Kamansky.Services.Hipstamp.Listing do
   end
 
   @spec description(Listing.t, map) :: String.t
-  defp description(%Listing{stamp: %Stamp{}}, %{"description" => description}), do: description
+  defp description(%Listing{stamp: %Stamp{}}, %{"hipstamp_description" => description}), do: description
   defp description(%Listing{stamp: %Stamp{} = stamp}, _opts), do: suggested_description(stamp)
 
   @spec title(Listing.t, map) :: String.t
-  defp title(%Listing{stamp: %Stamp{}}, %{"title" => title}), do: title
+  defp title(%Listing{stamp: %Stamp{}}, %{"hipstamp_title" => title}), do: title
   defp title(%Listing{stamp: %Stamp{} = stamp}, _opts), do: suggested_title(stamp)
 end

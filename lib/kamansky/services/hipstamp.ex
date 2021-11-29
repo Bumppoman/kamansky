@@ -13,28 +13,15 @@ defmodule Kamansky.Services.Hipstamp do
   plug Tesla.Middleware.Query, [api_key: Application.get_env(:kamansky, :hipstamp_api_key)]
 
   @spec condition(Stamp.t) :: String.t
-  def condition(%Stamp{hinged: hinged, hinge_remnant: hinge_remnant, no_gum: no_gum}) when
-    hinged == true or hinge_remnant == true or no_gum == true
-  do
-    "unused"
-  end
+  def condition(%Stamp{hinged: hinged, hinge_remnant: hinge_remnant, no_gum: no_gum}) when hinged == true or hinge_remnant == true or no_gum == true, do: "unused"
   def condition(%Stamp{}), do: "mint-nh"
 
   @spec format(Stamp.t) :: String.t
-  def format(%Stamp{format: format}) do
-    case format do
-      f when f in [:block, :mail_early_block] ->
-        "block"
-      :plate_block ->
-        "plate-block"
-      :pair ->
-        "pair"
-      :souvenir_sheet ->
-        "souvenir-sheet"
-      _ ->
-        "single"
-    end
-  end
+  def format(%Stamp{format: format}) when format in [:block, :mail_early_block, :zip_block], do: "block"
+  def format(%Stamp{format: :plate_block}), do: "plate-block"
+  def format(%Stamp{format: :pair}), do: "pair"
+  def format(%Stamp{format: :souvenir_sheet}), do: "souvenir-sheet"
+  def format(%Stamp{}), do: "single"
 
   @spec grade(Stamp.t) :: String.t
   def grade(%Stamp{grade: grade}) do
