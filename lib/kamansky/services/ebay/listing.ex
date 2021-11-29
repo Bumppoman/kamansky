@@ -203,7 +203,7 @@ defmodule Kamansky.Services.Ebay.Listing do
     end
   end
 
-  @spec maybe_remove_listing(Listing.t) :: Listing.t
+  @spec maybe_remove_listing(Listing.t) :: {:ebay_removed | :noop, Listing.t}
   def maybe_remove_listing(%Listing{} = listing) do
     with %EbayListing{ebay_id: ebay_id} = ebay_listing <- Platforms.get_ebay_listing_for_listing(listing),
       response <-
@@ -228,12 +228,12 @@ defmodule Kamansky.Services.Ebay.Listing do
       |> case do
         %{outcome: "Success"} ->
           Platforms.delete_external_listing(ebay_listing)
-          listing
+          {:ebay_removed, listing}
 
         _ -> {:error, %{code: :ebay_remove_listing_error, dump: response}}
       end
     else
-      _ -> listing
+      _ -> {:noop, listing}
     end
   end
 

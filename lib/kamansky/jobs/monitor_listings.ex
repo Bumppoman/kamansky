@@ -46,7 +46,12 @@ defmodule Kamansky.Jobs.MonitorListings do
             {:error, _changeset} -> Logger.error("Kamansky.Jobs.MonitorListings: error loading eBay bid")
           end
 
-          Hipstamp.Listing.maybe_remove_listing(listing.listing)
+          listing.listing
+          |> Hipstamp.Listing.maybe_remove_listing()
+          |> case do
+            {:hipstamp_removed, listing} -> Logger.info("Kamansky.Jobs.MonitorListings:  removed Hipstamp listing for listing #{listing.id}")
+            {:noop, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: no Hipstamp listing to remove for listing #{listing.id}")
+          end
         end
       end
     )

@@ -52,15 +52,15 @@ defmodule Kamansky.Jobs.MonitorOrders do
 
             order
             |> Kamansky.Services.Order.maybe_delist_listings()
-            |> case do
-              [] -> Logger.info("Kamansky.Jobs.MonitorOrders: no listings to delist")
-              listings -> Enum.each(
-                listings,
-                fn {type, listing} ->
-                  Logger.info("Kamansky.Jobs.MonitorOrders: delisted #{type} listing for listing #{listing.id}")
+            |> Enum.each(
+              fn {action, listing} ->
+                case action do
+                  :ebay_removed -> Logger.info("Kamansky.Jobs.MonitorOrders: delisted eBay listing for listing #{listing.id} (order #{order.id})")
+                  :hipstamp_removed -> Logger.info("Kamansky.Jobs.MonitorOrders: delisted Hipstamp listing for listing #{listing.id} (order #{order.id})")
+                  :noop -> Logger.info("Kamansky.Jobs.MonitorOrders: no listings to delist for listing #{listing.id} (order #{order.id})")
                 end
-              )
-            end
+              end
+            )
           end
         )
     end

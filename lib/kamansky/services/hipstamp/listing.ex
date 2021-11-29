@@ -61,14 +61,15 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     )
   end
 
-  @spec maybe_remove_listing(Listing.t) :: Listing.t
+  @spec maybe_remove_listing(Listing.t) :: {:hipstamp_removed | :noop, Listing.t}
   def maybe_remove_listing(%Listing{} = listing) do
     with %HipstampListing{hipstamp_id: hipstamp_id} = hipstamp_listing <- Platforms.get_hipstamp_listing_for_listing(listing) do
       Hipstamp.delete!("/listings/#{hipstamp_id}")
       Platforms.delete_external_listing(hipstamp_listing)
+      {:hipstamp_removed, listing}
+    else
+      _ -> {:noop, listing}
     end
-
-    listing
   end
 
   @spec suggested_description(Stamp.t) :: String.t
