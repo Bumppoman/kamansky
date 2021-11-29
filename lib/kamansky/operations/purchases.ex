@@ -3,7 +3,6 @@ defmodule Kamansky.Operations.Purchases do
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
-  import Kamansky.Helpers, only: [get_value_for_ecto_enum: 3]
 
   alias __MODULE__
   alias Kamansky.Operations.Purchases.Purchase

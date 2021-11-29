@@ -110,15 +110,11 @@ defmodule Kamansky.Sales.Listings do
     |> then(&Paginate.list(Listings, &1, params))
   end
 
-  @spec list_sold_listings(Paginate.params) :: [%Listing{status: :sold}]
-  def list_sold_listings(params) do
+  @spec list_listings_for_order(pos_integer) :: [Listing.t]
+  def list_listings_for_order(order_id) do
     Listing
-    |> where(status: :sold)
-    |> join(:left, [l], s in assoc(l, :stamp))
-    |> join(:left, [l], o in assoc(l, :order))
-    |> maybe_search(params.search)
-    |> preload([l, s, o], [stamp: s, order: {o, :listings}])  # Can't join listings twice for some reason so it's separately loaded
-    |> then(&Paginate.list(Listings, &1, params))
+    |> where(order_id: ^order_id)
+    |> Repo.all()
   end
 
   @spec list_listings_with_bids(Paginate.params) :: [Listing.t]
@@ -129,6 +125,17 @@ defmodule Kamansky.Sales.Listings do
     |> where([l, ..., el], el.bid_count > 0)
     |> maybe_search(params.search)
     |> preload([l, s, el], stamp: s, ebay_listing: el)
+    |> then(&Paginate.list(Listings, &1, params))
+  end
+
+  @spec list_sold_listings(Paginate.params) :: [%Listing{status: :sold}]
+  def list_sold_listings(params) do
+    Listing
+    |> where(status: :sold)
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> join(:left, [l], o in assoc(l, :order))
+    |> maybe_search(params.search)
+    |> preload([l, s, o], [stamp: s, order: {o, :listings}])  # Can't join listings twice for some reason so it's separately loaded
     |> then(&Paginate.list(Listings, &1, params))
   end
 

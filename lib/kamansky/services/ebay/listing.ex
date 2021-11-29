@@ -203,22 +203,38 @@ defmodule Kamansky.Services.Ebay.Listing do
     end
   end
 
-  @spec remove_listing(Listing.t) :: :ok
-  def remove_listing(%Listing{ebay_listing: %EbayListing{ebay_id: ebay_id}}) do
-    """
-    <?xml version="1.0" encoding="utf-8"?>
-    <EndItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-      #{Ebay.requester_credentials()}
-      <ItemID>#{ebay_id}</ItemID>
-      <EndingReason>NotAvailable</EndingReason>
-    </EndItemRequest>
-    """
-    |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "EndItem"}]))
-    |> Map.get(:body)
-    |> parse(dtd: :none)
-    |> xpath(~x"//EndTime"s)
+  @spec maybe_remove_listing(Listing.t) :: Listing.t
+  def maybe_remove_listing(%Listing{} = listing) do
+    with %EbayListing{ebay_id: ebay_id} = ebay_listing <- Platforms.get_ebay_listing_for_listing(listing),
+      response <-
+        """
+        <?xml version="1.0" encoding="utf-8"?>
+        <EndItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+          #{Ebay.requester_credentials()}
+          <ItemID>#{ebay_id}</ItemID>
+          <EndingReason>NotAvailable</EndingReason>
+        </EndItemRequest>
+        """
+        |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "EndItem"}]))
+        |> Map.get(:body)
+    do
+      response
+      |> parse(dtd: :none)
+      |> xpath(
+        ~x"//EndItemResponse",
+        outcome: ~x".//Ack/text()"s,
+        end_time: ~x".//EndTime/text()"s
+      )
+      |> case do
+        %{outcome: "Success"} ->
+          Platforms.delete_external_listing(ebay_listing)
+          listing
 
-    :ok
+        _ -> {:error, %{code: :ebay_remove_listing_error, dump: response}}
+      end
+    else
+      _ -> listing
+    end
   end
 
   @spec suggested_auction_price(Listing.t) :: Decimal.t

@@ -16,9 +16,8 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     |> Map.get("results")
   end
 
-  @spec list(Listing.t) :: {:ok, HipstampListing.t}
+  @spec list(Listing.t, map) :: {:ok, HipstampListing.t}
   def list(%Listing{stamp: stamp} = listing, opts \\ %{}) do
-
     %{
       listing_type: :product,
       name: title(listing, opts),
@@ -62,15 +61,14 @@ defmodule Kamansky.Services.Hipstamp.Listing do
     )
   end
 
-  @spec maybe_remove_listing(Listing.t) :: :ok
+  @spec maybe_remove_listing(Listing.t) :: Listing.t
   def maybe_remove_listing(%Listing{} = listing) do
     with %HipstampListing{hipstamp_id: hipstamp_id} = hipstamp_listing <- Platforms.get_hipstamp_listing_for_listing(listing) do
       Hipstamp.delete!("/listings/#{hipstamp_id}")
       Platforms.delete_external_listing(hipstamp_listing)
-      Logger.info("Deleted Hipstamp listing for listing #{listing.id}")
     end
 
-    :ok
+    listing
   end
 
   @spec suggested_description(Stamp.t) :: String.t

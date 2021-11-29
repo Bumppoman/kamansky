@@ -5,7 +5,6 @@ defmodule Kamansky.Jobs.MonitorOrders do
 
   alias Kamansky.Operations.Notifications
   alias Kamansky.Operations.Notifications.Notification
-  alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Services.{Ebay, Hipstamp}
 
@@ -44,13 +43,24 @@ defmodule Kamansky.Jobs.MonitorOrders do
         Enum.each(
           orders,
           fn order ->
-            Orders.maybe_delist_listings(order)
             {:ok, notification} =
               Notifications.send_notification(
                 notification_topic(order),
                 order.id
               )
             Logger.info("Kamansky.Jobs.MonitorOrders: " <> Notification.body(notification, order))
+
+            order
+            |> Kamansky.Services.Order.maybe_delist_listings()
+            |> case do
+              [] -> Logger.info("Kamansky.Jobs.MonitorOrders: no listings to delist")
+              listings -> Enum.each(
+                listings,
+                fn {type, listing} ->
+                  Logger.info("Kamansky.Jobs.MonitorOrders: delisted #{type} listing for listing #{listing.id}")
+                end
+              )
+            end
           end
         )
     end
