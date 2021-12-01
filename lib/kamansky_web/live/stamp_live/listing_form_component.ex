@@ -13,15 +13,22 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
   @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
   def update(%{trigger_params: %{"stamp-id" => stamp_id}} = assigns, socket) do
     with stamp <- Stamps.get_stamp_with_reference(stamp_id),
-      listing <- %Listing{}
+      listing <- %Listing{},
+      socket <-
+        socket
+        |> assign(:suggested_ebay_description, Services.Ebay.Listing.suggested_description(stamp))
+        |> assign(:suggested_ebay_title, Services.Ebay.Listing.suggested_title(stamp))
+        |> assign(:suggested_hipstamp_description, Services.Hipstamp.Listing.suggested_description(stamp))
+        |> assign(:suggested_hipstamp_title, Services.Hipstamp.Listing.suggested_title(stamp))
     do
       socket
       |> assign(assigns)
-      |> assign(:changeset, Listings.change_listing(listing))
-      |> assign(:ebay_description, Services.Ebay.Listing.suggested_description(stamp))
-      |> assign(:ebay_title, Services.Ebay.Listing.suggested_title(stamp))
-      |> assign(:hipstamp_description, Services.Hipstamp.Listing.suggested_description(stamp))
-      |> assign(:hipstamp_title, Services.Hipstamp.Listing.suggested_title(stamp))
+      |> assign(:changeset,
+        listing
+        |> Listings.change_listing()
+        |> maybe_put_ebay_suggested_values(socket)
+        |> maybe_put_hipstamp_suggested_values(socket)
+      )
       |> assign(:listing, listing)
       |> assign(:stamp, stamp)
       |> ok()
@@ -34,6 +41,8 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
     socket.assigns.listing
     |> Listings.change_listing(listing_params)
     |> Map.put(:action, :validate)
+    |> maybe_put_ebay_suggested_values(socket)
+    |> maybe_put_hipstamp_suggested_values(socket)
     |> then(&assign(socket, :changeset, &1))
     |> noreply()
   end
@@ -51,6 +60,28 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
           |> push_redirect(to: Routes.listing_active_path(socket, :index, show: listing_id))
           |> noreply()
         end
+    end
+  end
+
+  @spec maybe_put_ebay_suggested_values(Ecto.Changeset.t, Phoenix.LiveView.Socket.t) :: Ecto.Changeset.t
+  defp maybe_put_ebay_suggested_values(changeset, socket) do
+    if Ecto.Changeset.get_field(changeset, :ebay) == true and is_nil(Ecto.Changeset.get_field(changeset, :ebay_title)) do
+      changeset
+      |> Ecto.Changeset.put_change(:ebay_description, socket.assigns.suggested_ebay_description)
+      |> Ecto.Changeset.put_change(:ebay_title, socket.assigns.suggested_ebay_title)
+    else
+      changeset
+    end
+  end
+
+  @spec maybe_put_hipstamp_suggested_values(Ecto.Changeset.t, Phoenix.LiveView.Socket.t) :: Ecto.Changeset.t
+  defp maybe_put_hipstamp_suggested_values(changeset, socket) do
+    if Ecto.Changeset.get_field(changeset, :hipstamp) == true and is_nil(Ecto.Changeset.get_field(changeset, :hipstamp_title)) do
+      changeset
+      |> Ecto.Changeset.put_change(:hipstamp_description, socket.assigns.suggested_hipstamp_description)
+      |> Ecto.Changeset.put_change(:hipstamp_title, socket.assigns.suggested_hipstamp_title)
+    else
+      changeset
     end
   end
 end
