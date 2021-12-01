@@ -38,7 +38,7 @@ defmodule Kamansky.Jobs.MonitorListings do
       fn ebay_listing ->
         listing = Platforms.get_ebay_listing(ebay_listing.ebay_id)
 
-        if listing.bid_count == 0 do
+        if listing.bid_count < ebay_listing.bid_count do
           listing
           |> Platforms.update_external_listing(ebay_listing)
           |> case do
@@ -46,11 +46,13 @@ defmodule Kamansky.Jobs.MonitorListings do
             {:error, _changeset} -> Logger.error("Kamansky.Jobs.MonitorListings: error loading eBay bid")
           end
 
-          listing.listing
-          |> Hipstamp.Listing.maybe_remove_listing()
-          |> case do
-            {:hipstamp_removed, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: removed Hipstamp listing for listing #{listing.id}")
-            {:noop, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: no Hipstamp listing to remove for listing #{listing.id}")
+          if ebay_listing.bid_count == 1 do
+            listing.listing
+            |> Hipstamp.Listing.maybe_remove_listing()
+            |> case do
+              {:hipstamp_removed, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: removed Hipstamp listing for listing #{listing.id}")
+              {:noop, listing} -> Logger.info("Kamansky.Jobs.MonitorListings: no Hipstamp listing to remove for listing #{listing.id}")
+            end
           end
         end
       end

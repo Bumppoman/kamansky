@@ -4,10 +4,10 @@ defmodule Kamansky.Stamps.StampReferences do
 
   @sort_columns [
     :scott_number,
-    [quote(do: dynamic([sr, ..., l], count(l.id)))],
+    [quote(do: dynamic([sr, ..., l], count(l.id))), {:asc, :scott_number}],
     [quote(do: dynamic([sr], fragment("conversion_percentage"))), {:desc, quote(do: dynamic([sr, ..., l], count(l.id)))}, {:asc, :scott_number}],
-    [quote(do: dynamic([sr], fragment("median_sale_price")))],
-    [quote(do: dynamic([sr, s, l], sum(l.sale_price - s.cost - s.purchase_fees)))]
+    [quote(do: dynamic([sr], fragment("median_sale_price"))), {:asc, :scott_number}],
+    [quote(do: dynamic([sr, s, l], sum(l.sale_price - s.cost - s.purchase_fees))), {:asc, :scott_number}]
   ]
   use Kamansky.Paginate
 

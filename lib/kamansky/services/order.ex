@@ -14,12 +14,12 @@ defmodule Kamansky.Services.Order do
   def maybe_delist_listings(%Order{id: order_id, ebay_id: ebay_id, hipstamp_id: nil}) when not is_nil(ebay_id) do
     order_id
     |> Listings.list_listings_for_order()
-    |> Enum.map(&Ebay.Listing.maybe_remove_listing/1)
+    |> Enum.map(&Hipstamp.Listing.maybe_remove_listing/1)
   end
 
   def maybe_delist_listings(%Order{id: order_id, ebay_id: nil, hipstamp_id: hipstamp_id}) when not is_nil(hipstamp_id) do
     order_id
     |> Listings.list_listings_for_order()
-    |> Enum.map(&Hipstamp.Listing.maybe_remove_listing/1)
+    |> Enum.map(&Ebay.Listing.maybe_remove_listing/1)
   end
 end
