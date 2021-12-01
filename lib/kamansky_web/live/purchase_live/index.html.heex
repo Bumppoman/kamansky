@@ -42,7 +42,7 @@
     <:col let={purchase} label="Total Listing Price">
       <%= format_decimal_as_currency(Purchase.total_listing_price(purchase)) %>
     </:col>
-    <:col let={purchase} label="Realized Profit/Loss">
+    <:col let={purchase} label="Realized Profit">
       <%= format_decimal_as_currency(Purchase.realized_profit(purchase)) %>
     </:col>
     <:col let={purchase} label="Potential Profit">

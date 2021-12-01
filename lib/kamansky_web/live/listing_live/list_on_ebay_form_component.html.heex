@@ -8,16 +8,26 @@
     phx_submit="submit"
   >
     <div class="form-group required" x-data="{count: 0}">
-      <%= label f, :title %>
+      <%= label f, :ebay_title %>
       <div class="form-input">
         <%= text_input f, 
-          :title, 
+          :ebay_title, 
           maxlength: 80,
           "x-init": "count = $el.value.length",
           "x-on:change": "count = $el.value.length"
         %>
       </div>
       <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
+    </div>
+    <div class="form-group">
+      <%= label f, :ebay_description, "Description" %>
+      <div class="form-input">
+        <%= textarea f,
+          :ebay_description,
+          rows: 4,
+          class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+        %>
+      </div>
     </div>
     <div class="grid grid-cols-2">
       <div class="form-group required">

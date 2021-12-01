@@ -152,12 +152,12 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> parse(dtd: :none)
     |> xpath(
       ~x"//Item"l,
-      bid_count: ~x".//BidCount/text()"s,
+      bid_count: ~x".//BidCount/text()"i,
       current_bid: ~x".//CurrentPrice/text()"s,
       inventory_key: ~x".//SKU/text()"s,
       ebay_id: ~x".//ItemID/text()"s
     )
-    |> Enum.filter(&(String.to_integer(&1.bid_count) > 0))
+    |> Enum.filter(&(&1.bid_count > 0))
   end
 
   @spec relist(EbayListing.t) :: {:ok, EbayListing.t} | {:error, %{code: :ebay_relist_listing_error, dump: String.t}}

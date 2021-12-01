@@ -29,7 +29,7 @@
       </span>
     </:col>
     <:col let={listing} label="Net Profit/Loss">
-      <span class={if Decimal.gt?(Listing.net_profit(listing), 0), do: "text-green-600", else: "text-red-600"}>
+      <span class={color_for_currency(Listing.net_profit(listing))}>
         <%= format_decimal_as_currency(Listing.net_profit(listing)) %>
       </span>
     </:col>

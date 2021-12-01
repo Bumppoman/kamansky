@@ -3,6 +3,7 @@ defmodule KamanskyWeb.TrendLive.Sold do
   use KamanskyWeb.Paginate, sort: {1, :desc}
 
   import Kamansky.Helpers
+  import KamanskyWeb.Helpers
 
   alias Kamansky.Stamps.StampReferences
 

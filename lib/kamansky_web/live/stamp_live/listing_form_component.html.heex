@@ -59,7 +59,7 @@
     </div>
     <%= if Ecto.Changeset.get_field(@changeset, :ebay) == true do %>
       <h6 class="font-bold mb-2">eBay</h6>
-      <div class="form-group">
+      <div class="form-group" x-data="{count: 0}">
         <%= label f, :ebay_title, "Title" %>
         <div class="form-input">
           <%= text_input f, 
@@ -86,7 +86,7 @@
     <% end %>
     <%= if Ecto.Changeset.get_field(@changeset, :hipstamp) == true do %>
       <h6 class="font-bold mb-2">Hipstamp</h6>
-      <div class="form-group">
+      <div class="form-group" x-data="{count: 0}">
         <%= label f, :hipstamp_title, "Title" %>
         <div class="form-input">
           <%= text_input f, 

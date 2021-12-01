@@ -3,6 +3,7 @@ defmodule KamanskyWeb.ListingLive.Sold do
   use KamanskyWeb.Paginate, sort: {1, :desc}
 
   import Kamansky.Helpers
+  import KamanskyWeb.Helpers
 
   alias Kamansky.Sales.Listings
   alias Kamansky.Sales.Listings.Listing

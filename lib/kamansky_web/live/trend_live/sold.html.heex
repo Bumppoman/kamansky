@@ -20,7 +20,7 @@
       <%= format_decimal_as_currency(stamp.median_sale_price) %>
     </:col>
     <:col let={stamp} label="Total Profit">
-      <%= format_decimal_as_currency(stamp.total_profit) %>
+      <span class={color_for_currency(stamp.total_profit)}><%= format_decimal_as_currency(stamp.total_profit) %></span>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.TrendLive.Components.footer socket={@socket} />
