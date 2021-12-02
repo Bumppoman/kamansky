@@ -1,5 +1,11 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title="Reports" />
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main>
   <div class="mt-4 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
@@ -37,4 +43,4 @@
       </tfoot>
     </table>
   </div>
-</div>
+</main>

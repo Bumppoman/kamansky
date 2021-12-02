@@ -46,6 +46,11 @@ const liveSocket = new LiveSocket('/live', Socket, {
         window.Alpine.clone(from, to);
       }
     },
+    onNodeAdded(node) {
+      if (node._x_dataStack) {
+        window.Alpine.initTree(node);
+      }
+    }
   },
 });
 

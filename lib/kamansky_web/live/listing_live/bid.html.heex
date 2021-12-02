@@ -1,5 +1,11 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title={@page_title} />
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<div class="content">
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}

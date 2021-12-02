@@ -45,7 +45,8 @@ defmodule KamanskyWeb.Components.DataTable do
                       <th
                         scope="col"
                         class={
-                          "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" <>
+                          "px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider " <>
+                            header_align(col) <>
                             (if index == @pagination.sort, do: " sorting-#{@pagination.direction}", else: "")
                         }
                       >
@@ -76,10 +77,10 @@ defmodule KamanskyWeb.Components.DataTable do
                   <% end %>
                 </tbody>
                 <%= if @pagination.total_items > 0 do %>
-                  <tfoot class={if @pagination.total_pages == 1, do: "hidden sm:table-footer-group", else: ""}>
+                  <tfoot class={"bg-gray-50" <> (if @pagination.total_pages == 1, do: " hidden sm:table-footer-group", else: "")}>
                     <tr>
                       <td colspan={Enum.count(@col)}>
-                        <div class="bg-white px-4 flex items-center justify-between sm:px-6">
+                        <div class="px-4 flex items-center justify-between sm:px-6">
                           <div class="flex-1 flex justify-between sm:hidden">
                             <%= live_patch "Previous",
                               to: path(@socket, @live_action, @pagination, page: @pagination.page - 1),
@@ -116,7 +117,7 @@ defmodule KamanskyWeb.Components.DataTable do
                                   <% end %>
                                   <%= page_links(@socket, @live_action, @pagination) %>
                                   <%= live_patch to: path(@socket, @live_action, @pagination, page: @pagination.page + 1),
-                                    class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
+                                    class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
                                       (if @pagination.page == @pagination.total_pages, do: " disabled", else: "")
                                   do %>
                                     <span class="sr-only">Next</span>
@@ -158,6 +159,16 @@ defmodule KamanskyWeb.Components.DataTable do
       end
     end
   end
+
+  defp header_align(%{class: classlist}) when is_binary(classlist) do
+    cond do
+      String.contains?(classlist, "text-center") -> "text-center"
+      String.contains?(classlist, "text-right") -> "text-right"
+      true -> "text-left"
+    end
+  end
+
+  defp header_align(_col), do: "text-left"
 
   @spec link_to_page(Phoenix.LiveView.Socket.t, atom, KamanskyWeb.Paginate.params, pos_integer) :: Phoenix.HTML.safe
   defp link_to_page(socket, action, pagination, page) do

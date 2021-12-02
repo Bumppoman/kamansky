@@ -1,33 +1,39 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title={@page_title}>
-    <:buttons>
-      <KamanskyWeb.Components.Page.header_button
-        color="gray"
-        display={@live_action == :pending}
-        phx-click="load_new_orders"
-      >
-        Load New Orders
-      </KamanskyWeb.Components.Page.header_button>
-      <KamanskyWeb.Components.Page.header_button_with_confirmation
-        color="secondary"
-        display={@live_action == :processed}
-        confirmation_action="mark_all_processed_shipped"
-        confirmation_content="Are you sure you want to mark all processed orders as shipped?"
-        confirmation_external="true"
-        confirmation_title="Mark All as Shipped"
-        confirmation_values={[]}
-      >
-        Mark All as Shipped
-      </KamanskyWeb.Components.Page.header_button_with_confirmation>
-      <KamanskyWeb.Components.Page.header_button
-        display={@live_action == :pending}
-        phx-click="open"
-        phx-target="#new-order-form-modal"
-      >
-        Create Order
-      </KamanskyWeb.Components.Page.header_button>
-    </:buttons>
-  </KamanskyWeb.Components.Page.page_header>
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+>
+  <:buttons>
+    <KamanskyWeb.Components.Page.header_button
+      color="gray"
+      display={@live_action == :pending}
+      phx-click="load_new_orders"
+    >
+      Load New Orders
+    </KamanskyWeb.Components.Page.header_button>
+    <KamanskyWeb.Components.Page.header_button_with_confirmation
+      color="secondary"
+      display={@live_action == :processed}
+      confirmation_action="mark_all_processed_shipped"
+      confirmation_content="Are you sure you want to mark all processed orders as shipped?"
+      confirmation_external="true"
+      confirmation_title="Mark All as Shipped"
+      confirmation_values={[]}
+    >
+      Mark All as Shipped
+    </KamanskyWeb.Components.Page.header_button_with_confirmation>
+    <KamanskyWeb.Components.Page.header_button
+      display={@live_action == :pending}
+      phx-click="open"
+      phx-target="#new-order-form-modal"
+    >
+      Create Order
+    </KamanskyWeb.Components.Page.header_button>
+  </:buttons>
+</.live_component>
+<div class="content">
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}

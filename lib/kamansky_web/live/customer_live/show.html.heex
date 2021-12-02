@@ -1,13 +1,17 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header
-    breadcrumbs={
-      [
-        {"Customer List", Routes.customer_index_path(@socket, :index, show: @customer.id)},
-        "Customer Information"
-      ]
-    }
-    page_title={@page_title} 
-  />
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  breadcrumbs={
+    [
+      {"Customer List", Routes.customer_index_path(@socket, :index, show: @customer.id)},
+      "Customer Information"
+    ]
+  }
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main>
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -26,4 +30,4 @@
       <%= format_decimal_as_currency(Order.total_paid(order)) %>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
-</div>
+</main>

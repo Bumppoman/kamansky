@@ -1,16 +1,22 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title="Expenses">
-    <:buttons>
-      <KamanskyWeb.Components.Page.header_button
-        phx-click="open"
-        phx-target="#expense-form-modal"
-        phx-value-action="new"
-        phx-value-expense-id=""
-      >
-        Add New Expense
-      </KamanskyWeb.Components.Page.header_button>
-    </:buttons>
-  </KamanskyWeb.Components.Page.page_header>
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+>
+  <:buttons>
+    <KamanskyWeb.Components.Page.header_button
+      phx-click="open"
+      phx-target="#expense-form-modal"
+      phx-value-action="new"
+      phx-value-expense-id=""
+    >
+      Add New Expense
+    </KamanskyWeb.Components.Page.header_button>
+  </:buttons>
+</.live_component>
+<main>
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -42,7 +48,7 @@
       </a>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
-</div>
+</main>
 <%= live_modal KamanskyWeb.ExpenseLive.FormComponent,
   id: "expense-form-modal",
   form_id: "expense-form"

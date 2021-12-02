@@ -1,5 +1,11 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title="Customers" />
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main>
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -33,7 +39,7 @@
       </a>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
-</div>
+</main>
 <%= live_modal KamanskyWeb.CustomerLive.FormComponent,
   id: "edit-customer-form-modal",
   form_id: "customer-form"

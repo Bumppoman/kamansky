@@ -1,5 +1,11 @@
-<div class="h-full">
-  <KamanskyWeb.Components.Page.page_header page_title="User Settings" />
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main class="h-full">
   <div class="mt-4 lg:grid lg:grid-cols-12 lg:gap-x-5">
     <aside class="py-6 px-2 sm:px-6 lg:py-0 lg:px-0 lg:col-span-3">
       <nav class="space-y-1">
@@ -72,4 +78,4 @@
       </.form>
     </div>
   </div>
-</div>
+</main>

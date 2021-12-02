@@ -10,12 +10,12 @@
     <link rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")} />
     <script defer type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
   </head>
-  <body class="bg-gray-200 text-gray-700 text-sm">
+  <body class="bg-gray-100 text-gray-700 text-sm">
     <%= @inner_content %>
     <%= if @current_user do %>
       <%= live_render @conn, KamanskyWeb.NotificationLive.Notifications %>
     <% end %>
-    <footer class="font-extralight text-center text-xs">
+    <footer class="font-extralight mb-4 text-center text-xs">
       © 2021 Brendon Stanton and Bumppoman Industries.
     </footer>
   </body>

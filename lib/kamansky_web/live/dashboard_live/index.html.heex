@@ -1,5 +1,11 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title="Dashboard" />
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main>
   <div class="mt-4">
     <div class="px-4 sm:px-6 lg:px-8">
       <h2 class="text-lg leading-6 font-medium text-gray-900">Overview</h2>
@@ -274,4 +280,4 @@
       </div>
     </div>
   </div>
-</div>
+</main>

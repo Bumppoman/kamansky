@@ -1,17 +1,23 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title={@page_title}>
-    <:buttons>
-      <KamanskyWeb.Components.Page.header_button
-        phx-click="open"
-        phx-target="#stamp-form-modal"
-        phx-value-action="new"
-        phx-value-stamp-id=""
-        phx-value-status={@live_action}
-      >
-        Add New Stamp
-      </KamanskyWeb.Components.Page.header_button>
-    </:buttons>
-  </KamanskyWeb.Components.Page.page_header>
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+>
+  <:buttons>
+    <KamanskyWeb.Components.Page.header_button
+      phx-click="open"
+      phx-target="#stamp-form-modal"
+      phx-value-action="new"
+      phx-value-stamp-id=""
+      phx-value-status={@live_action}
+    >
+      Add New Stamp
+    </KamanskyWeb.Components.Page.header_button>
+  </:buttons>
+</.live_component>
+<div class="content">
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}

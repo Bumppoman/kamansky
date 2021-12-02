@@ -17,6 +17,7 @@ defmodule KamanskyWeb.ReportLive.Index do
       {{:totals, totals}, reports} <- List.pop_at(reports, 0)
     do
       socket
+      |> assign(:page_title, "Reports")
       |> assign(:reports, reports)
       |> assign(:totals, totals)
       |> noreply()

@@ -1,11 +1,3 @@
-<.live_component 
-  module={KamanskyWeb.Components.Header} 
-  id="kamansky-header"
-  current_user={@current_user}
-  live_action={@live_action}
-/>
-<main role="main" class="bg-white mx-auto my-3 p-8 w-11/12">
-  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
-  <%= @inner_content %>
-  <KamanskyWeb.Components.Page.confirmation_modal />
-</main>
+<KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+<%= @inner_content %>
+<KamanskyWeb.Components.Page.confirmation_modal />

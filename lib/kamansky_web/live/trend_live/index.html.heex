@@ -1,5 +1,11 @@
-<div>
-  <KamanskyWeb.Components.Page.page_header page_title="Trends" />
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main>
   <div class="grid grid-cols-3 mt-4">
     <div>
       <h4 class="font-medium text-xl">Hinged/Never Hinged</h4>
@@ -90,4 +96,4 @@
     </div>
   </div>
   <KamanskyWeb.TrendLive.Components.footer socket={@socket} />
-</div>
+</main>

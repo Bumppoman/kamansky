@@ -66,6 +66,10 @@
   h5 {
     @apply text-lg;
   }
+
+  main {
+    @apply container mx-auto my-3 px-6 py-6 lg:px-8 lg:py-4;
+  }
 }
 
 @layer components {
@@ -79,6 +83,10 @@
   
   .btn-gray {
     @apply bg-gray-500 text-white;
+  }
+
+  .content {
+    @apply container mx-auto my-3 px-6 py-6 lg:px-8 lg:py-4;
   }
   
   .modal-open {
@@ -116,10 +124,10 @@
     }
     
     tr.even {
-      @apply bg-warm-gray-100;
+      @apply bg-gray-50;
       
       td.sorting {
-        @apply bg-warm-gray-200;
+        @apply bg-gray-100;
       }
     }
     
