@@ -17,7 +17,8 @@
     </KamanskyWeb.Components.Page.header_button>
   </:buttons>
 </.live_component>
-<div class="content">
+<main>
+  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -83,7 +84,7 @@
       live_action={@live_action}
     />
   <% end %>
-</div>
+</main>
 <%= live_modal KamanskyWeb.StampLive.FormComponent,
   id: "stamp-form-modal",
   form_id: "stamp-form" 

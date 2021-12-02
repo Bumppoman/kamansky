@@ -5,7 +5,8 @@
   live_action={@live_action}
   page_title={@page_title}
 />
-<div class="content">
+<main>
+  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -41,7 +42,7 @@
     </:col>
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
-</div>
+</main>
 <.live_component
   module={KamanskyWeb.StampLive.DetailComponent}
   id="stamp-detail-modal"

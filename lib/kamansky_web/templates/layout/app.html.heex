@@ -27,5 +27,6 @@
   </nav>
 </header>
 <main role="main" class="bg-white mx-auto my-3 p-8 w-11/12">
+  <KamanskyWeb.Components.Page.flash flash={get_flash(@conn, :info)} />
   <%= @inner_content %>
 </main>

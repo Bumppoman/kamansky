@@ -24,6 +24,7 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
   def handle_event("close", _, socket), do: {:noreply, assign(socket, :open, false)}
   def handle_event("open", %{"stamp-id" => stamp_id}, socket) do
     socket
+    |> assign(:current_photo, "front")
     |> assign(:open, true)
     |> assign(:stamp, Stamps.get_stamp_detail!(stamp_id))
     |> noreply()

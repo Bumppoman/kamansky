@@ -16,7 +16,8 @@
     </KamanskyWeb.Components.Page.header_button>
   </:buttons>
 </.live_component>
-<div class="content">
+<main>
+  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -66,7 +67,7 @@
       </a>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
-</div>
+</main>
 <%= live_modal KamanskyWeb.PurchaseLive.FormComponent,
   id: "purchase-form-modal",
   form_id: "purchase-form"

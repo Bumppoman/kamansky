@@ -6,7 +6,7 @@ defmodule KamanskyWeb.UserSessionController do
 
   @spec new(Plug.Conn.t, map) :: Plug.Conn.t
   def new(conn, _params) do
-    render(conn, "new.html", page_title: "Login", error_message: nil)
+    render(conn, "new.html", page_title: "Sign in")
   end
 
   @spec create(Plug.Conn.t, map) :: Plug.Conn.t
@@ -17,14 +17,16 @@ defmodule KamanskyWeb.UserSessionController do
       UserAuth.log_in_user(conn, user, user_params)
     else
       # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
-      render(conn, "new.html", page_title: "Login", error_message: "Invalid email or password")
+      conn
+      |> put_flash(:info, %{type: :error, message: "Invalid email or password", timestamp: DateTime.utc_now()})
+      |> render("new.html", page_title: "Sign in")
     end
   end
 
   @spec delete(Plug.Conn.t, map) :: Plug.Conn.t
   def delete(conn, _params) do
     conn
-    |> put_flash(:info, "Logged out successfully.")
+    |> put_flash(:info, %{type: :success, message: "Logged out successfully.", timestamp: DateTime.utc_now()})
     |> UserAuth.log_out_user()
   end
 end

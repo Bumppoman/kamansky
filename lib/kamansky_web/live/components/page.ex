@@ -116,7 +116,7 @@ defmodule KamanskyWeb.Components.Page do
     <%= if @flash do %>
       <div
         id="kamansky-flash"
-        class={"mx-auto px-4 py-4 rounded-md w-9/12 " <> flash_background_color(@flash.type)}
+        class={"mb-4 mx-auto px-4 py-4 rounded-md w-9/12 " <> flash_background_color(@flash.type)}
         phx-hook="flash"
         phx-value-type={@flash.type}
         x-data={

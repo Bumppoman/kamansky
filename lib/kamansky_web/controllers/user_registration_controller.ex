@@ -20,7 +20,7 @@ defmodule KamanskyWeb.UserRegistrationController do
           )
 
         conn
-        |> put_flash(:info, "User created successfully.")
+        |> put_flash(:info, %{type: :success, message: "User created successfully.", timestamp: DateTime.utc_now()})
         |> UserAuth.log_in_user(user)
 
       {:error, %Ecto.Changeset{} = changeset} ->

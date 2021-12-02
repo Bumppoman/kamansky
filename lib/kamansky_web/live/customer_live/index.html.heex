@@ -6,6 +6,7 @@
   page_title={@page_title}
 />
 <main>
+  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
