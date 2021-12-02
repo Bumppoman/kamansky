@@ -20,8 +20,8 @@
     <section aria-labelledby="stamps-heading" class="mt-6">
       <h2 id="stamps-heading" class="sr-only">Stamps purchased</h2>
       <div class="space-y-8">
-        <%= for listing <- @order.listings do %>
-          <div class="bg-white border-t border-b border-gray-200 shadow-sm sm:border sm:rounded-lg">
+        <div class="bg-white border-t border-b border-gray-200 shadow-sm sm:border sm:rounded-lg">
+          <%= for listing <- @order.listings do %>
             <div class="py-6 px-4 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-x-8 lg:p-8">
               <div class="sm:flex lg:col-span-7">
                 <div class="flex-shrink-0 w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden sm:aspect-none sm:w-24 sm:h-24">
@@ -44,27 +44,26 @@
                 </div>
               </div>
             </div>
-
-            <div class="border-t border-gray-200 py-6 px-4 sm:px-6 lg:p-8">
-              <h4 class="sr-only">Status</h4>
-              <p class="text-sm font-medium text-gray-900">
-                <% IO.inspect order_status_width(@order) %>
-                <%= order_status_text(@order) %> on <time datetime={order_status_time(@order)}><%= formatted_date(order_status_time(@order)) %></time>
-              </p>
-              <div class="mt-6" aria-hidden="true">
-                <div class="bg-gray-200 rounded-full overflow-hidden">
-                  <div class={"h-2 bg-indigo-600 rounded-full " <> order_status_width(@order)}></div>
-                </div>
-                <div class="hidden sm:grid grid-cols-4 text-sm font-medium text-gray-600 mt-6">
-                  <div>Order placed<br /><%= formatted_date(@order.ordered_at) %></div>
-                  <div class="text-center">Processed<br /><%= formatted_date(@order.processed_at) %></div>
-                  <div class="text-center">Shipped<br /><%= formatted_date(@order.shipped_at) %></div>
-                  <div class="text-right">Completed<br /><%= formatted_date(@order.completed_at) %></div>
-                </div>
+          <% end %>
+          <div class="border-t border-gray-200 py-6 px-4 sm:px-6 lg:p-8">
+            <h4 class="sr-only">Status</h4>
+            <p class="text-sm font-medium text-gray-900">
+              <% IO.inspect order_status_width(@order) %>
+              <%= order_status_text(@order) %> on <time datetime={order_status_time(@order)}><%= formatted_date(order_status_time(@order)) %></time>
+            </p>
+            <div class="mt-6" aria-hidden="true">
+              <div class="bg-gray-200 rounded-full overflow-hidden">
+                <div class={"h-2 bg-indigo-600 rounded-full " <> order_status_width(@order)}></div>
+              </div>
+              <div class="hidden sm:grid grid-cols-4 text-sm font-medium text-gray-600 mt-6">
+                <div>Order placed<br /><%= formatted_date(@order.ordered_at) %></div>
+                <div class="text-center">Processed<br /><%= formatted_date(@order.processed_at) %></div>
+                <div class="text-center">Shipped<br /><%= formatted_date(@order.shipped_at) %></div>
+                <div class="text-right">Completed<br /><%= formatted_date(@order.completed_at) %></div>
               </div>
             </div>
           </div>
-        <% end %>
+        </div>
       </div>
     </section>
     <section aria-labelledby="summary-heading" class="mt-16">
