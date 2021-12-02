@@ -42,7 +42,7 @@
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
 </div>
-<%= live_modal KamanskyWeb.StampLive.DetailComponent,
-  id: "stamp-detail-modal",
-  footer: false 
-%>
+<.live_component
+  module={KamanskyWeb.StampLive.DetailComponent}
+  id="stamp-detail-modal"
+/>
