@@ -84,10 +84,6 @@
     />
   <% end %>
 </div>
-<%= live_modal KamanskyWeb.StampLive.DetailComponent,
-  id: "stamp-detail-modal",
-  footer: false
-%>
 <%= live_modal KamanskyWeb.StampLive.FormComponent,
   id: "stamp-form-modal",
   form_id: "stamp-form" 
@@ -97,3 +93,6 @@
   form_id: "listing-form",
   external: true
 %>
+<.live_component module={KamanskyWeb.StampLive.DetailComponent}
+  id="stamp-detail-modal"
+/>

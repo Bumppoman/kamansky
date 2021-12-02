@@ -1,7 +1,7 @@
 defmodule KamanskyWeb.StampLive.DetailComponent do
   use KamanskyWeb, :live_component
 
-  import Kamansky.Helpers
+  import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
 
   alias Kamansky.Attachments.Attachment
   alias Kamansky.Stamps
@@ -10,37 +10,29 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
 
   @impl true
   @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{trigger_params: %{"stamp-id" => stamp_id}} = assigns, socket) do
-    with socket <- assign(socket, assigns),
-      stamp <- Stamps.get_stamp_detail!(stamp_id),
-      socket <- assign(socket, :stamp, stamp)
-    do
-      socket
-      |> assign(:current_photo, current_photo("front", socket))
-      |> ok()
-    end
+  def update(assigns, socket) do
+    socket
+    |> assign(assigns)
+    |> assign(:current_photo, "front")
+    |> assign_new(:open, fn -> false end)
+    |> ok()
   end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_event("change_photo", %{"display" => display}, socket), do: {:noreply, assign(socket, :current_photo, current_photo(display, socket))}
-
-  @spec current_photo(
-    String.t,
-    %Phoenix.LiveView.Socket{
-      assigns: %{
-        required(:stamp) => %Stamp{
-          front_photo: Kamansky.Attachments.Attachment.t | nil,
-          rear_photo: Kamansky.Attachments.Attachment.t | nil
-        }
-      }
-    }
-  ) :: {:blank, String.t} | {:front, String.t} | {:rear, String.t}
-  def current_photo(_display, %{assigns: %{stamp: %Stamp{front_photo: nil, rear_photo: nil}}} = socket) do
-    {:blank, Routes.static_path(socket, "/images/blank-stamp.png")}
+  def handle_event("change_photo", %{"display" => display}, socket), do: {:noreply, assign(socket, :current_photo, display)}
+  def handle_event("close", _, socket), do: {:noreply, assign(socket, :open, false)}
+  def handle_event("open", %{"stamp-id" => stamp_id}, socket) do
+    socket
+    |> assign(:open, true)
+    |> assign(:stamp, Stamps.get_stamp_detail!(stamp_id))
+    |> noreply()
   end
-  def current_photo("rear", %{assigns: %{stamp: %Stamp{rear_photo: rear_photo}}}), do: {:rear, Attachment.path(rear_photo)}
-  def current_photo("front", %{assigns: %{stamp: %Stamp{front_photo: front_photo}}}), do: {:front, Attachment.path(front_photo)}
+
+  @spec current_photo(Phoenix.LiveView.Socket.t, Stamp.t, String.t) :: String.t
+  def current_photo(socket, %Stamp{front_photo: nil, rear_photo: nil}, _display), do: Routes.static_path(socket, "/images/blank-stamp.png")
+  def current_photo(_socket, %Stamp{rear_photo: rear_photo}, "rear"), do: Attachment.path(rear_photo)
+  def current_photo(_socket, %Stamp{front_photo: front_photo}, "front"), do: Attachment.path(front_photo)
 
   @spec display_photo_nav(Stamp.t) :: boolean
   def display_photo_nav(%Stamp{front_photo: nil}), do: false

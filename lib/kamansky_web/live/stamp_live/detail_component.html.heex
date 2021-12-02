@@ -1,57 +1,138 @@
-<div class="flex" x-init="title = 'View Stamp'">
-  <div class="mr-8">
-    <div>
-      <img
-        class="h-52 max-w-max"
-        src={elem(@current_photo, 1)}
-      />
-      <%= if display_photo_nav(@stamp) do %>
-        <div class="text-center mt-2">
-          <a
-            href="#"
-            class={"photo-display-link" <> (if elem(@current_photo, 0) != :rear, do: " font-bold", else: "")}
-            phx-click="change_photo"
-            phx-target={@myself}
-            phx-value-display="front"
-          >Front</a>
-          |
-          <a
-            href="#"
-            class={"photo-display-link" <> (if elem(@current_photo, 0) == :rear, do: " font-bold", else: "")}
-            phx-click="change_photo"
-            phx-target={@myself}
-            phx-value-display="rear"
-          >Rear</a>
+<div id={@id}>
+  <%= if @open == true do %>
+    <div 
+      class="fixed z-10 inset-0 overflow-y-auto" 
+      role="dialog" 
+      aria-modal="true"
+      phx-hook="modalInit"
+      phx-target={"##{@id}"}
+      x-data="{open: false}" 
+      x-init={
+        "() => {
+          $nextTick(() => open = true);
+          $watch('open', isOpen => $dispatch('kamansky:toggle-modal', { open: isOpen, id: '##{@id}' }));
+        }"
+      }
+      x-on:phx:kamansky:close-modal.camel.window="open = false"
+      x-show="open"
+    >
+      <div class="flex min-h-screen text-center md:block md:px-2 lg:px-4" style="font-size: 0;">
+        <div 
+          class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity md:block" 
+          aria-hidden="true"
+          x-show="open"
+          x-transition:enter="ease-out duration-300"
+          x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100"
+          x-transition:leave="ease-in duration-200"
+          x-transition:leave-start="opacity-100"
+          x-transition:leave-end="opacity-0"
+        />
+
+        <!-- This element is to trick the browser into centering the modal contents. -->
+        <span class="hidden md:inline-block md:align-middle md:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div 
+          class="flex text-base text-left transform transition w-full md:inline-block md:max-w-2xl md:px-4 md:my-8 md:align-middle lg:max-w-4xl"
+          x-show="open"
+          x-transition:enter="ease-out duration-300"
+          x-transition:enter-start="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
+          x-transition:enter-end="opacity-100 translate-y-0 md:scale-100"
+          x-transition:leave="ease-in duration-200"
+          x-transition:leave-start="opacity-100 translate-y-0 md:scale-100"
+          x-transition:leave-end="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
+        >
+          <div class="w-full relative flex items-center bg-white px-4 pt-14 pb-8 overflow-hidden shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
+            <button 
+              type="button" 
+              class="absolute top-4 right-4 text-gray-400 hover:text-gray-500 sm:top-8 sm:right-6 md:top-6 md:right-6 lg:top-8 lg:right-8"
+              x-on:click="open = false"
+            >
+              <span class="sr-only">Close</span>
+              <!-- Heroicon name: outline/x -->
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div class="w-full grid grid-cols-1 gap-y-8 gap-x-6 items-start sm:grid-cols-12 lg:gap-x-8">
+              <div class="sm:col-span-4 lg:col-span-5">
+                <div class="aspect-w-1 aspect-h-1 rounded-lg bg-gray-100 overflow-hidden">
+                  <img src={current_photo(@socket, @stamp, @current_photo)} class="object-center object-cover">
+                </div>
+                <%= if display_photo_nav(@stamp) do %>
+                  <div class="text-center mt-2">
+                    <a
+                      href="#"
+                      class={"photo-display-link" <> (if @current_photo != "rear", do: " font-bold", else: "")}
+                      phx-click="change_photo"
+                      phx-target={@myself}
+                      phx-value-display="front"
+                    >Front</a>
+                    |
+                    <a
+                      href="#"
+                      class={"photo-display-link" <> (if @current_photo == "rear", do: " font-bold", else: "")}
+                      phx-click="change_photo"
+                      phx-target={@myself}
+                      phx-value-display="rear"
+                    >Rear</a>
+                  </div>
+                <% end %>
+              </div>
+              <div class="sm:col-span-8 lg:col-span-7">
+                <h2 class="text-2xl font-extrabold text-gray-900 sm:pr-12"><%= StampReference.description(@stamp.stamp_reference) %></h2>
+                <section aria-labelledby="information-heading" class="mt-3">
+                  <h3 id="information-heading" class="sr-only">Stamp information</h3>
+                  <div class="mt-6">
+                    <h4 class="sr-only">Details</h4>
+                    <p class="text-sm text-gray-700">
+                      <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+                        <dl class="sm:divide-y sm:divide-gray-200">
+                          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              Grade
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              <%= Stamp.formatted_grade(@stamp) %>
+                            </dd>
+                          </div>
+                          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              Cost
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              <%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %>
+                              (<%= format_decimal_as_currency(@stamp.cost) %> stamp/<%= format_decimal_as_currency(@stamp.purchase_fees) %> fees)
+                            </dd>
+                          </div>
+                          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              History
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              <%= raw formatted_history(@stamp) %>
+                            </dd>
+                          </div>
+                          <%= if @stamp.inventory_key do %>
+                            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                              <dt class="text-sm font-medium text-gray-500">
+                                Inventory key
+                              </dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <%= @stamp.inventory_key %>
+                              </dd>
+                            </div>
+                          <% end %>
+                        </dl>
+                      </div>
+                    </p>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
         </div>
-      <% end %>
+      </div>
     </div>
-  </div>
-  <div class="flex-grow">
-    <h4 class="text-2xl"><%= StampReference.description(@stamp.stamp_reference) %></h4>
-    <table class="mt-4 w-full">
-      <tbody>
-        <tr class="border-b">
-          <th class="p-2 text-left">Grade</th>
-          <td><%= Stamp.formatted_grade(@stamp) %></td>
-        </tr>
-        <tr class="border-b">
-          <th class="p-2 text-left">Cost</th>
-          <td>
-            <%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %>
-            (<%= format_decimal_as_currency(@stamp.cost) %> stamp/<%= format_decimal_as_currency(@stamp.purchase_fees) %> fees)
-          </td>
-        </tr>
-        <tr class="border-b">
-          <th class="p-2 text-left">History</th>
-          <td><%= raw formatted_history(@stamp) %></td>
-        </tr>
-        <%= if @stamp.inventory_key do %>
-          <tr class="border-b">
-            <th class="p-2 text-left">Inventory Key</th>
-            <td><%= @stamp.inventory_key %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+  <% end %>
 </div>
