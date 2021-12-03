@@ -13,13 +13,13 @@
         <div class="bg-white overflow-hidden shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
+              <div class="w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-gray-500 truncate">
                     Collection
                   </dt>
                   <dd>
-                    <div class="text-lg font-medium text-gray-900">
+                    <div class="font-medium mt-2 text-center text-gray-900 text-4xl">
                       <%= format_decimal_as_currency(@data.collection_stamp_cost) %>
                     </div>
                   </dd>
@@ -31,13 +31,13 @@
         <div class="bg-white overflow-hidden shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
+              <div class="w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-gray-500 truncate">
                     Stock
                   </dt>
                   <dd>
-                    <div class="text-lg font-medium text-gray-900">
+                    <div class="font-medium mt-2 text-center text-gray-900 text-4xl">
                       <%= format_decimal_as_currency(@data.stock_stamp_cost) %>
                     </div>
                   </dd>
@@ -49,15 +49,21 @@
         <div class="bg-white overflow-hidden shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
+              <div class="w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-gray-500 truncate">
                     Listings
                   </dt>
                   <dd>
-                    <div class="text-lg font-medium text-gray-900">
-                      <%= format_decimal_as_currency(@data.listed_stamp_cost) %> <span class="text-gray-500 text-sm">(cost)</span> /
-                      <%= format_decimal_as_currency(@data.total_listing_price) %> <span class="text-gray-500 text-sm">(listed)</span>
+                    <div class="ml-2 mt-2">
+                      <div class="items-center grid grid-cols-2">
+                        <div class="text-gray-500 text-sm">Cost</div>
+                        <div class="text-lg font-medium text-gray-900"><%= format_decimal_as_currency(@data.listed_stamp_cost) %></div>
+                      </div>
+                      <div class="items-center grid grid-cols-2">
+                        <div class="text-gray-500 text-sm">Listed Value</div>
+                        <div class="text-lg font-medium text-gray-900"><%= format_decimal_as_currency(@data.total_listing_price) %></div>
+                      </div>
                     </div>
                   </dd>
                 </dl>
@@ -68,15 +74,21 @@
         <div class="bg-white overflow-hidden shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
+              <div class="w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-gray-500 truncate">
                     Sales
                   </dt>
                   <dd>
-                    <div class="text-lg font-medium text-gray-900">
-                      <%= format_decimal_as_currency(@data.total_gross_profit) %> <span class="text-gray-500 text-sm">(gross)</span> /
-                      <%= format_decimal_as_currency(@total_net_profit) %> <span class="text-gray-500 text-sm">(net)</span>
+                    <div class="ml-2 mt-2">
+                      <div class="items-center grid grid-cols-2">
+                        <div class="text-gray-500 text-sm">Gross</div>
+                        <div class="font-medium text-gray-900 text-lg"><%= format_decimal_as_currency(@data.total_gross_profit) %></div>
+                      </div>
+                      <div class="items-center grid grid-cols-2">
+                        <div class="text-gray-500 text-sm">Net</div>
+                        <div class="font-medium text-gray-900 text-lg"><%= format_decimal_as_currency(@total_net_profit) %></div>
+                      </div>
                     </div>
                   </dd>
                 </dl>
@@ -132,7 +144,7 @@
                     </dd>
                   </div>
                 </dl>
-                <dl>
+                <dl class="mt-2">
                   <dt class="text-sm font-medium text-gray-500 truncate">
                       Orders
                     </dt>
@@ -194,7 +206,7 @@
                     </dd>
                   </div>
                 </dl>
-                <dl>
+                <dl class="mt-2">
                   <dt class="text-sm font-medium text-gray-500 truncate">
                       Orders
                     </dt>
