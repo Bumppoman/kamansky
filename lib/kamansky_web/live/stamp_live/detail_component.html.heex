@@ -57,8 +57,8 @@
             </button>
             <div class="w-full grid grid-cols-1 gap-y-8 gap-x-6 items-start sm:grid-cols-12 lg:gap-x-8">
               <div class="flex flex-col h-full sm:col-span-4 lg:col-span-5">
-                <div class="aspect-h-1 rounded-lg bg-gray-100 flex-grow overflow-hidden">
-                  <img src={current_photo(@socket, @stamp, @current_photo)} class="object-center">
+                <div class="aspect-h-1 rounded-lg bg-gray-100 flex flex-grow overflow-hidden">
+                  <img src={current_photo(@socket, @stamp, @current_photo)} class="my-auto object-center">
                 </div>
                 <%= if display_photo_nav(@stamp) do %>
                   <div class="text-center mt-2">

@@ -1,24 +1,11 @@
 defmodule KamanskyWeb.CustomerLive.FormComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   import Kamansky.Helpers
 
   alias Kamansky.Sales.Customers
   alias Kamansky.Sales.Customers.Customer
-
-  @impl true
-  @spec update(%{required(:customer) => Customer.t, optional(any) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{trigger_params: %{"customer-id" => customer_id}} = assigns, socket) do
-    with customer <- Customers.get_customer!(customer_id),
-      changeset <- Customers.change_customer(customer)
-    do
-      socket
-      |> assign(assigns)
-      |> assign(:customer, customer)
-      |> assign(:changeset, changeset)
-      |> ok()
-    end
-  end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -39,6 +26,18 @@ defmodule KamanskyWeb.CustomerLive.FormComponent do
         noreply(socket)
 
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, :changeset, changeset)}
+    end
+  end
+
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, %{"customer-id" => customer_id}) do
+    with customer <- Customers.get_customer!(customer_id),
+      changeset <- Customers.change_customer(customer)
+    do
+      socket
+      |> assign(:customer, customer)
+      |> assign(:changeset, changeset)
     end
   end
 end

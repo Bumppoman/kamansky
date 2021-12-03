@@ -23,29 +23,6 @@ defmodule KamanskyWeb.LiveHelpers do
     |> noreply()
   end
 
-  @spec live_confirmation_modal(keyword) :: Phoenix.LiveView.Component.t
-  def live_confirmation_modal(opts) do
-    live_modal(
-      KamanskyWeb.Components.ConfirmationModalComponent,
-      Keyword.merge(
-        opts,
-        [
-          button_action: Keyword.get(opts, :success),
-          type: Keyword.get(opts, :type, :confirmation)
-        ]
-      )
-    )
-  end
-
-  @spec live_modal(module, keyword) :: Phoenix.LiveView.Component.t
-  def live_modal(component, opts \\ []) do
-    with id <- Keyword.get(opts, :id, :modal),
-      modal_opts <- [component: component, id: id, opts: opts]
-    do
-      live_component(KamanskyWeb.Components.Modal, modal_opts)
-    end
-  end
-
   @spec live_navbar_admin_links(Phoenix.LiveView.Socket.t, atom) :: [map]
   def live_navbar_admin_links(%Phoenix.LiveView.Socket{view: view} = socket, _live_action) do
     [

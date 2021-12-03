@@ -1,26 +1,10 @@
 defmodule KamanskyWeb.OrderLive.NewComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   alias Kamansky.Sales.{Customers, Orders}
   alias Kamansky.Sales.Customers.Customer
   alias Kamansky.Sales.Orders.Order
-
-  @impl true
-  @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(assigns, socket) do
-    with socket <- assign_new(socket, :customer, fn -> %Customer{} end) do
-      socket
-      |> assign(assigns)
-      |> assign(:matching_customers, [])
-      |> assign(:searched, false)
-      |> assign_new(:button_text, fn -> "Next" end)
-      |> assign_new(:changeset, fn -> Customers.change_customer(socket.assigns.customer) end)
-      |> assign_new(:order_step, fn -> 1 end)
-      |> assign_new(:submit, fn -> "submit_customer" end)
-      |> assign_new(:validate, fn -> "validate_customer" end)
-      |> ok()
-    end
-  end
 
   @impl true
   @spec handle_event(String.t, map, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -93,6 +77,21 @@ defmodule KamanskyWeb.OrderLive.NewComponent do
     |> noreply()
   end
 
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, _params) do
+    with socket <- assign(socket, :customer, %Customer{}) do
+      socket
+      |> assign(:button_text, "Next")
+      |> assign(:changeset, Customers.change_customer(socket.assigns.customer))
+      |> assign(:matching_customers, [])
+      |> assign(:order_step, 1)
+      |> assign(:searched, false)
+      |> assign(:submit, "submit_customer")
+      |> assign(:validate, "validate_customer")
+    end
+  end
+
   @spec existing_customer(Ecto.Changeset.t) :: boolean
-  def existing_customer(changeset), do: Ecto.Changeset.get_field(changeset, :existing)
+  defp existing_customer(changeset), do: Ecto.Changeset.get_field(changeset, :existing)
 end

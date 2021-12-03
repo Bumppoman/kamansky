@@ -54,7 +54,7 @@
     />
   <% end %>
 </main>
-<%= live_modal KamanskyWeb.StampReferenceLive.FormComponent,
-  id: "stamp_reference-form-modal",
-  form_id: "stamp_reference-form"
-%>
+<.live_component
+  module={KamanskyWeb.StampReferenceLive.FormComponent}
+  id="stamp_reference-form-modal"
+/>

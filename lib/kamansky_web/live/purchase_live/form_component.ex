@@ -1,22 +1,9 @@
 defmodule KamanskyWeb.PurchaseLive.FormComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   alias Kamansky.Operations.Purchases
   alias Kamansky.Operations.Purchases.Purchase
-
-  @impl true
-  @spec update(%{required(:trigger_params) => %{required(String.t) => any}, optional(atom) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{trigger_params: %{"action" => action, "purchase-id" => purchase_id}} = assigns, socket) do
-    with purchase <- Purchases.get_or_initialize_purchase(purchase_id) do
-      socket
-      |> assign(assigns)
-      |> assign(:action, action)
-      |> assign(:changeset, Purchases.change_purchase(purchase))
-      |> assign(:purchase, purchase)
-      |> assign(:title, (if action == "new", do: "Add Purchase", else: "Update Purchase"))
-      |> ok()
-    end
-  end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -28,6 +15,18 @@ defmodule KamanskyWeb.PurchaseLive.FormComponent do
     |> noreply()
   end
   def handle_event("submit", %{"purchase" => purchase_params}, socket), do: save_purchase(socket, purchase_params)
+
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, %{"action" => action, "purchase-id" => purchase_id}) do
+    with purchase <- Purchases.get_or_initialize_purchase(purchase_id) do
+      socket
+      |> assign(:action, action)
+      |> assign(:changeset, Purchases.change_purchase(purchase))
+      |> assign(:purchase, purchase)
+      |> assign(:title, (if action == "new", do: "Add Purchase", else: "Update Purchase"))
+    end
+  end
 
   @spec save_purchase(Phoenix.LiveView.Socket.t, map) :: {:noreply, Phoenix.LiveView.Socket.t}
   defp save_purchase(%Phoenix.LiveView.Socket{assigns: %{action: "edit"}} = socket, purchase_params) do

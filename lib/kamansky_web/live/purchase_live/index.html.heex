@@ -68,7 +68,7 @@
     </:col>
   </KamanskyWeb.Components.DataTable.table>
 </main>
-<%= live_modal KamanskyWeb.PurchaseLive.FormComponent,
-  id: "purchase-form-modal",
-  form_id: "purchase-form"
-%>
+<.live_component 
+  module={KamanskyWeb.PurchaseLive.FormComponent} 
+  id="purchase-form-modal"
+/>

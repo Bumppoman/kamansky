@@ -85,15 +85,15 @@
     />
   <% end %>
 </main>
-<%= live_modal KamanskyWeb.StampLive.FormComponent,
-  id: "stamp-form-modal",
-  form_id: "stamp-form" 
-%>
-<%= live_modal KamanskyWeb.StampLive.ListingFormComponent,
-  id: "listing-form-modal",
-  form_id: "listing-form",
-  external: true
-%>
+<.live_component
+  module={KamanskyWeb.StampLive.FormComponent}
+  id="stamp-form-modal"
+/>
+<.live_component
+  module={KamanskyWeb.StampLive.ListingFormComponent}
+  id="listing-form-modal"
+  external="true"
+/>
 <.live_component module={KamanskyWeb.StampLive.DetailComponent}
   id="stamp-detail-modal"
 />

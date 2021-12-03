@@ -122,11 +122,11 @@
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.OrderLive.Components.bottom_tabs socket={@socket} live_action={@live_action} />
 </main>
-<%= live_modal KamanskyWeb.OrderLive.NewComponent,
-  id: "new-order-form-modal",
-  form_id: "new-order-form"
-%>
-<%= live_modal KamanskyWeb.OrderLive.EditComponent,
-  id: "edit-order-form-modal",
-  form_id: "edit-order-form"
-%>
+<.live_component
+  module={KamanskyWeb.OrderLive.EditComponent}
+  id="edit-order-form-modal"
+/>
+<.live_component
+  module={KamanskyWeb.OrderLive.NewComponent}
+  id="new-order-form-modal"
+/>

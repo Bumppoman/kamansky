@@ -1,5 +1,6 @@
 defmodule KamanskyWeb.StampLive.ListingFormComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   import Kamansky.Helpers
 
@@ -8,32 +9,6 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
   alias Kamansky.Services
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
-
-  @impl true
-  @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{trigger_params: %{"stamp-id" => stamp_id}} = assigns, socket) do
-    with stamp <- Stamps.get_stamp_with_reference(stamp_id),
-      listing <- %Listing{},
-      socket <-
-        socket
-        |> assign(:suggested_ebay_description, Services.Ebay.Listing.suggested_description(stamp))
-        |> assign(:suggested_ebay_title, Services.Ebay.Listing.suggested_title(stamp))
-        |> assign(:suggested_hipstamp_description, Services.Hipstamp.Listing.suggested_description(stamp))
-        |> assign(:suggested_hipstamp_title, Services.Hipstamp.Listing.suggested_title(stamp))
-    do
-      socket
-      |> assign(assigns)
-      |> assign(:changeset,
-        listing
-        |> Listings.change_listing()
-        |> maybe_put_ebay_suggested_values(socket)
-        |> maybe_put_hipstamp_suggested_values(socket)
-      )
-      |> assign(:listing, listing)
-      |> assign(:stamp, stamp)
-      |> ok()
-    end
-  end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -60,6 +35,30 @@ defmodule KamanskyWeb.StampLive.ListingFormComponent do
           |> push_redirect(to: Routes.listing_active_path(socket, :index, show: listing_id))
           |> noreply()
         end
+    end
+  end
+
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, %{"stamp-id" => stamp_id}) do
+    with stamp <- Stamps.get_stamp_with_reference(stamp_id),
+      listing <- %Listing{},
+      socket <-
+        socket
+        |> assign(:suggested_ebay_description, Services.Ebay.Listing.suggested_description(stamp))
+        |> assign(:suggested_ebay_title, Services.Ebay.Listing.suggested_title(stamp))
+        |> assign(:suggested_hipstamp_description, Services.Hipstamp.Listing.suggested_description(stamp))
+        |> assign(:suggested_hipstamp_title, Services.Hipstamp.Listing.suggested_title(stamp))
+    do
+      socket
+      |> assign(:changeset,
+        listing
+        |> Listings.change_listing()
+        |> maybe_put_ebay_suggested_values(socket)
+        |> maybe_put_hipstamp_suggested_values(socket)
+      )
+      |> assign(:listing, listing)
+      |> assign(:stamp, stamp)
     end
   end
 

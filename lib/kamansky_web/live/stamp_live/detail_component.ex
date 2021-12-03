@@ -1,5 +1,6 @@
 defmodule KamanskyWeb.StampLive.DetailComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
 
@@ -9,25 +10,15 @@ defmodule KamanskyWeb.StampLive.DetailComponent do
   alias Kamansky.Stamps.StampReferences.StampReference
 
   @impl true
-  @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(assigns, socket) do
-    socket
-    |> assign(assigns)
-    |> assign(:current_photo, "front")
-    |> assign_new(:open, fn -> false end)
-    |> ok()
-  end
-
-  @impl true
   @spec handle_event(String.t, %{required(String.t) => String.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
   def handle_event("change_photo", %{"display" => display}, socket), do: {:noreply, assign(socket, :current_photo, display)}
-  def handle_event("close", _, socket), do: {:noreply, assign(socket, :open, false)}
-  def handle_event("open", %{"stamp-id" => stamp_id}, socket) do
+
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, %{"stamp-id" => stamp_id}) do
     socket
     |> assign(:current_photo, "front")
-    |> assign(:open, true)
     |> assign(:stamp, Stamps.get_stamp_detail!(stamp_id))
-    |> noreply()
   end
 
   @spec current_photo(Phoenix.LiveView.Socket.t, Stamp.t, String.t) :: String.t

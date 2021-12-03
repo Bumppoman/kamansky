@@ -1,23 +1,9 @@
 defmodule KamanskyWeb.OrderLive.EditComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   alias Kamansky.Sales.Orders
   alias Kamansky.Sales.Orders.Order
-
-  @impl true
-  @spec update(%{required(:trigger_params) => %{String.t => any}, optional(:any) => any}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{trigger_params: %{"order-id" => id}} = assigns, socket) do
-    with order <- Orders.get_order_with_customer!(id),
-      changeset <- Orders.change_new_order(order)
-    do
-      socket
-      |> assign(assigns)
-      |> assign(:changeset, changeset)
-      |> assign(:customer, order.customer)
-      |> assign(:order, order)
-      |> ok()
-    end
-  end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => map}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -38,11 +24,24 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
     |> noreply()
   end
 
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, %{"order-id" => id}) do
+    with order <- Orders.get_order_with_customer!(id),
+      changeset <- Orders.change_new_order(order)
+    do
+      socket
+      |> assign(:changeset, changeset)
+      |> assign(:customer, order.customer)
+      |> assign(:order, order)
+    end
+  end
+
   @spec existing_customer(Ecto.Changeset.t) :: boolean
-  def existing_customer(changeset), do: Ecto.Changeset.get_field(changeset, :existing_customer)
+  defp existing_customer(changeset), do: Ecto.Changeset.get_field(changeset, :existing_customer)
 
   @spec get_platform_id_field(Ecto.Changeset.t) :: :ebay_id | :hipstamp_id
-  def get_platform_id_field(changeset) do
+  defp get_platform_id_field(changeset) do
     changeset
     |> Ecto.Changeset.get_field(:platform)
     |> case do
@@ -52,7 +51,7 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
   end
 
   @spec get_platform_id_field_label(Ecto.Changeset.t) :: String.t
-  def get_platform_id_field_label(changeset) do
+  defp get_platform_id_field_label(changeset) do
     changeset
     |> Ecto.Changeset.get_field(:platform)
     |> case do

@@ -1,111 +1,119 @@
-<div x-init="title = 'List Stamp for Sale'">
-  <.form
-    let={f}
-    for={@changeset}
-    id={@form_id}
-    phx_target={@myself}
-    phx_change="validate"
-    phx_submit="submit"
-  >
-    <div class="grid grid-cols-4">
-      <div class="form-group">
-        <label>Scott Number</label>
-        <p><%= @stamp.scott_number %></p>
-      </div>
-      <div class="form-group">
-        <label>Grade</label>
-        <p><%= Stamp.formatted_grade(@stamp) %></p>
-      </div>
-      <div class="form-group">
-        <label>Price Paid</label>
-        <p><%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %></p>
-      </div>
-      <div class="form-group">
-        <label>Median Listing Price</label>
-        <p><%= format_decimal_as_currency(Listings.get_median_listing_price_for_scott_number(@stamp.scott_number)) %></p>
-      </div>
-    </div>
-    <div class="grid grid-cols-2">
-      <div class="form-group required">
-        <%= label f, :listing_price, "Listing Price" %>
-        <div class="form-input">
-          <div class="form-input-prepend">
-            <span>$</span>
+<div id={@id}>
+  <%= if @open do %>
+    <KamanskyWeb.Components.Modal.modal
+      parent_id={@id}
+      form_id="stamp-listing-form"
+      title="List Stamp for Sale"
+    >
+      <.form
+        let={f}
+        for={@changeset}
+        id="stamp-listing-form"
+        phx_target={@myself}
+        phx_change="validate"
+        phx_submit="submit"
+      >
+        <div class="grid grid-cols-4">
+          <div class="form-group">
+            <label>Scott Number</label>
+            <p><%= @stamp.scott_number %></p>
           </div>
-          <%= text_input f, :listing_price %>
-        </div>
-      </div>
-      <div class="flex flex-col form-group required">
-        <label>List On</label>
-        <div class="flex flex-grow flex-row items-center">
-          <div class="flex flex-grow">
-            <div>
-              <%= checkbox f, :hipstamp %>
-            </div>
-            <div class="ml-3">
-              <label>Hipstamp</label>
-            </div>
+          <div class="form-group">
+            <label>Grade</label>
+            <p><%= Stamp.formatted_grade(@stamp) %></p>
           </div>
-          <div class="flex flex-grow">
-            <div>
-              <%= checkbox f, :ebay %>
-            </div>
-            <div class="ml-3">
-              <label>eBay</label>
-            </div>
+          <div class="form-group">
+            <label>Price Paid</label>
+            <p><%= format_decimal_as_currency(Stamp.total_cost(@stamp)) %></p>
+          </div>
+          <div class="form-group">
+            <label>Median Listing Price</label>
+            <p><%= format_decimal_as_currency(Listings.get_median_listing_price_for_scott_number(@stamp.scott_number)) %></p>
           </div>
         </div>
-      </div>
-    </div>
-    <%= if Ecto.Changeset.get_field(@changeset, :ebay) == true do %>
-      <h6 class="font-bold mb-2">eBay</h6>
-      <div class="form-group" x-data="{count: 0}">
-        <%= label f, :ebay_title, "Title" %>
-        <div class="form-input">
-          <%= text_input f, 
-            :ebay_title,
-            maxlength: 80,
-            "x-init": "count = $el.value.length",
-            "x-on:change": "count = $el.value.length"
-          %>
+        <div class="grid grid-cols-2">
+          <div class="form-group required">
+            <%= label f, :listing_price, "Listing Price" %>
+            <div class="form-input">
+              <div class="form-input-prepend">
+                <span>$</span>
+              </div>
+              <%= text_input f, :listing_price %>
+            </div>
+          </div>
+          <div class="flex flex-col form-group required">
+            <label>List On</label>
+            <div class="flex flex-grow flex-row items-center">
+              <div class="flex flex-grow">
+                <div>
+                  <%= checkbox f, :hipstamp %>
+                </div>
+                <div class="ml-3">
+                  <label>Hipstamp</label>
+                </div>
+              </div>
+              <div class="flex flex-grow">
+                <div>
+                  <%= checkbox f, :ebay %>
+                </div>
+                <div class="ml-3">
+                  <label>eBay</label>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
-      </div>
-      <div class="form-group">
-        <%= label f, :ebay_description, "Description" %>
-        <div class="form-input">
-          <%= textarea f,
-            :ebay_description,
-            rows: 4,
-            class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-          %>
-        </div>
-      </div>
-    <% end %>
-    <%= if Ecto.Changeset.get_field(@changeset, :hipstamp) == true do %>
-      <h6 class="font-bold mb-2">Hipstamp</h6>
-      <div class="form-group" x-data="{count: 0}">
-        <%= label f, :hipstamp_title, "Title" %>
-        <div class="form-input">
-          <%= text_input f, 
-            :hipstamp_title,
-            maxlength: 80,
-            "x-init": "count = $el.value.length",
-            "x-on:change": "count = $el.value.length"
-          %>
-        </div>
-        <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
-      </div>
-      <div class="form-group">
-        <%= label f, :hipstamp_description, "Description" %>
-        <div class="form-input">
-          <%= textarea f,
-            :hipstamp_description,
-            rows: 4,
-            class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-          %>
-        </div>
-      </div>
-    <% end %>
-  </.form>
+        <%= if Ecto.Changeset.get_field(@changeset, :ebay) == true do %>
+          <h6 class="font-bold mb-2">eBay</h6>
+          <div class="form-group" x-data="{count: 0}">
+            <%= label f, :ebay_title, "Title" %>
+            <div class="form-input">
+              <%= text_input f, 
+                :ebay_title,
+                maxlength: 80,
+                "x-init": "count = $el.value.length",
+                "x-on:change": "count = $el.value.length"
+              %>
+            </div>
+            <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
+          </div>
+          <div class="form-group">
+            <%= label f, :ebay_description, "Description" %>
+            <div class="form-input">
+              <%= textarea f,
+                :ebay_description,
+                rows: 4,
+                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              %>
+            </div>
+          </div>
+        <% end %>
+        <%= if Ecto.Changeset.get_field(@changeset, :hipstamp) == true do %>
+          <h6 class="font-bold mb-2">Hipstamp</h6>
+          <div class="form-group" x-data="{count: 0}">
+            <%= label f, :hipstamp_title, "Title" %>
+            <div class="form-input">
+              <%= text_input f, 
+                :hipstamp_title,
+                maxlength: 80,
+                "x-init": "count = $el.value.length",
+                "x-on:change": "count = $el.value.length"
+              %>
+            </div>
+            <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
+          </div>
+          <div class="form-group">
+            <%= label f, :hipstamp_description, "Description" %>
+            <div class="form-input">
+              <%= textarea f,
+                :hipstamp_description,
+                rows: 4,
+                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              %>
+            </div>
+          </div>
+        <% end %>
+      </.form>
+    </KamanskyWeb.Components.Modal.modal>
+  <% end %>
 </div>

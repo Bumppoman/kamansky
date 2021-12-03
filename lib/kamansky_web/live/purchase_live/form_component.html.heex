@@ -1,51 +1,59 @@
-<div x-init={"title = '#{@title}'"}>
-  <.form
-    let={f}
-    for={@changeset}
-    id={@form_id}
-    phx_target={@myself}
-    phx_change="validate"
-    phx_submit="submit"
-  >
-    <div class="grid grid-cols-3">
-      <div class="col-span-2 form-group required">
-        <%= label f, :description %>
-        <div class="form-input">
-          <%= text_input f, :description %>
-        </div>
-      </div>
-      <div class="form-group required">
-        <%= label f, :date %>
-        <div class="form-input">
-          <%= date_input f, :date, class: "max-h-[38px]" %>
-        </div>
-      </div>
-    </div>
-    <div class="grid grid-cols-3">
-      <div class="form-group required">
-        <%= label f, :cost %>
-        <div class="form-input">
-          <div class="form-input-prepend">
-            <span>$</span>
+<div id={@id}>
+  <%= if @open do %>
+    <KamanskyWeb.Components.Modal.modal
+      parent_id={@id}
+      form_id="purchase-form"
+      title={@title}
+    >
+      <.form
+        let={f}
+        for={@changeset}
+        id="purchase-form"
+        phx_target={@myself}
+        phx_change="validate"
+        phx_submit="submit"
+      >
+        <div class="grid grid-cols-3">
+          <div class="col-span-2 form-group required">
+            <%= label f, :description %>
+            <div class="form-input">
+              <%= text_input f, :description %>
+            </div>
           </div>
-          <%= text_input f, :cost %>
-        </div>
-      </div>
-      <div class="form-group required">
-        <%= label f, :purchase_fees, "Purchase Fees" %>
-        <div class="form-input">
-          <div class="form-input-prepend">
-            <span>$</span>
+          <div class="form-group required">
+            <%= label f, :date %>
+            <div class="form-input">
+              <%= date_input f, :date, class: "max-h-[38px]" %>
+            </div>
           </div>
-          <%= text_input f, :purchase_fees %>
         </div>
-      </div>
-      <div class="form-group required">
-        <%= label f, :quantity %>
-        <div class="form-input">
-          <%= number_input f, :quantity %>
+        <div class="grid grid-cols-3">
+          <div class="form-group required">
+            <%= label f, :cost %>
+            <div class="form-input">
+              <div class="form-input-prepend">
+                <span>$</span>
+              </div>
+              <%= text_input f, :cost %>
+            </div>
+          </div>
+          <div class="form-group required">
+            <%= label f, :purchase_fees, "Purchase Fees" %>
+            <div class="form-input">
+              <div class="form-input-prepend">
+                <span>$</span>
+              </div>
+              <%= text_input f, :purchase_fees %>
+            </div>
+          </div>
+          <div class="form-group required">
+            <%= label f, :quantity %>
+            <div class="form-input">
+              <%= number_input f, :quantity %>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </.form>
+      </.form>
+    </KamanskyWeb.Components.Modal.modal>
+  <% end %>
 </div>

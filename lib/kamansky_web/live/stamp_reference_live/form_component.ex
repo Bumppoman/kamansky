@@ -1,22 +1,9 @@
 defmodule KamanskyWeb.StampReferenceLive.FormComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   alias Kamansky.Stamps.StampReferences
   alias Kamansky.Stamps.StampReferences.StampReference
-
-  @impl true
-  @spec update(%{required(:trigger_params) => %{String.t => any}}, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{trigger_params: %{"action" => action, "stamp-reference-id" => stamp_reference_id}} = assigns, socket) do
-    with stamp_reference <- StampReferences.get_or_initialize_stamp_reference(stamp_reference_id) do
-      socket
-      |> assign(assigns)
-      |> assign(:action, String.to_existing_atom(action))
-      |> assign(:changeset, StampReferences.change_stamp_reference(stamp_reference))
-      |> assign(:stamp_reference, stamp_reference)
-      |> assign(:title, (if action == "new", do: "Add New Stamp Reference", else: "Update Stamp Reference"))
-      |> ok()
-    end
-  end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -27,6 +14,18 @@ defmodule KamanskyWeb.StampReferenceLive.FormComponent do
     |> Map.put(:action, :validate)
     |> then(&assign(socket, :changeset, &1))
     |> noreply()
+  end
+
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, %{"action" => action, "stamp-reference-id" => stamp_reference_id}) do
+    with stamp_reference <- StampReferences.get_or_initialize_stamp_reference(stamp_reference_id) do
+      socket
+      |> assign(:action, String.to_existing_atom(action))
+      |> assign(:changeset, StampReferences.change_stamp_reference(stamp_reference))
+      |> assign(:stamp_reference, stamp_reference)
+      |> assign(:title, (if action == "new", do: "Add New Stamp Reference", else: "Update Stamp Reference"))
+    end
   end
 
   @spec save_stamp_reference(Phoenix.LiveView.Socket.t, :edit | :new, map) :: {:noreply, Phoenix.LiveView.Socket.t}

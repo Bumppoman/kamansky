@@ -1,52 +1,60 @@
-<div x-init={"title = '#{@title}'"}>
-  <.form 
-    let={f}
-    for={@changeset}
-    id={@form_id}
-    phx_target={@myself}
-    phx_change="validate"
-    phx_submit="submit"
-  >
-    <div class="grid grid-cols-3">
-      <div class="form-group required">
-        <%= label f, :scott_number, "Scott Number" %>
-        <%= text_input f, :scott_number %>
-      </div>
-      <div class="form-group required">
-        <%= label f, :year_of_issue, "Year of Issue" %>
-        <%= text_input f, :year_of_issue %>
-      </div>
-      <div class="form-group required">
-        <%= label f, :denomination %>
-        <%= text_input f, :denomination %>
-      </div>
-    </div>
-    <div class="grid grid-cols-2">
-      <div class="form-group required">
-        <%= label f, :color %>
-        <%= text_input f, :color %>
-      </div>
-      <div class="form-group required">
-        <%= label f, :issue_type %>
-        <%= select f, :issue_type, StampReference.issue_types %>
-      </div>
-    </div>
-    <div class="form-group required">
-      <%= label f, :title, "Description" %>
-      <%= text_input f, :title %>
-    </div>
-    <div class="form-group required">
-      <%= label f, :commemorative, "Classification" %>
-      <div class="flex flex-row">
-        <div class="flex flex-row items-center mr-8">
-          <%= radio_button f, :commemorative, false %>
-          <label for={input_id(f, :commemorative, false)}>Definitive</label>
+<div id={@id}>
+  <%= if @open do %>
+    <KamanskyWeb.Components.Modal.modal
+      parent_id={@id}
+      form_id="stamp-reference-form"
+      title={@title}
+    >
+      <.form 
+        let={f}
+        for={@changeset}
+        id="stamp-reference-form"
+        phx_target={@myself}
+        phx_change="validate"
+        phx_submit="submit"
+      >
+        <div class="grid grid-cols-3">
+          <div class="form-group required">
+            <%= label f, :scott_number, "Scott Number" %>
+            <%= text_input f, :scott_number %>
+          </div>
+          <div class="form-group required">
+            <%= label f, :year_of_issue, "Year of Issue" %>
+            <%= text_input f, :year_of_issue %>
+          </div>
+          <div class="form-group required">
+            <%= label f, :denomination %>
+            <%= text_input f, :denomination %>
+          </div>
         </div>
-        <div class="flex flex-row items-center">
-          <%= radio_button f, :commemorative, true %>
-          <label for={input_id(f, :commemorative, true)}>Commemorative</label>
+        <div class="grid grid-cols-2">
+          <div class="form-group required">
+            <%= label f, :color %>
+            <%= text_input f, :color %>
+          </div>
+          <div class="form-group required">
+            <%= label f, :issue_type %>
+            <%= select f, :issue_type, StampReference.issue_types %>
+          </div>
         </div>
-      </div>
-    </div>
-  </.form>
+        <div class="form-group required">
+          <%= label f, :title, "Description" %>
+          <%= text_input f, :title %>
+        </div>
+        <div class="form-group required">
+          <%= label f, :commemorative, "Classification" %>
+          <div class="flex flex-row">
+            <div class="flex flex-row items-center mr-8">
+              <%= radio_button f, :commemorative, false %>
+              <label for={input_id(f, :commemorative, false)}>Definitive</label>
+            </div>
+            <div class="flex flex-row items-center">
+              <%= radio_button f, :commemorative, true %>
+              <label for={input_id(f, :commemorative, true)}>Commemorative</label>
+            </div>
+          </div>
+        </div>
+      </.form>
+    </KamanskyWeb.Components.Modal.modal>
+  <% end %>
 </div>
