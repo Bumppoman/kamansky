@@ -66,7 +66,7 @@ defmodule KamanskyWeb.Components.Modal do
             <%= render_slot(@inner_block) %>
           </div>
           <%= unless assigns[:footer] == false do %>
-            <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+            <div class="bg-gray-50 flex flex-row-reverse px-4 py-3 text-right sm:px-6">
               <button
                 type="submit"
                 class={"btn btn-blue ml-1" <> if(Map.get(assigns, :external), do: " kamansky-external", else: "")}

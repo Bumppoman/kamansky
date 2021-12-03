@@ -36,27 +36,4 @@ defmodule KamanskyWeb.OrderLive.EditComponent do
       |> assign(:order, order)
     end
   end
-
-  @spec existing_customer(Ecto.Changeset.t) :: boolean
-  defp existing_customer(changeset), do: Ecto.Changeset.get_field(changeset, :existing_customer)
-
-  @spec get_platform_id_field(Ecto.Changeset.t) :: :ebay_id | :hipstamp_id
-  defp get_platform_id_field(changeset) do
-    changeset
-    |> Ecto.Changeset.get_field(:platform)
-    |> case do
-      :ebay -> :ebay_id
-      _ -> :hipstamp_id
-    end
-  end
-
-  @spec get_platform_id_field_label(Ecto.Changeset.t) :: String.t
-  defp get_platform_id_field_label(changeset) do
-    changeset
-    |> Ecto.Changeset.get_field(:platform)
-    |> case do
-      :ebay -> "eBay ID"
-      _ -> "Hipstamp ID"
-    end
-  end
 end

@@ -1,5 +1,5 @@
 defmodule KamanskyWeb.LiveHelpers do
-  import Phoenix.LiveView.Helpers
+  import Phoenix.LiveView.Helpers, warn: false
 
   alias KamanskyWeb.Router.Helpers, as: Routes
 
