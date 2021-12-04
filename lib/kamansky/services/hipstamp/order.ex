@@ -185,7 +185,7 @@ defmodule Kamansky.Services.Hipstamp.Order do
             Listings.mark_listing_sold(
               listing,
               order_id: order_id,
-              sale_price: Decimal.new(sale_listing["price"]), # comes in as a string instead of float
+              sale_price: Decimal.new(sale_listing["price"]) # comes in as a string instead of float
             ),
           {:ok, _hipstamp_listing} <- Platforms.delete_external_listing(listing.hipstamp_listing)
         ) do

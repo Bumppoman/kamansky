@@ -5,7 +5,7 @@ defmodule Kamansky.Operations.Notifications.Notification do
   import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
 
   alias __MODULE__
-  alias Kamansky.Sales.Orders
+  alias Kamansky.Sales.{Listings, Orders}
   alias Kamansky.Sales.Orders.Order
   alias KamanskyWeb.Router.Helpers, as: Routes
 
@@ -52,6 +52,10 @@ defmodule Kamansky.Operations.Notifications.Notification do
   end
 
   @spec body(t, struct) :: String.t
+  def body(%Notification{topic: :ebay_bid_received}, listing) do
+    "New eBay bid received for listing #{listing.stamp.inventory_key}"
+  end
+
   def body(%Notification{topic: :ebay_new_order}, order) do
     "eBay order ##{order.ebay_id} for #{format_decimal_as_currency(Order.total_paid(order))} is ready for processing"
   end
@@ -93,13 +97,16 @@ defmodule Kamansky.Operations.Notifications.Notification do
   def list_topic_details, do: @topic_details
 
   @spec associated_record(t) :: struct
+  defp associated_record(%Notification{topic: :ebay_bid_received, associated_record: listing_id}), do: Listings.get_listing!(listing_id)
   defp associated_record(%Notification{topic: topic, associated_record: order_id}) when topic in [:ebay_new_order, :hipstamp_new_order], do: Orders.get_order!(order_id)
 
   @spec route(t, struct) :: {fun, atom, integer}
+  defp route(%Notification{topic: :ebay_bid_received}, listing), do: {&Routes.listing_bid_path/2, :index, listing.id}
   defp route(%Notification{topic: :ebay_new_order}, order), do: {&Routes.order_show_path/3, :show, order.id}
   defp route(%Notification{topic: :hipstamp_new_order}, order), do: {&Routes.order_show_path/3, :show, order.id}
 
   @spec title(t) :: String.t
+  defp title(%Notification{topic: :ebay_bid_received}), do: "New eBay Bid"
   defp title(%Notification{topic: :ebay_new_order}), do: "New eBay Order"
   defp title(%Notification{topic: :hipstamp_new_order}), do: "New Hipstamp Order"
 end

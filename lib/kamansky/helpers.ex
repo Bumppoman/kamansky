@@ -41,16 +41,6 @@ defmodule Kamansky.Helpers do
     end
   end
 
-  def cast_enum_fields(attrs, fields) do
-    attrs
-    |> Enum.map(
-      fn {key, value} ->
-        if key in fields, do: {key, String.to_existing_atom(value)}, else: {key, value}
-      end
-    )
-    |> Enum.into(%{})
-  end
-
   @spec get_value_for_ecto_enum(atom, atom, atom) :: integer | String.t
   def get_value_for_ecto_enum(schema, field, enum_key) do
     schema

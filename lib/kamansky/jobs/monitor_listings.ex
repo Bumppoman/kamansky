@@ -3,6 +3,7 @@ require Logger
 defmodule Kamansky.Jobs.MonitorListings do
   use GenServer
 
+  alias Kamansky.Operations.Notifications
   alias Kamansky.Sales.Listings.Platforms
   alias Kamansky.Sales.Listings.Platforms.EbayListing
   alias Kamansky.Services.{Ebay, Hipstamp}
@@ -49,6 +50,7 @@ defmodule Kamansky.Jobs.MonitorListings do
       nil -> :noop
       %EbayListing{bid_count: 0} = kamansky_ebay_listing when new_bid_count == 1 ->
         update_ebay_listing(kamansky_ebay_listing, ebay_listing)
+        Notifications.send_notification(:ebay_bid_received, kamansky_ebay_listing.listing.id)
 
         kamansky_ebay_listing.listing
         |> Hipstamp.Listing.maybe_remove_listing()
@@ -58,6 +60,7 @@ defmodule Kamansky.Jobs.MonitorListings do
         end
       %EbayListing{bid_count: current_bid_count} = kamansky_ebay_listing when new_bid_count > current_bid_count ->
         update_ebay_listing(kamansky_ebay_listing, ebay_listing)
+        Notifications.send_notification(:ebay_bid_received, kamansky_ebay_listing.listing.id)
       _ -> :noop
     end
   end

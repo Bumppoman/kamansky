@@ -257,7 +257,7 @@
               <tbody class="bg-white divide-y divide-gray-200">
                 <%= if Enum.empty?(@unshipped_orders) do %>
                   <tr class="bg-white">
-                    <td colspan="4" class="max-w-0 px-6 py-4 text-sm text-gray-900 w-full whitespace-nowrap">There are currently no pending orders.</td>
+                    <td colspan="5" class="max-w-0 px-6 py-4 text-sm text-gray-900 w-full whitespace-nowrap">There are currently no pending orders.</td>
                   </tr>
                 <% end %>
                 <%= for order <- @unshipped_orders do %>

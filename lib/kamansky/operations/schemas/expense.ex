@@ -2,7 +2,6 @@ defmodule Kamansky.Operations.Expenses.Expense do
   use Ecto.Schema
 
   import Ecto.Changeset
-  import Kamansky.Helpers, only: [cast_enum_fields: 2]
 
   alias __MODULE__
 
@@ -31,9 +30,6 @@ defmodule Kamansky.Operations.Expenses.Expense do
 
   @spec changeset(t, map) :: Ecto.Changeset.t
   def changeset(%Expense{} = expense, attrs) do
-    # Workaround for Ecto.Enum (7/2021)
-    attrs = cast_enum_fields(attrs, ["category"])
-
     expense
     |> cast(attrs, [:amount, :category, :date, :description])
   end
