@@ -4,7 +4,6 @@ defmodule KamanskyWeb.TrendLive.Index do
   import Kamansky.Helpers, only: [format_decimal_as_currency: 1]
 
   alias Kamansky.Operations.Trends
-  alias Kamansky.Sales.Listings
   alias Kamansky.Stamps
   alias Kamansky.Stamps.Stamp
 
@@ -22,7 +21,6 @@ defmodule KamanskyWeb.TrendLive.Index do
       |> assign(:format_data, format_data(sold_stamps_by_format, total_sold_stamps))
       |> assign(:hinged, (hinged / total_sold_stamps) * 100)
       |> assign(:letter_grade_data, letter_grade_data(sold_stamps_by_grade, total_sold_stamps))
-      |> assign(:median_sold_price_data, Listings.median_price_data_for_sold_listings())
       |> assign(:never_hinged, (never_hinged / total_sold_stamps) * 100)
       |> assign(:page_title, "Sales Trends")
       |> ok()

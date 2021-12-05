@@ -1,23 +1,11 @@
 defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
   use KamanskyWeb, :live_component
+  use KamanskyWeb.Modal
 
   import Kamansky.Helpers
 
   alias Kamansky.Sales.{Listings, Orders}
   alias Kamansky.Sales.Orders.Order
-
-  @impl true
-  @spec update(map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
-  def update(%{trigger_params: %{"listing-id" => listing_id}} = assigns, socket) do
-    with listing <- Listings.get_listing!(listing_id) do
-      socket
-      |> assign(assigns)
-      |> assign(:changeset, Listings.change_listing(listing))
-      |> assign(:listing, listing)
-      |> assign(:pending_orders, Orders.list_pending_orders_to_add_listing())
-      |> ok()
-    end
-  end
 
   @impl true
   @spec handle_event(String.t, %{required(String.t) => any}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
@@ -36,6 +24,17 @@ defmodule KamanskyWeb.ListingLive.AddToOrderFormComponent do
         noreply(socket)
 
       {:error, %Ecto.Changeset{} = changeset} -> {:noreply, assign(socket, changeset: changeset)}
+    end
+  end
+
+  @impl true
+  @spec open_assigns(Phoenix.LiveView.Socket.t, map) :: Phoenix.LiveView.Socket.t
+  def open_assigns(socket, %{"listing-id" => listing_id}) do
+    with listing <- Listings.get_listing!(listing_id) do
+      socket
+      |> assign(:changeset, Listings.change_listing(listing))
+      |> assign(:listing, listing)
+      |> assign(:pending_orders, Orders.list_pending_orders_to_add_listing())
     end
   end
 end

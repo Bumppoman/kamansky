@@ -1,53 +1,61 @@
-<div x-init="title = 'Add Listing to Order'">
-  <.form
-    let={f}
-    for={@changeset}
-    id={@form_id}
-    phx_target={@myself}
-    phx_change="validate"
-    phx_submit="submit"
-  >
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Number</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <%= if Enum.empty?(@pending_orders) do %>
-          <tr>
-            <td colspan="4" class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">There are no available orders.</td>
-          </tr>
-        <% end %>
-        <%= for order <- @pending_orders do %>
-          <tr>
-            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= radio_button f, :order_id, order.id %></td>
-            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= Order.order_number(order) %></td>
-            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= order.customer.name %></td>
-            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= formatted_date(order.ordered_at) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-    <div class="grid grid-cols-2 mt-4">
-      <div class="flex flex-col mb-4">
-        <label>Listing Price</label>
-        <div class="flex flex-grow">
-          <span class="block self-center"><%= format_decimal_as_currency(@listing.listing_price) %></span>
-        </div>
-      </div>
-      <div class="form-group required">
-        <%= label f, :sale_price, "Sale Price" %>
-        <div class="form-input">
-          <div class="form-input-prepend">
-            <span>$</span>
+<div id={@id}>
+  <%= if @open do %>
+    <KamanskyWeb.Components.Modal.modal
+      parent_id={@id}
+      form_id="listing-add-to-order-form"
+      title="Add Listing to Order"
+    >
+      <.form
+        let={f}
+        for={@changeset}
+        id={@form_id}
+        phx_target={@myself}
+        phx_change="validate"
+        phx_submit="submit"
+      >
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Number</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= if Enum.empty?(@pending_orders) do %>
+              <tr>
+                <td colspan="4" class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">There are no available orders.</td>
+              </tr>
+            <% end %>
+            <%= for order <- @pending_orders do %>
+              <tr>
+                <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= radio_button f, :order_id, order.id %></td>
+                <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= Order.order_number(order) %></td>
+                <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= order.customer.name %></td>
+                <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500"><%= formatted_date(order.ordered_at) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <div class="grid grid-cols-2 mt-4">
+          <div class="flex flex-col mb-4">
+            <label>Listing Price</label>
+            <div class="flex flex-grow">
+              <span class="block self-center"><%= format_decimal_as_currency(@listing.listing_price) %></span>
+            </div>
           </div>
-          <%= text_input f, :sale_price %>
+          <div class="form-group required">
+            <%= label f, :sale_price, "Sale Price" %>
+            <div class="form-input">
+              <div class="form-input-prepend">
+                <span>$</span>
+              </div>
+              <%= text_input f, :sale_price %>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </.form>
+      </.form>
+    </KamanskyWeb.Components.Modal.modal>
+  <% end %>
 </div>

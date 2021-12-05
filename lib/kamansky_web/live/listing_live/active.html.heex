@@ -133,15 +133,14 @@
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
 </main>
-<%# live_modal KamanskyWeb.ListingLive.AddToOrderFormComponent,
-  id: "listing-add-to-order-form-modal",
-  form_id: "listing-add-to-order-form"
-%>
-<%# live_modal KamanskyWeb.ListingLive.ListOnEbayFormComponent,
-  id: "listing-list-on-ebay-form-modal",
-  form_id: "listing-list-on-ebay-form",
-  external: true
-%>
+<.live_component 
+  module={KamanskyWeb.ListingLive.AddToOrderFormComponent}
+  id="listing-add-to-order-form-modal"
+/>
+<.live_component 
+  module={KamanskyWeb.ListingLive.ListOnEbayFormComponent}
+  id="listing-list-on-ebay-form-modal"
+/>
 <.live_component
   module={KamanskyWeb.StampLive.DetailComponent}
   id="stamp-detail-modal"
