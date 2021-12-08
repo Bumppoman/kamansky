@@ -13,6 +13,29 @@ defmodule Kamansky.Helpers do
     end
   end
 
+  @spec begin_and_end_date_for_year(pos_integer) :: {DateTime.t, DateTime.t}
+  def begin_and_end_date_for_year(year) do
+    {
+      year
+      |> Date.new!(1, 1)
+      |> DateTime.new!(Time.new!(0, 0, 0), "America/New_York")
+      |> DateTime.shift_zone!("Etc/UTC"),
+      year
+      |> Date.new!(12, 31)
+      |> DateTime.new!(Time.new!(23, 59, 59), "America/New_York")
+      |> DateTime.shift_zone!("Etc/UTC")
+    }
+  end
+
+  @spec begin_and_end_date_for_year(pos_integer, :date) :: {Date.t, Date.t}
+  def begin_and_end_date_for_year(year, :date) do
+    with begin_date <- Date.new!(year, 1, 1),
+      end_date <- Date.new!(year, 12, 31)
+    do
+      {begin_date, end_date}
+    end
+  end
+
   @spec begin_and_end_date_for_year_and_month(pos_integer, pos_integer) :: {DateTime.t, DateTime.t}
   def begin_and_end_date_for_year_and_month(year, month) do
     with(
@@ -57,9 +80,23 @@ defmodule Kamansky.Helpers do
     end
   end
 
+  @spec filter_query_for_year(Ecto.Queryable.t, pos_integer, atom | nil) :: Ecto.Query.t
+  def filter_query_for_year(query, year, field_name \\ :inserted_at) do
+    with {begin_date, end_date} <- begin_and_end_date_for_year(year) do
+      filter_query_for_dates(query, field_name, begin_date, end_date)
+    end
+  end
+
   @spec filter_query_for_year_and_month(Ecto.Queryable.t, pos_integer, pos_integer, atom) :: Ecto.Query.t
   def filter_query_for_year_and_month(query, year, month, field_name \\ :inserted_at) do
     with {begin_date, end_date} <- begin_and_end_date_for_year_and_month(year, month) do
+      filter_query_for_dates(query, field_name, begin_date, end_date)
+    end
+  end
+
+  @spec filter_query_for_year_as_date(Ecto.Queryable.t, pos_integer, atom) :: Ecto.Query.t
+  def filter_query_for_year_as_date(query, year, field_name \\ :date) do
+    with {begin_date, end_date} <- begin_and_end_date_for_year(year, :date) do
       filter_query_for_dates(query, field_name, begin_date, end_date)
     end
   end

@@ -24,7 +24,7 @@
           <tr class={if rem(counter, 2) != 0, do: "bg-gray-50", else: "bg-white"}>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
               <%= live_redirect Calendar.strftime(Date.new!(@year, month, 1), "%B %Y"),
-                to: Routes.report_show_path(@socket, :index, year: @year, month: month)
+                to: Routes.report_show_path(@socket, :index, @year, month)
               %>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.gross_sales) %></td>

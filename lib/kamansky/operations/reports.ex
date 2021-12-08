@@ -7,18 +7,18 @@ defmodule Kamansky.Operations.Reports do
   alias Kamansky.Sales.Orders.Order
   alias Kamansky.Stamps.Stamp
 
-  @spec get_expense_data(pos_integer, pos_integer) :: map
-  def get_expense_data(year, month) do
+  @spec get_expense_data(pos_integer, pos_integer | nil) :: map
+  def get_expense_data(year, month \\ nil) do
     with(
       stamp_cost <-
         Stamp
-        |> filter_query_for_year_and_month(year, month)
+        |> filter_query_for_year_and_maybe_month(year, month)
         |> where([s], s.status != ^:collection)
         |> select([s], sum(s.cost + s.purchase_fees))
         |> Repo.one(),
       base_data <-
         from(e in "expenses")
-        |> filter_query_for_year_and_month_as_date(year, month)
+        |> filter_query_for_year_and_maybe_month_as_date(year, month)
         |> select(
           [e],
           %{
@@ -39,8 +39,8 @@ defmodule Kamansky.Operations.Reports do
     end
   end
 
-  @spec get_order_data(pos_integer, pos_integer) :: map
-  def get_order_data(year, month) do
+  @spec get_order_data(pos_integer, pos_integer | nil) :: map
+  def get_order_data(year, month \\ nil) do
     with(
       stamps_query <-
         Stamp
@@ -49,7 +49,7 @@ defmodule Kamansky.Operations.Reports do
         |> select([s], %{stamp_cost: sum(s.cost + s.purchase_fees)}),
       base_data <-
         from(o in "orders", as: :order)
-        |> filter_query_for_year_and_month(year, month, :ordered_at)
+        |> filter_query_for_year_and_maybe_month(year, month, :ordered_at)
         |> join(:left_lateral, [o], ss in subquery(stamps_query))
         |> select(
           [o, ss],
@@ -202,4 +202,14 @@ defmodule Kamansky.Operations.Reports do
     |> Kernel.*(100)
     |> Kernel.round()
   end
+
+  @spec filter_query_for_year_and_maybe_month(Ecto.Queryable.t, pos_integer, pos_integer | nil, atom) :: Ecto.Queryable.t
+  defp filter_query_for_year_and_maybe_month(query, year, month, field_name \\ :inserted_at)
+  defp filter_query_for_year_and_maybe_month(query, year, nil, field_name), do: filter_query_for_year(query, year, field_name)
+  defp filter_query_for_year_and_maybe_month(query, year, month, field_name), do: filter_query_for_year_and_month(query, year, month, field_name)
+
+  @spec filter_query_for_year_and_maybe_month_as_date(Ecto.Queryable.t, pos_integer, pos_integer | nil, atom) :: Ecto.Queryable.t
+  defp filter_query_for_year_and_maybe_month_as_date(query, year, month, field_name \\ :date)
+  defp filter_query_for_year_and_maybe_month_as_date(query, year, nil, field_name), do: filter_query_for_year_as_date(query, year, field_name)
+  defp filter_query_for_year_and_maybe_month_as_date(query, year, month, field_name), do: filter_query_for_year_and_month_as_date(query, year, month, field_name)
 end

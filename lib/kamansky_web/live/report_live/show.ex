@@ -22,4 +22,15 @@ defmodule KamanskyWeb.ReportLive.Show do
       |> noreply()
     end
   end
+
+  def handle_params(%{"year" => year}, _uri, socket) do
+    with year <- String.to_integer(year) do
+      socket
+      |> assign(:expense_data, Reports.get_expense_data(year))
+      |> assign(:page_title, "Report for #{year}")
+      |> assign(:order_data, Reports.get_order_data(year))
+      |> assign(:year, year)
+      |> noreply()
+    end
+  end
 end

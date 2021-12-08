@@ -97,7 +97,7 @@ defmodule Kamansky.Operations.Notifications.Notification do
   def list_topic_details, do: @topic_details
 
   @spec associated_record(t) :: struct
-  defp associated_record(%Notification{topic: :ebay_bid_received, associated_record: listing_id}), do: Listings.get_listing!(listing_id)
+  defp associated_record(%Notification{topic: :ebay_bid_received, associated_record: listing_id}), do: Listings.get_listing_to_list(listing_id)
   defp associated_record(%Notification{topic: topic, associated_record: order_id}) when topic in [:ebay_new_order, :hipstamp_new_order], do: Orders.get_order!(order_id)
 
   @spec route(t, struct) :: {fun, atom, integer}
