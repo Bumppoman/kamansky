@@ -3,9 +3,21 @@ defmodule Kamansky.Stamps do
   import Kamansky.Helpers, only: [filter_query_for_month: 2]
 
   @sort_columns [
-    [:scott_number, {:asc, :id}],
-    [nulls_last: :grade, asc: :id],
-    [quote(do: dynamic([s], s.cost + s.purchase_fees)), {:asc, :id}]
+    %{
+      actions: [:collection, :collection_to_replace, :stock],
+      sort: [
+        [:scott_number, {:asc, :id}],
+        [nulls_last: :grade, asc: :id],
+        [quote(do: dynamic([s], s.cost + s.purchase_fees)), {:asc, :id}]
+      ]
+    },
+    %{
+      actions: [:in_purchase],
+      sort: [
+        [:scott_number, {:asc, :id}],
+        [:status, {:asc, :scott_number}, {:asc, :id}]
+      ]
+    }
   ]
   use Kamansky.Paginate
 
@@ -54,6 +66,14 @@ defmodule Kamansky.Stamps do
     |> maybe_search(search)
     |> where(status: :collection)
     |> where([s], s.grade < ^grade)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  @spec count_stamps_in_purchase(pos_integer, String.t | nil) :: integer
+  def count_stamps_in_purchase(purchase_id, search) do
+    Stamp
+    |> where(purchase_id: ^purchase_id)
+    |> maybe_search(search)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -159,6 +179,14 @@ defmodule Kamansky.Stamps do
     Stamp
     |> where(status: :collection)
     |> where([s], s.grade < ^grade)
+    |> then(&Paginate.list(Stamps, &1, params))
+  end
+
+  @spec list_stamps_in_purchase(pos_integer, Paginate.params) :: [Stamp.t]
+  def list_stamps_in_purchase(id, params) do
+    Stamp
+    |> where(purchase_id: ^id)
+    |> maybe_search(params.search)
     |> then(&Paginate.list(Stamps, &1, params))
   end
 

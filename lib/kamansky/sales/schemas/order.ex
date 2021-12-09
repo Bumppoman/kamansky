@@ -52,6 +52,12 @@ defmodule Kamansky.Sales.Orders.Order do
     has_many :listings, Kamansky.Sales.Listings.Listing
   end
 
+  @doc guard: true
+  defguard is_ebay(order) when not is_nil(order.ebay_id)
+
+  @doc guard: true
+  defguard is_hipstamp(order) when not is_nil(order.hipstamp_id)
+
   @spec changeset(Order.t, map) :: Ecto.Changeset.t
   def changeset(order, attrs) do
     order
@@ -76,9 +82,9 @@ defmodule Kamansky.Sales.Orders.Order do
     |> Enum.at(column)
   end
 
-  @spec ebay?(t) :: boolean
-  def ebay?(%Order{ebay_id: nil}), do: false
-  def ebay?(%Order{}), do: true
+  @spec formatted_platform(Order.t) :: String.t
+  def formatted_platform(%Order{} = order) when is_ebay(order), do: "eBay"
+  def formatted_platform(%Order{} = order) when is_hipstamp(order), do: "Hipstamp"
 
   @spec full_changeset(t, map) :: Ecto.Changeset.t
   def full_changeset(%Order{} = order, attrs) do
@@ -93,10 +99,6 @@ defmodule Kamansky.Sales.Orders.Order do
     )
   end
 
-  @spec hipstamp?(Order.t) :: boolean
-  def hipstamp?(%Order{hipstamp_id: nil}), do: false
-  def hipstamp?(%Order{}), do: true
-
   @spec net_profit(Order.t) :: Decimal.t
   def net_profit(%Order{} = order), do: Decimal.sub(total_paid(order), total_cost(order))
 
@@ -107,21 +109,13 @@ defmodule Kamansky.Sales.Orders.Order do
   def pending?(%Order{status: :pending}), do: true
   def pending?(%Order{}), do: false
 
-  @spec platform(Order.t) :: String.t
-  def platform(%Order{} = order) do
-    cond do
-      Order.hipstamp?(order) -> "Hipstamp"
-      Order.ebay?(order) -> "eBay"
-    end
-  end
+  @spec platform(Order.t) :: :ebay | :hipstamp
+  def platform(%Order{} = order) when is_ebay(order), do: :ebay
+  def platform(%Order{} = order) when is_hipstamp(order), do: :hipstamp
 
   @spec platform_id(Order.t) :: integer | String.t
-  def platform_id(%Order{} = order) do
-    cond do
-      Order.hipstamp?(order) -> order.hipstamp_id
-      Order.ebay?(order) -> order.ebay_id
-    end
-  end
+  def platform_id(%Order{} = order) when is_ebay(order), do: order.ebay_id
+  def platform_id(%Order{} = order) when is_hipstamp(order), do: order.hipstamp_id
 
   @spec processed?(Order.t) :: boolean
   def processed?(%Order{status: :processed}), do: true

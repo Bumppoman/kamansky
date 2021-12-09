@@ -144,6 +144,7 @@ defmodule Kamansky.Services.Ebay.Listing do
       <OutputSelector>BidCount</OutputSelector>
       <OutputSelector>CurrentPrice</OutputSelector>
       <OutputSelector>ItemID</OutputSelector>
+      <OutputSelector>ListingStatus</OutputSelector>
       <OutputSelector>SKU</OutputSelector>
     </GetSellerListRequest>
     """
@@ -155,9 +156,10 @@ defmodule Kamansky.Services.Ebay.Listing do
       bid_count: ~x".//BidCount/text()"i,
       current_bid: ~x".//CurrentPrice/text()"s,
       inventory_key: ~x".//SKU/text()"s,
+      listing_status: ~x".//ListingStatus/text()"s,
       ebay_id: ~x".//ItemID/text()"s
     )
-    |> Enum.filter(&(&1.bid_count > 0))
+    |> Enum.filter(&(&1.bid_count > 0 and &1.listing_status == "Active"))
   end
 
   @spec relist(EbayListing.t) :: {:ok, EbayListing.t} | {:error, %{code: :ebay_relist_listing_error, dump: String.t}}
@@ -282,7 +284,7 @@ defmodule Kamansky.Services.Ebay.Listing do
   @spec denomination(Stamp.t) :: String.t
   defp denomination(%Stamp{stamp_reference: %StampReference{denomination: denomination}}) do
     cond do
-      Decimal.lt?(denomination, 1) -> "#{Decimal.to_integer(Decimal.mult(denomination, 100))} Cent"
+      Decimal.lt?(denomination, 1) -> "#{sub_dollar_denomination(denomination)} Cent"
       Decimal.eq?(denomination, 1) -> "1 Dollar"
       Decimal.eq?(denomination, 2) -> "2 Dollar"
       Decimal.eq?(denomination, 5) -> "5 Dollar"
@@ -317,6 +319,19 @@ defmodule Kamansky.Services.Ebay.Listing do
   @spec shipping_cost(Listing.t, map) :: String.t
   defp shipping_cost(%Listing{listing_price: listing_price}, opts) do
     if Decimal.lt?(Map.get(opts, "auction_price", listing_price), 15), do: "1.00", else: "0.00"
+  end
+
+  @spec sub_dollar_denomination(Decimal.t) :: Decimal.t | integer | String.t
+  defp sub_dollar_denomination(denomination) do
+    with cents <- Decimal.mult(denomination, 100) do
+      cond do
+        Decimal.eq?(cents, "1.25") -> "1 1/4"
+        Decimal.eq?(cents, "1.5") -> "1 1/2"
+        Decimal.eq?(cents, "4.5") -> "4 1/2"
+        not Decimal.integer?(cents) -> Decimal.normalize(cents)
+        true -> Decimal.to_integer(cents)
+      end
+    end
   end
 
   @spec title(Listing.t, map) :: String.t

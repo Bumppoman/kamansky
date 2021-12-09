@@ -269,20 +269,9 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.update()
   end
 
-  @spec maybe_determine_platform(nil) :: nil
+  @spec maybe_determine_platform(Order.t | nil) :: Order.t | nil
   defp maybe_determine_platform(nil), do: nil
-
-  @spec maybe_determine_platform(Order.t) :: Order.t
-  defp maybe_determine_platform(%Order{} = order) do
-    %{
-      order | platform:
-        cond do
-          Order.hipstamp?(order) -> :hipstamp
-          Order.ebay?(order) -> :ebay
-          true -> nil
-        end
-    }
-  end
+  defp maybe_determine_platform(%Order{} = order), do: %{order | platform: Order.platform(order)}
 
   @spec maybe_search(Ecto.Queryable.t, String.t | nil) :: Ecto.Queryable.t
   defp maybe_search(query, nil), do: query

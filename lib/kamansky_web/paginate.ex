@@ -5,7 +5,8 @@ defmodule KamanskyWeb.Paginate do
   @callback find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, :asc | :desc) :: integer
   @callback load_data(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params) :: [any]
   @callback self_path(Phoenix.LiveView.Socket.t, atom, map) :: String.t
-  @optional_callbacks find_item_in_data: 4
+  @callback sort_action(Phoenix.LiveView.Socket.t) :: atom
+  @optional_callbacks find_item_in_data: 4, sort_action: 1
 
   defmacro __using__(opts \\ []) do
     quote bind_quoted: [opts: opts] do
@@ -50,7 +51,7 @@ defmodule KamanskyWeb.Paginate do
         )
       end
 
-      @spec sort_action(Phoenix.LiveView.Socket) :: atom
+      @impl true
       def sort_action(socket), do: socket.assigns.live_action
 
       defoverridable default_direction: 1, default_sort: 1, sort_action: 1
@@ -65,7 +66,7 @@ defmodule KamanskyWeb.Paginate do
     params
     |> Map.take([:direction, :show, :page, :search, :sort])
     |> Map.merge(add)
-    |> then(&:maps.filter(fn k, v -> necessary?(implementation, action, k, v) end, &1))
+    |> Map.filter(fn {k, v} -> necessary?(implementation, action, k, v) end)
   end
 
   @spec current_page(Phoenix.LiveView.Socket.t, map, integer, Kamansky.Paginate.sort_direction, integer) :: integer

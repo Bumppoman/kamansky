@@ -148,7 +148,7 @@ defmodule Kamansky.Sales.Listings do
 
   @spec median_price_data_for_sold_listings :: map
   def median_price_data_for_sold_listings do
-    for class <- Stamps.Stamp.grade_classes() do
+    for class <- Stamps.Stamp.grade_classes(), into: %{} do
       {
         class.name,
         Listing
@@ -159,7 +159,6 @@ defmodule Kamansky.Sales.Listings do
         |> Repo.one()
       }
     end
-    |> Enum.into(%{})
   end
 
   @impl true

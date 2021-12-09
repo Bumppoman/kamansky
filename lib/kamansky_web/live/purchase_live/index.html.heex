@@ -26,7 +26,9 @@
     empty_message="There are no purchases to display."
   >
     <:col let={purchase} label="Date">
-      <time datetime={purchase.date}><%= formatted_date(purchase.date) %></time>
+      <%= live_redirect to: Routes.purchase_show_path(@socket, :show, purchase) do %>
+        <time datetime={purchase.date}><%= formatted_date(purchase.date) %></time>
+      <% end %>
     </:col>
     <:col let={purchase} label="Description">
       <%= purchase.description %>

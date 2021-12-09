@@ -30,9 +30,19 @@ defmodule Kamansky.Paginate do
       if Module.has_attribute?(__MODULE__, :sort_columns) do
         @sort_columns
         |> Enum.with_index()
-        |> Enum.each(fn {column, index} ->
-          @impl true
-          def sort(query, %{column: unquote(index), direction: direction}), do: order_by(query, ^Paginate.make_query_column(unquote(column), direction))
+        |> Enum.each(fn
+          {%{actions: actions, sort: sort}, _index} ->
+            sort
+            |> Enum.with_index()
+            |> Enum.each(fn {column, index} ->
+              @impl true
+              def sort(query, %{action: action, column: unquote(index), direction: direction}) when action in unquote(actions) do
+                order_by(query, ^Paginate.make_query_column(unquote(column), direction))
+              end
+            end)
+          {column, index} ->
+            @impl true
+            def sort(query, %{column: unquote(index), direction: direction}), do: order_by(query, ^Paginate.make_query_column(unquote(column), direction))
         end)
       else
         @impl true
@@ -41,30 +51,6 @@ defmodule Kamansky.Paginate do
 
       defoverridable sort: 2
     end
-  end
-
-  defmacrop compare(field_name, operator, value) do
-    {
-      operator,
-      [context: Elixir, import: Kernel],
-      [
-        {
-          :field,
-          [],
-          [
-            {:b, [], Elixir},
-            field_name
-          ]
-        },
-        value
-      ]
-    }
-  end
-
-  def cursorize(query, order_by, last) do
-    Enum.reduce(order_by, query, fn clause, q ->
-      where(q, [{^clause.binding, b}], compare(^clause.field, :>, ^Map.get(last, clause.field)))
-    end)
   end
 
   @spec find_row_number(Ecto.Queryable.t, pos_integer, atom | list, sort_direction) :: integer | nil

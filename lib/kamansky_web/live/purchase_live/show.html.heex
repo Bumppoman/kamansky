@@ -1,0 +1,33 @@
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main>
+  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
+    empty_message="There are no stamps in this purchase to display."
+  >
+    <:col let={stamp} label="Scott Number">
+      <%= stamp.scott_number %>
+    </:col>
+    <:col let={stamp} label="Status">
+      <%= String.capitalize(Atom.to_string(stamp.status)) %>
+    </:col>
+    <:col let={stamp} label="Quantity">
+      <%# purchase.quantity %>
+    </:col>
+    <:col let={stamp} label="In Collection">
+      <%# Purchase.stamps_in_collection(purchase) %>
+    </:col>
+    <:col let={stamp} label="Listed">
+      <%# Purchase.stamps_listed(purchase) %>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
+</main>

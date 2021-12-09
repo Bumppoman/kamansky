@@ -56,6 +56,7 @@ defmodule KamanskyWeb.Router do
 
       live "/purchases", PurchaseLive.Index, :index
       live "/purchases/new", PurchaseLive.Index, :new
+      live "/purchases/:id", PurchaseLive.Show, :show
 
       live "/reports", ReportLive.Index, :index
       live "/reports/:year/overall", ReportLive.Show, :index

@@ -141,6 +141,7 @@ defmodule KamanskyWeb.Components.DataTable do
     """
   end
 
+  @spec dummy_page_link :: Phoenix.HTML.safe
   defp dummy_page_link do
     Phoenix.HTML.Tag.content_tag(
       :span,
@@ -160,6 +161,7 @@ defmodule KamanskyWeb.Components.DataTable do
     end
   end
 
+  @spec header_align(map) :: String.t
   defp header_align(%{class: classlist}) when is_binary(classlist) do
     cond do
       String.contains?(classlist, "text-center") -> "text-center"
@@ -183,41 +185,44 @@ defmodule KamanskyWeb.Components.DataTable do
       )
   end
 
-  @spec page_links(Phoenix.LiveView.Socket.t, atom, KamanskyWeb.Paginate.params) :: [String.t]
-  defp page_links(socket, action, pagination) do
-    cond do
-      pagination.total_pages < 8 ->
-        for page <- (1..pagination.total_pages) do
+  @spec page_links(Phoenix.LiveView.Socket.t, atom, KamanskyWeb.Paginate.params) :: [String.t | Phoenix.HTML.safe]
+  defp page_links(socket, action, pagination) when pagination.total_pages < 8 do
+    for page <- (1..pagination.total_pages) do
+      link_to_page(socket, action, pagination, page)
+    end
+  end
+
+  defp page_links(socket, action, pagination) when pagination.page - 3 > 1 and pagination.page + 3 < pagination.total_pages do
+    with(
+      pages <-
+        for page <- (pagination.page - 2..pagination.page + 2) do
           link_to_page(socket, action, pagination, page)
         end
-      pagination.page - 3 > 1 and pagination.page + 3 < pagination.total_pages ->
-        with(
-          pages <-
-            for page <- (pagination.page - 2..pagination.page + 2) do
-              link_to_page(socket, action, pagination, page)
-            end
-        ) do
-          [link_to_page(socket, action, pagination, 1), dummy_page_link()]
-          ++ pages
-          ++ [dummy_page_link(), link_to_page(socket, action, pagination, pagination.total_pages)]
-        end
-      pagination.page + 7 < pagination.total_pages ->
-        with(
-          pages <-
-            for page <- (1..7) do
-              link_to_page(socket, action, pagination, page)
-            end
-        ) do
-          pages ++ [dummy_page_link(), link_to_page(socket, action, pagination, pagination.total_pages)]
-        end
-      true ->
-        pages =
-          for page <- (pagination.total_pages - 7..pagination.total_pages) do
-            link_to_page(socket, action, pagination, page)
-          end
-
-        [link_to_page(socket, action, pagination, 1), dummy_page_link()] ++ pages
+    ) do
+      [link_to_page(socket, action, pagination, 1), dummy_page_link()]
+      ++ pages
+      ++ [dummy_page_link(), link_to_page(socket, action, pagination, pagination.total_pages)]
     end
+  end
+
+  defp page_links(socket, action, pagination) when pagination.page + 7 < pagination.total_pages do
+    with(
+      pages <-
+        for page <- (1..7) do
+          link_to_page(socket, action, pagination, page)
+        end
+    ) do
+      pages ++ [dummy_page_link(), link_to_page(socket, action, pagination, pagination.total_pages)]
+    end
+  end
+
+  defp page_links(socket, action, pagination) do
+    pages =
+      for page <- (pagination.total_pages - 7..pagination.total_pages) do
+        link_to_page(socket, action, pagination, page)
+      end
+
+    [link_to_page(socket, action, pagination, 1), dummy_page_link()] ++ pages
   end
 
   @spec path(Phoenix.LiveView.Socket.t, atom, Kamansky.Paginate.params, keyword) :: String.t
