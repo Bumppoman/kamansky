@@ -28,15 +28,12 @@
       #<%= listing.stamp.inventory_key %>
     </:col>
     <:col let={listing} label="Grade">
-      <span><%= Stamp.formatted_grade(listing.stamp) %></span>
-      <%= if Stamp.flaws?(listing.stamp) do %>
-        <sup class="fs-6">
-          <a
-            tabindex="0"
-            title="Flaws"
-          >*</a>
-        </sup>
-      <% end %>
+      <div class="flex md:flex-row flex-col relative items-start w-full">
+        <span><%= Stamp.formatted_grade(listing.stamp) %></span>
+        <%= if Stamp.flaws?(listing.stamp) do %>
+          <KamanskyWeb.ListingLive.Components.flaws stamp={listing.stamp} />
+        <% end %>
+      </div>
     </:col>
     <:col let={listing} label="Price">
       <%= format_decimal_as_currency(listing.listing_price) %>

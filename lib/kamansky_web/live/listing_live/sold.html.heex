@@ -15,14 +15,19 @@
     empty_message="There are no sold listings to display."
   >
     <:col let={listing} label="Scott Number">
-      <a
-        class="action-icon"
-        phx-click="open"
-        phx-target="#stamp-detail-modal"
-        phx-value-stamp-id={listing.stamp.id}
-      >
-        <%= listing.stamp.scott_number %>
-      </a>
+      <div class="flex md:flex-row flex-col relative items-start w-full">
+        <a
+          class="action-icon"
+          phx-click="open"
+          phx-target="#stamp-detail-modal"
+          phx-value-stamp-id={listing.stamp.id}
+        >
+          <%= listing.stamp.scott_number %>
+        </a>
+        <%= if Stamp.flaws?(listing.stamp) do %>
+          <KamanskyWeb.ListingLive.Components.flaws stamp={listing.stamp} />
+        <% end %>
+      </div>
     </:col>
     <:col let={listing} label="Date of Sale">
       <time datetime={listing.order.ordered_at}><%= formatted_date(listing.order.ordered_at) %></time>
