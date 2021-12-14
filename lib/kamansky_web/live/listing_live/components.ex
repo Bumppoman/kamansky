@@ -17,7 +17,7 @@ defmodule KamanskyWeb.ListingLive.Components do
         >*</a>
       </sup>
       <div
-        class="absolute transition duration-150 ease-in-out mt-8 md:mt-0 -top-6 left-4 sm:ml-10 w-10/12 md:w-1/2"
+        class="absolute transition duration-150 ease-in-out mt-8 md:mt-0 -top-6 left-4 sm:ml-10 w-10/12 md:w-min"
         x-cloak
         x-show="showFlaws"
       >

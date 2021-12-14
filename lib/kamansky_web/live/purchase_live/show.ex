@@ -2,11 +2,14 @@ defmodule KamanskyWeb.PurchaseLive.Show do
   use KamanskyWeb, :live_view
   use KamanskyWeb.Paginate, sort: {0, :asc}
 
-  import Kamansky.Helpers, only: [formatted_date: 1]
+  import Kamansky.Helpers, only: [format_decimal_as_currency: 1, formatted_date: 1]
+  import KamanskyWeb.Helpers
 
   alias Kamansky.Operations.Purchases
   alias Kamansky.Operations.Purchases.Purchase
+  alias Kamansky.Sales.Listings.Listing
   alias Kamansky.Stamps
+  alias Kamansky.Stamps.Stamp
 
   @impl true
   @spec mount(map, map, Phoenix.LiveView.Socket.t) :: {:ok, Phoenix.LiveView.Socket.t}
@@ -41,4 +44,18 @@ defmodule KamanskyWeb.PurchaseLive.Show do
   @impl true
   @spec sort_action(Phoenix.LiveView.Socket.t) :: atom
   def sort_action(_socket), do: :in_purchase
+
+  @spec formatted_price_to_display(Stamp.t) :: String.t
+  defp formatted_price_to_display(%Stamp{} = stamp) do
+    with %Decimal{} = price <- raw_price_to_display(stamp) do
+      format_decimal_as_currency(price)
+    else
+      nil -> "---"
+    end
+  end
+
+  @spec raw_price_to_display(Stamp.t) :: Decimal.t | nil
+  defp raw_price_to_display(%Stamp{status: status}) when status in [:collection, :stock], do: nil
+  defp raw_price_to_display(%Stamp{status: :listed, listing: %Listing{listing_price: price}}), do: price
+  defp raw_price_to_display(%Stamp{status: :sold, listing: %Listing{sale_price: price}}), do: price
 end

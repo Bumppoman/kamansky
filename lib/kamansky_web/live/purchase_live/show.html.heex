@@ -20,8 +20,8 @@
     <:col let={stamp} label="Status">
       <%= String.capitalize(Atom.to_string(stamp.status)) %>
     </:col>
-    <:col let={stamp} label="Quantity">
-      <%# purchase.quantity %>
+    <:col let={stamp} label="Price">
+      <span class={color_for_currency(raw_price_to_display(stamp))}><%= formatted_price_to_display(stamp) %></span>
     </:col>
     <:col let={stamp} label="In Collection">
       <%# Purchase.stamps_in_collection(purchase) %>

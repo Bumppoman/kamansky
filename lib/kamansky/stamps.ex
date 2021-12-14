@@ -38,14 +38,13 @@ defmodule Kamansky.Stamps do
     |> Repo.one()
   end
 
-  @spec cost_of_stamps([atom], integer) :: float
+  @spec cost_of_stamps([atom] | atom, integer) :: float
   def cost_of_stamps(status, month) when is_list(status) do
     Stamp
     |> where([s], s.status in ^status)
     |> cost_of_stamps_for_month(month)
   end
 
-  @spec cost_of_stamps(atom, integer) :: float
   def cost_of_stamps(status, month) do
     Stamp
     |> where(status: ^status)
@@ -77,14 +76,13 @@ defmodule Kamansky.Stamps do
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec count_stamps_purchased([atom], integer) :: integer
+  @spec count_stamps_purchased([atom] | atom, integer) :: integer
   def count_stamps_purchased(status, month) when is_list(status) do
     Stamp
     |> where([s], s.status in ^status)
     |> count_stamps_purchased_in_month(month)
   end
 
-  @spec count_stamps_purchased(atom, integer) :: integer
   def count_stamps_purchased(status, month) do
     Stamp
     |> where(status: ^status)
@@ -186,7 +184,9 @@ defmodule Kamansky.Stamps do
   def list_stamps_in_purchase(id, params) do
     Stamp
     |> where(purchase_id: ^id)
+    |> join(:left, [s], l in assoc(s, :listing))
     |> maybe_search(params.search)
+    |> preload([s, l], listing: l)
     |> then(&Paginate.list(Stamps, &1, params))
   end
 
@@ -270,7 +270,7 @@ defmodule Kamansky.Stamps do
   def update_stamp(%Stamp{} = stamp, attrs, front_photo, rear_photo) do
     stamp
     |> Stamp.changeset(attrs)
-    |> handle_photos(front_photo, rear_photo)
+    |> maybe_attach_photos(front_photo, rear_photo)
     |> Repo.update()
   end
 
@@ -289,11 +289,11 @@ defmodule Kamansky.Stamps do
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec handle_photos(Ecto.Changeset.t, Kamansky.Attachments.Attachment.t | nil, Kamansky.Attachments.Attachment.t) :: Ecto.Changeset.t
-  defp handle_photos(changeset, nil, nil), do: changeset
-  defp handle_photos(changeset, front_photo, nil), do: Ecto.Changeset.put_change(changeset, :front_photo_id, front_photo.id)
-  defp handle_photos(changeset, nil, rear_photo), do: Ecto.Changeset.put_change(changeset, :rear_photo_id, rear_photo.id)
-  defp handle_photos(changeset, front_photo, rear_photo), do: Ecto.Changeset.change(changeset, [front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
+  @spec maybe_attach_photos(Ecto.Changeset.t, Kamansky.Attachments.Attachment.t | nil, Kamansky.Attachments.Attachment.t | nil) :: Ecto.Changeset.t
+  defp maybe_attach_photos(changeset, nil, nil), do: changeset
+  defp maybe_attach_photos(changeset, front_photo, nil), do: Ecto.Changeset.put_change(changeset, :front_photo_id, front_photo.id)
+  defp maybe_attach_photos(changeset, nil, rear_photo), do: Ecto.Changeset.put_change(changeset, :rear_photo_id, rear_photo.id)
+  defp maybe_attach_photos(changeset, front_photo, rear_photo), do: Ecto.Changeset.change(changeset, [front_photo_id: front_photo.id, rear_photo_id: rear_photo.id])
 
   @spec maybe_search(Ecto.Queryable.t, String.t | nil) :: Ecto.Queryable.t
   defp maybe_search(query, nil), do: query

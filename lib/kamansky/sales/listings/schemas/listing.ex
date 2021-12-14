@@ -36,7 +36,7 @@ defmodule Kamansky.Sales.Listings.Listing do
     has_one :hipstamp_listing, Kamansky.Sales.Listings.Platforms.HipstampListing
   end
 
-  @spec changeset(Listing.t, map) :: Ecto.Changeset.t
+  @spec changeset(t, map) :: Ecto.Changeset.t
   def changeset(%Listing{} = listing, attrs) do
     listing
     |> cast(attrs, [:ebay, :hipstamp, :hipstamp_description, :hipstamp_title, :listing_price, :order_id, :sale_price])
@@ -61,6 +61,6 @@ defmodule Kamansky.Sales.Listings.Listing do
   def internal_only?(%Listing{ebay_listing: nil, hipstamp_listing: nil}), do: true
   def internal_only?(%Listing{}), do: false
 
-  @spec net_profit(Listing.t) :: Decimal.t
+  @spec net_profit(t) :: Decimal.t
   def net_profit(%Listing{} = listing), do: Decimal.sub(listing.sale_price, Stamp.total_cost(listing.stamp))
 end
