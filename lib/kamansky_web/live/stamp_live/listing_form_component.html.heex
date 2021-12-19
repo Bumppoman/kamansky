@@ -32,87 +32,32 @@
             <p><%= format_decimal_as_currency(Listings.get_median_listing_price_for_scott_number(@stamp.scott_number)) %></p>
           </div>
         </div>
-        <div class="grid grid-cols-2">
-          <div class="form-group required">
-            <%= label f, :listing_price, "Listing Price" %>
-            <div class="form-input">
-              <div class="form-input-prepend">
-                <span>$</span>
+        <div class="flex flex-col form-group required">
+          <label>List On</label>
+          <div class="flex flex-grow flex-row items-center">
+            <div class="flex flex-grow">
+              <div>
+                <%= checkbox f, :hipstamp %>
               </div>
-              <%= text_input f, :listing_price %>
+              <div class="ml-3">
+                <label>Hipstamp</label>
+              </div>
             </div>
-          </div>
-          <div class="flex flex-col form-group required">
-            <label>List On</label>
-            <div class="flex flex-grow flex-row items-center">
-              <div class="flex flex-grow">
-                <div>
-                  <%= checkbox f, :hipstamp %>
-                </div>
-                <div class="ml-3">
-                  <label>Hipstamp</label>
-                </div>
+            <div class="flex flex-grow">
+              <div>
+                <%= checkbox f, :ebay %>
               </div>
-              <div class="flex flex-grow">
-                <div>
-                  <%= checkbox f, :ebay %>
-                </div>
-                <div class="ml-3">
-                  <label>eBay</label>
-                </div>
+              <div class="ml-3">
+                <label>eBay</label>
               </div>
             </div>
           </div>
         </div>
         <%= if Ecto.Changeset.get_field(@changeset, :ebay) == true do %>
-          <h6 class="font-bold mb-2">eBay</h6>
-          <div class="form-group" x-data="{count: 0}">
-            <%= label f, :ebay_title, "Title" %>
-            <div class="form-input">
-              <%= text_input f, 
-                :ebay_title,
-                maxlength: 80,
-                "x-init": "count = $el.value.length",
-                "x-on:change": "count = $el.value.length"
-              %>
-            </div>
-            <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
-          </div>
-          <div class="form-group">
-            <%= label f, :ebay_description, "Description" %>
-            <div class="form-input">
-              <%= textarea f,
-                :ebay_description,
-                rows: 4,
-                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-              %>
-            </div>
-          </div>
+          <KamanskyWeb.ListingLive.Components.ebay_form f={f} />
         <% end %>
         <%= if Ecto.Changeset.get_field(@changeset, :hipstamp) == true do %>
-          <h6 class="font-bold mb-2">Hipstamp</h6>
-          <div class="form-group" x-data="{count: 0}">
-            <%= label f, :hipstamp_title, "Title" %>
-            <div class="form-input">
-              <%= text_input f, 
-                :hipstamp_title,
-                maxlength: 80,
-                "x-init": "count = $el.value.length",
-                "x-on:change": "count = $el.value.length"
-              %>
-            </div>
-            <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
-          </div>
-          <div class="form-group">
-            <%= label f, :hipstamp_description, "Description" %>
-            <div class="form-input">
-              <%= textarea f,
-                :hipstamp_description,
-                rows: 4,
-                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-              %>
-            </div>
-          </div>
+          <KamanskyWeb.ListingLive.Components.hipstamp_form f={f} />
         <% end %>
       </.form>
     </KamanskyWeb.Components.Modal.modal>

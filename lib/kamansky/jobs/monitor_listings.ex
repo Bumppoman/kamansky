@@ -3,7 +3,7 @@ require Logger
 defmodule Kamansky.Jobs.MonitorListings do
   use GenServer
 
-  alias Kamansky.Operations.Notifications
+  alias Kamansky.Operations.{Administration, Notifications}
   alias Kamansky.Sales.Listings.Platforms
   alias Kamansky.Sales.Listings.Platforms.EbayListing
   alias Kamansky.Services.{Ebay, Hipstamp}
@@ -24,7 +24,7 @@ defmodule Kamansky.Jobs.MonitorListings do
   @spec handle_info(:work, any) :: {:noreply, any}
   def handle_info(:work, state) do
     load_new_ebay_bids()
-    relist_ebay_listings()
+    relist_ebay_listings(Administration.get_setting!(:ebay_automatically_relist))
     schedule()
     {:noreply, state}
   end
@@ -65,8 +65,8 @@ defmodule Kamansky.Jobs.MonitorListings do
     end
   end
 
-  @spec relist_ebay_listings :: :ok
-  defp relist_ebay_listings do
+  @spec relist_ebay_listings(boolean) :: :ok
+  defp relist_ebay_listings(true) do
     case Platforms.list_expired_ebay_listings() do
       [] -> Logger.info("Kamansky.Jobs.MonitorListings: no eBay listings to relist")
       listings ->
@@ -80,6 +80,8 @@ defmodule Kamansky.Jobs.MonitorListings do
         end)
     end
   end
+
+  defp relist_ebay_listings(false), do: Logger.info("Kamansky.Jobs.MonitorListings: automatic relisting of eBay listings disabled")
 
   @spec update_ebay_listing(EbayListing.t, map) :: :ok
   defp update_ebay_listing(%EbayListing{} = kamansky_ebay_listing, ebay_listing) do

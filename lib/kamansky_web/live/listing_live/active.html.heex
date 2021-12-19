@@ -103,8 +103,9 @@
             class="action-icon"
             title="List on eBay"
             phx-click="open"
-            phx-target="#listing-list-on-ebay-form-modal"
+            phx-target="#listing-add-external-listing-form-modal"
             phx-value-listing-id={listing.id}
+            phx-value-type="ebay"
           >
             <img
               class="h-5 w-5"
@@ -113,17 +114,19 @@
           </a>
         <% end %>
         <%= unless Listing.hipstamp?(listing) do %>
-          <KamanskyWeb.Components.Page.link_with_confirmation
-            action="list_on_hipstamp"
-            content="Are you sure you want to list this listing on Hipstamp?"
+          <a
+            class="action-icon"
             title="List on Hipstamp"
-            values={[{"listing-id", listing.id}]}
+            phx-click="open"
+            phx-target="#listing-add-external-listing-form-modal"
+            phx-value-listing-id={listing.id}
+            phx-value-type="hipstamp"
           >
             <img
               class="h-5 w-5"
               src={Routes.static_path(@socket, "/images/hipstamp-logo.png")} 
             />
-          </KamanskyWeb.Components.Page.link_with_confirmation>
+          </a>
         <% end %>
       </div>
     </:col>
@@ -131,12 +134,12 @@
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
 </main>
 <.live_component 
-  module={KamanskyWeb.ListingLive.AddToOrderFormComponent}
-  id="listing-add-to-order-form-modal"
+  module={KamanskyWeb.ListingLive.AddExternalListingFormComponent}
+  id="listing-add-external-listing-form-modal"
 />
 <.live_component 
-  module={KamanskyWeb.ListingLive.ListOnEbayFormComponent}
-  id="listing-list-on-ebay-form-modal"
+  module={KamanskyWeb.ListingLive.AddToOrderFormComponent}
+  id="listing-add-to-order-form-modal"
 />
 <.live_component
   module={KamanskyWeb.StampLive.DetailComponent}

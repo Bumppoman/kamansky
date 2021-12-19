@@ -1,8 +1,59 @@
 defmodule KamanskyWeb.ListingLive.Components do
   use Phoenix.Component
 
+  import Phoenix.HTML.Form
+
   alias Kamansky.Stamps.Stamp
   alias KamanskyWeb.Router.Helpers, as: Routes
+
+  @spec ebay_form(map) :: Phoenix.LiveView.Rendered.t
+  def ebay_form(assigns) do
+    ~H"""
+    <h6 class="font-bold mb-2">eBay</h6>
+    <div class="form-group" x-data="{count: 0}">
+      <%= label @f, :ebay_title, "Title" %>
+      <div class="form-input">
+        <%= text_input @f,
+          :ebay_title,
+          maxlength: 80,
+          "x-init": "count = $el.value.length",
+          "x-on:change": "count = $el.value.length"
+        %>
+      </div>
+      <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
+    </div>
+    <div class="form-group">
+      <%= label @f, :ebay_description, "Description" %>
+      <div class="form-input">
+        <%= textarea @f,
+          :ebay_description,
+          rows: 4,
+          class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+        %>
+      </div>
+    </div>
+    <div class="grid grid-cols-2">
+      <div class="form-group required">
+        <%= label @f, :auction_price, "Auction Price" %>
+        <div class="form-input">
+          <div class="form-input-prepend">
+            <span>$</span>
+          </div>
+          <%= text_input @f, :auction_price %>
+        </div>
+      </div>
+      <div class="form-group required">
+        <%= label @f, :buy_it_now_price, "Buy It Now Price" %>
+        <div class="form-input">
+          <div class="form-input-prepend">
+            <span>$</span>
+          </div>
+          <%= text_input @f, :buy_it_now_price %>
+        </div>
+      </div>
+    </div>
+    """
+  end
 
   @spec flaws(map) :: Phoenix.LiveView.Rendered.t
   def flaws(assigns) do
@@ -37,6 +88,44 @@ defmodule KamanskyWeb.ListingLive.Components do
             <%= Stamp.formatted_flaws(@stamp) %>
           </div>
         </div>
+      </div>
+    </div>
+    """
+  end
+
+  @spec hipstamp_form(map) :: Phoenix.LiveView.Rendered.t
+  def hipstamp_form(assigns) do
+    ~H"""
+    <h6 class="font-bold mb-2">Hipstamp</h6>
+    <div class="form-group" x-data="{count: 0}">
+      <%= label @f, :hipstamp_title, "Title" %>
+      <div class="form-input">
+        <%= text_input @f,
+          :hipstamp_title,
+          maxlength: 80,
+          "x-init": "count = $el.value.length",
+          "x-on:change": "count = $el.value.length"
+        %>
+      </div>
+      <div class="mt-2 text-xs" x-text="count + '/80 characters'" />
+    </div>
+    <div class="form-group">
+      <%= label @f, :hipstamp_description, "Description" %>
+      <div class="form-input">
+        <%= textarea @f,
+          :hipstamp_description,
+          rows: 4,
+          class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+        %>
+      </div>
+    </div>
+    <div class="form-group required">
+      <%= label @f, :listing_price, "Listing Price" %>
+      <div class="form-input">
+        <div class="form-input-prepend">
+          <span>$</span>
+        </div>
+        <%= text_input @f, :listing_price %>
       </div>
     </div>
     """

@@ -1,0 +1,21 @@
+<div id={@id}>
+  <%= if @open do %>
+    <KamanskyWeb.Components.Modal.modal
+      parent_id={@id}
+      external="true"
+      form_id="listing-add-external-listing-form"
+      title={"List on #{listing_service(@type)}"}
+    >
+      <.form
+        let={f}
+        for={@changeset}
+        id="listing-list-externally-form"
+        phx_target={@myself}
+        phx_change="validate"
+        phx_submit="submit"
+      >
+        <%= component form_component(@type), f: f %>
+      </.form>
+    </KamanskyWeb.Components.Modal.modal>
+  <% end %>
+</div>
