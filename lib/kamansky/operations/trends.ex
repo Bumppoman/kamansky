@@ -12,7 +12,7 @@ defmodule Kamansky.Operations.Trends do
         grade_listings_query <-
           Listing
           |> join(:left, [l], s in assoc(l, :stamp))
-          |> where([l, s], s.grade >= ^grade.start and s.grade <= ^grade.finish),
+          |> grade_filter(grade.start, grade.end),
         grade_sold_listings_query <- where(grade_listings_query, status: :sold),
         grade_total_listings <- Repo.aggregate(grade_listings_query, :count),
         grade_total_sold_listings <- Repo.aggregate(grade_sold_listings_query, :count),
@@ -23,6 +23,7 @@ defmodule Kamansky.Operations.Trends do
           grade.name,
           %{
             average_listing_time: average_listing_time(grade_sold_listings_query),
+            percent_sold: percent_sold(grade_total_sold_listings, grade_total_listings),
             profit_ratio: profit_ratio(grade_total_sales_income, grade_total_sold_cost),
             total_listings: grade_total_listings,
             total_sales_income: grade_total_sales_income,
@@ -103,6 +104,14 @@ defmodule Kamansky.Operations.Trends do
     round((era_total_sold / total_listings) * 100)
   end
   defp conversion_percentage(_, _), do: 0
+
+  @spec grade_filter(Ecto.Queryable.t, integer, integer) :: Ecto.Queryable.t
+  defp grade_filter(query, 0, 39), do: where(query, [l, s], is_nil(s.grade) or (s.grade >= 0 and s.grade <= 39))
+  defp grade_filter(query, start, finish), do: where(query, [l, s], s.grade >= ^start and s.grade <= ^finish)
+
+  @spec percent_sold(integer, integer) :: float | integer
+  defp percent_sold(sold, total) when sold == 0 or total == 0, do: 0
+  defp percent_sold(sold, total), do: round((sold / total) * 100)
 
   @spec profit_ratio(any, any) :: Decimal.t
   defp profit_ratio(%Decimal{} = total_sales_income, %Decimal{} = total_cost) do
