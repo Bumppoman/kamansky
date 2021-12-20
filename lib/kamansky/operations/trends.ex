@@ -16,16 +16,17 @@ defmodule Kamansky.Operations.Trends do
         grade_sold_listings_query <- where(grade_listings_query, status: :sold),
         grade_total_listings <- Repo.aggregate(grade_listings_query, :count),
         grade_total_sold_listings <- Repo.aggregate(grade_sold_listings_query, :count),
-        grade_total_cost <- total_cost(grade_listings_query),
+        grade_total_sold_cost <- total_cost(grade_sold_listings_query),
         grade_total_sales_income <- Repo.aggregate(grade_sold_listings_query, :sum, :sale_price)
       ) do
         {
           grade.name,
           %{
             average_listing_time: average_listing_time(grade_sold_listings_query),
-            profit_ratio: profit_ratio(grade_total_sales_income, grade_total_cost),
-            total_cost: grade_total_cost,
+            profit_ratio: profit_ratio(grade_total_sales_income, grade_total_sold_cost),
             total_listings: grade_total_listings,
+            total_sales_income: grade_total_sales_income,
+            total_sold_cost: grade_total_sold_cost,
             total_sold_listings: grade_total_sold_listings
           }
         }
@@ -55,7 +56,7 @@ defmodule Kamansky.Operations.Trends do
           era_sold_listings_query
           |> select([l], fragment("PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ?) AS median_sale_price", l.listing_price))
           |> Repo.one(),
-        total_cost <- total_cost(era_sold_listings_query),
+        total_sold_cost <- total_cost(era_sold_listings_query),
         total_sales_income <- Repo.aggregate(era_sold_listings_query, :sum, :sale_price)
       ) do
         {
@@ -66,8 +67,8 @@ defmodule Kamansky.Operations.Trends do
             median_sale_price: era_median_sale_price,
             percentage_of_total_listings: round((era_total_listings / total_listings) * 100),
             percentage_of_total_sales: round((era_total_sold / total_sold) * 100),
-            profit_ratio: profit_ratio(total_sales_income, total_cost),
-            total_cost: total_cost,
+            profit_ratio: profit_ratio(total_sales_income, total_sold_cost),
+            total_sold_cost: total_sold_cost,
             total_sales_income: total_sales_income
           }
         }
