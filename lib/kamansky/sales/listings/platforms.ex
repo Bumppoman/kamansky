@@ -67,6 +67,7 @@ defmodule Kamansky.Sales.Listings.Platforms do
     |> Repo.update()
   end
 
+  @spec external_listing_struct(:ebay | :hipstamp) :: EbayListing.t | HipstampListing.t
   defp external_listing_struct(:ebay), do: %EbayListing{}
   defp external_listing_struct(:hipstamp), do: %HipstampListing{}
 end

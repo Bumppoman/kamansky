@@ -19,6 +19,7 @@ defmodule KamanskyWeb.TrendLive.Index do
       socket
       |> assign(:era_sold_listing_data, Trends.sold_listing_data_by_era())
       |> assign(:format_data, format_data(sold_stamps_by_format, total_sold_stamps))
+      |> assign(:grade_listing_data, Trends.listing_data_by_grade())
       |> assign(:hinged, (hinged / total_sold_stamps) * 100)
       |> assign(:letter_grade_data, letter_grade_data(sold_stamps_by_grade, total_sold_stamps))
       |> assign(:never_hinged, (never_hinged / total_sold_stamps) * 100)

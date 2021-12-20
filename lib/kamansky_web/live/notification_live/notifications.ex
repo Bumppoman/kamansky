@@ -34,5 +34,5 @@ defmodule KamanskyWeb.NotificationLive.Notifications do
 
   @impl true
   @spec handle_info({:new, Notification.t}, Phoenix.LiveView.Socket.t) :: {:noreply, Phoenix.LiveView.Socket.t}
-  def handle_info({:new, %Notification{} = notification}, socket), do: {:noreply, assign(socket, :notifications, [notification])}
+  def handle_info({:new, %Notification{} = notification}, socket), do: {:noreply, assign(socket, :notifications, [Notification.display(notification)])}
 end

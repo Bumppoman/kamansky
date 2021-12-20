@@ -28,7 +28,7 @@ defmodule Kamansky.Operations.Notifications do
         %Notification{}
         |> Notification.changeset(%{topic: topic, associated_record: associated_record})
         |> Repo.insert(),
-      :ok <- Phoenix.PubSub.broadcast(Kamansky.PubSub, Atom.to_string(topic), {:new, Notification.display(notification)})
+      :ok <- Phoenix.PubSub.broadcast(Kamansky.PubSub, Atom.to_string(topic), {:new, notification})
     ) do
       {:ok, notification}
     end

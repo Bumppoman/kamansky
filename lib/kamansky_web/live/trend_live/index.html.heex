@@ -74,5 +74,34 @@
       </table>
     </div>
   </div>
+  <div class="mt-4">
+    <h4 class="font-medium text-xl">Sales by Grade</h4>
+    <div class="mt-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Listings</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sold</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost ($)</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Ratio</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Average Time to Sale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= for {{grade, data}, counter} <- Enum.with_index(@grade_listing_data) do %>
+            <tr class={if rem(counter, 2) != 0, do: "bg-white", else: "bg-gray-50"}>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= grade %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.total_listings %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.total_sold_listings %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(data.total_cost) %>%</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.profit_ratio %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data.average_listing_time %> days</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
   <KamanskyWeb.TrendLive.Components.footer socket={@socket} />
 </main>
