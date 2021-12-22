@@ -12,7 +12,7 @@ defmodule Kamansky.Operations.Trends do
         grade_listings_query <-
           Listing
           |> join(:left, [l], s in assoc(l, :stamp))
-          |> grade_filter(grade.start, grade.end),
+          |> grade_filter(grade.start, grade.finish),
         grade_sold_listings_query <- where(grade_listings_query, status: :sold),
         grade_total_listings <- Repo.aggregate(grade_listings_query, :count),
         grade_total_sold_listings <- Repo.aggregate(grade_sold_listings_query, :count),

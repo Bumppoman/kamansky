@@ -97,8 +97,12 @@ defmodule KamanskyWeb.Paginate do
   defp direction(_socket, %{"direction" => direction}), do: String.to_existing_atom(direction)
   defp direction(%Phoenix.LiveView.Socket{} = socket, _), do: apply(socket.view, :default_direction, [socket.assigns.live_action])
 
+  @spec maybe_update_page(Phoenix.LiveView.Socket.t, Kamansky.Paginate.params, integer) :: Phoenix.LiveView.Socket.t
   defp maybe_update_page(socket, %{page: page, search: search, show: show} = params, uri_page) when not is_nil(show) and (not is_nil(search) or page != uri_page) do
     push_patch(socket, to: apply(socket.view, :self_path, [socket, socket.assigns.live_action, params, %{search: nil}]))
+  end
+  defp maybe_update_page(socket, %{page: page, total_pages: total_pages} = params, _uri_page) when page > total_pages do
+    push_patch(socket, to: apply(socket.view, :self_path, [socket, socket.assigns.live_action, %{params | page: total_pages}, %{}]))
   end
   defp maybe_update_page(socket, _params, _uri_page), do: socket
 
