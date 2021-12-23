@@ -132,7 +132,7 @@
     }
     
     tr.odd td.sorting {
-      @apply bg-warm-gray-50;
+      @apply bg-stone-50;
     }
   }
 

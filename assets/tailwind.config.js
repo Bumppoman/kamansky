@@ -3,11 +3,11 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   mode: 'jit',
-  purge: ['./ts/**/*.ts', './node_modules/phoenix*/**/*.js', '../lib/*_web/**/*.*ex'],
+  content: ['./ts/**/*.ts', './node_modules/phoenix*/**/*.js', '../lib/*_web/**/*.*ex'],
   theme: {
     extend: {
       colors: {
-        'warm-gray': colors.warmGray
+        green: colors.emerald
       },
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
@@ -16,9 +16,6 @@ module.exports = {
         '10': '0.1'
       }
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [
     require('@tailwindcss/aspect-ratio'),
