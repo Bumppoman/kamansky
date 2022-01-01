@@ -9,9 +9,7 @@ defmodule Kamansky.Jobs.MonitorListings do
   alias Kamansky.Services.{Ebay, Hipstamp}
 
   @spec start_link(any) :: :ignore | {:error, any} | {:ok, pid}
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
-  end
+  def start_link(state), do: GenServer.start_link(__MODULE__, state, name: __MODULE__)
 
   @impl true
   @spec init(any) :: {:ok, any}
@@ -30,9 +28,7 @@ defmodule Kamansky.Jobs.MonitorListings do
   end
 
   @spec schedule :: reference
-  defp schedule do
-    Process.send_after(self(), :work, 120000)
-  end
+  defp schedule, do: Process.send_after(self(), :work, 120000)
 
   @spec load_new_ebay_bids :: :ok
   defp load_new_ebay_bids do

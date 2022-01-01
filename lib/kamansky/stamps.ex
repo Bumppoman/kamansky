@@ -1,6 +1,6 @@
 defmodule Kamansky.Stamps do
   import Ecto.Query, warn: false
-  import Kamansky.Helpers, only: [filter_query_for_month: 2]
+  import Kamansky.Helpers, only: [filter_query_for_year_and_month: 3]
 
   @sort_columns [
     %{
@@ -38,17 +38,17 @@ defmodule Kamansky.Stamps do
     |> Repo.one()
   end
 
-  @spec cost_of_stamps([atom] | atom, integer) :: float
-  def cost_of_stamps(status, month) when is_list(status) do
+  @spec cost_of_stamps([atom] | atom, integer, integer) :: float
+  def cost_of_stamps(status, year, month) when is_list(status) do
     Stamp
     |> where([s], s.status in ^status)
-    |> cost_of_stamps_for_month(month)
+    |> cost_of_stamps_for_month(year, month)
   end
 
-  def cost_of_stamps(status, month) do
+  def cost_of_stamps(status, year, month) do
     Stamp
     |> where(status: ^status)
-    |> cost_of_stamps_for_month(month)
+    |> cost_of_stamps_for_month(year, month)
   end
 
   @spec count_stamps(atom, String.t | nil) :: integer
@@ -76,17 +76,17 @@ defmodule Kamansky.Stamps do
     |> Repo.aggregate(:count, :id)
   end
 
-  @spec count_stamps_purchased([atom] | atom, integer) :: integer
-  def count_stamps_purchased(status, month) when is_list(status) do
+  @spec count_stamps_purchased([atom] | atom, integer, integer) :: integer
+  def count_stamps_purchased(status, year, month) when is_list(status) do
     Stamp
     |> where([s], s.status in ^status)
-    |> count_stamps_purchased_in_month(month)
+    |> count_stamps_purchased_in_month(year, month)
   end
 
-  def count_stamps_purchased(status, month) do
+  def count_stamps_purchased(status, year, month) do
     Stamp
     |> where(status: ^status)
-    |> count_stamps_purchased_in_month(month)
+    |> count_stamps_purchased_in_month(year, month)
   end
 
   @spec create_stamp(%{}, Kamansky.Attachments.Attachment.t, Kamansky.Attachments.Attachment.t) :: {:ok, Stamp.t} | {:error, Ecto.Changeset.t}
@@ -274,18 +274,18 @@ defmodule Kamansky.Stamps do
     |> Repo.update()
   end
 
-  @spec cost_of_stamps_for_month(Ecto.Query.t, integer) :: float
-  defp cost_of_stamps_for_month(query, month) do
+  @spec cost_of_stamps_for_month(Ecto.Query.t, integer, integer) :: float
+  defp cost_of_stamps_for_month(query, year, month) do
     query
-    |> filter_query_for_month(month)
+    |> filter_query_for_year_and_month(year, month)
     |> select([s], sum(s.cost + s.purchase_fees))
     |> Repo.one()
   end
 
-  @spec count_stamps_purchased_in_month(Ecto.Query.t, integer) :: integer
-  defp count_stamps_purchased_in_month(query, month) do
+  @spec count_stamps_purchased_in_month(Ecto.Query.t, integer, integer) :: integer
+  defp count_stamps_purchased_in_month(query, year, month) do
     query
-    |> filter_query_for_month(month)
+    |> filter_query_for_year_and_month(year, month)
     |> Repo.aggregate(:count, :id)
   end
 

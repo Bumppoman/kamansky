@@ -7,7 +7,7 @@ defmodule Kamansky.Sales.Orders do
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
-  import Kamansky.Helpers, only: [filter_query_for_month: 3, filter_query_for_year_and_month: 4]
+  import Kamansky.Helpers, only: [filter_query_for_year_and_month: 4]
 
   alias __MODULE__
   alias Kamansky.Repo
@@ -23,9 +23,9 @@ defmodule Kamansky.Sales.Orders do
   @spec count_orders(:all | [{:month, integer} | {:status, atom}]) :: integer
   def count_orders(:all), do: Repo.aggregate(Order, :count, :id)
 
-  def count_orders(month: month) do
+  def count_orders(year: year, month: month) do
     Order
-    |> filter_query_for_month(month, :ordered_at)
+    |> filter_query_for_year_and_month(year, month, :ordered_at)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -239,19 +239,19 @@ defmodule Kamansky.Sales.Orders do
   @spec total_net_profit(atom) :: Decimal.t
   def total_net_profit(:all), do: total_net_profit_calculation(Order)
 
-  @spec total_net_profit([month: integer]) :: Decimal.t
-  def total_net_profit(month: month) do
+  @spec total_net_profit([month: integer, year: integer]) :: Decimal.t
+  def total_net_profit(year: year, month: month) do
     Order
-    |> filter_query_for_month(month, :ordered_at)
+    |> filter_query_for_year_and_month(year, month, :ordered_at)
     |> total_net_profit_calculation()
   end
 
-  @spec total_stamps_in_orders(atom | [{:month, integer}]) :: integer
+  @spec total_stamps_in_orders(atom | [month: integer, year: integer]) :: integer
   def total_stamps_in_orders(:all), do: stamps_in_orders_calculation(Order)
 
-  def total_stamps_in_orders(month: month) do
+  def total_stamps_in_orders(year: year, month: month) do
     Order
-    |> filter_query_for_month(month, :ordered_at)
+    |> filter_query_for_year_and_month(year, month, :ordered_at)
     |> stamps_in_orders_calculation()
   end
 

@@ -6,6 +6,7 @@ defmodule Kamansky.Sales.Listings do
   alias __MODULE__
   alias Kamansky.Repo
   alias Kamansky.Sales.Listings.Listing
+  alias Kamansky.Services
   alias Kamansky.Stamps
 
   @spec add_listing_to_order(Listing.t, map) :: {:ok, Listing.t} | {:error, Ecto.Changeset.t}
@@ -14,12 +15,15 @@ defmodule Kamansky.Sales.Listings do
       {:ok, _stamp} <-
         stamp_id
         |> Stamps.get_stamp!()
-        |> Stamps.mark_stamp_as_sold()
+        |> Stamps.mark_stamp_as_sold(),
+      {:ok, listing} <-
+        listing
+        |> change_listing(attrs)
+        |> Ecto.Changeset.put_change(:status, :sold)
+        |> Repo.update(),
+      :ok <- Services.Listing.delist_any_external_listings(listing)
     ) do
       listing
-      |> change_listing(attrs)
-      |> Ecto.Changeset.put_change(:status, :sold)
-      |> Repo.update()
     end
   end
 

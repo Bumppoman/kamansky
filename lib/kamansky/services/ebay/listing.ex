@@ -162,6 +162,40 @@ defmodule Kamansky.Services.Ebay.Listing do
     |> Enum.filter(&(&1.bid_count > 0 and &1.listing_status == "Active"))
   end
 
+  @spec maybe_remove_listing(Listing.t) :: {:ebay_removed | :noop, Listing.t}
+  def maybe_remove_listing(%Listing{} = listing) do
+    with %EbayListing{ebay_id: ebay_id} = ebay_listing <- Platforms.get_ebay_listing_for_listing(listing),
+      response <-
+        """
+        <?xml version="1.0" encoding="utf-8"?>
+        <EndItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+          #{Ebay.requester_credentials()}
+          <ItemID>#{ebay_id}</ItemID>
+          <EndingReason>NotAvailable</EndingReason>
+        </EndItemRequest>
+        """
+        |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "EndItem"}]))
+        |> Map.get(:body)
+    do
+      response
+      |> parse(dtd: :none)
+      |> xpath(
+        ~x"//EndItemResponse",
+        outcome: ~x".//Ack/text()"s,
+        end_time: ~x".//EndTime/text()"s
+      )
+      |> case do
+        %{outcome: "Success"} ->
+          Platforms.delete_external_listing(ebay_listing)
+          {:ebay_removed, listing}
+
+        _ -> {:error, %{code: :ebay_remove_listing_error, dump: response}}
+      end
+    else
+      _ -> {:noop, listing}
+    end
+  end
+
   @spec relist(EbayListing.t) :: {:ok, EbayListing.t} | {:error, %{code: :ebay_relist_listing_error, dump: String.t}}
   def relist(%EbayListing{} = ebay_listing) do
     with response <-
@@ -199,40 +233,6 @@ defmodule Kamansky.Services.Ebay.Listing do
 
         _ -> {:error, %{code: :ebay_relist_listing_error, dump: response}}
       end
-    end
-  end
-
-  @spec maybe_remove_listing(Listing.t) :: {:ebay_removed | :noop, Listing.t}
-  def maybe_remove_listing(%Listing{} = listing) do
-    with %EbayListing{ebay_id: ebay_id} = ebay_listing <- Platforms.get_ebay_listing_for_listing(listing),
-      response <-
-        """
-        <?xml version="1.0" encoding="utf-8"?>
-        <EndItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-          #{Ebay.requester_credentials()}
-          <ItemID>#{ebay_id}</ItemID>
-          <EndingReason>NotAvailable</EndingReason>
-        </EndItemRequest>
-        """
-        |> then(&Ebay.post!("", &1, headers: [{"X-EBAY-API-CALL-NAME", "EndItem"}]))
-        |> Map.get(:body)
-    do
-      response
-      |> parse(dtd: :none)
-      |> xpath(
-        ~x"//EndItemResponse",
-        outcome: ~x".//Ack/text()"s,
-        end_time: ~x".//EndTime/text()"s
-      )
-      |> case do
-        %{outcome: "Success"} ->
-          Platforms.delete_external_listing(ebay_listing)
-          {:ebay_removed, listing}
-
-        _ -> {:error, %{code: :ebay_remove_listing_error, dump: response}}
-      end
-    else
-      _ -> {:noop, listing}
     end
   end
 
