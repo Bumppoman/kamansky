@@ -81,13 +81,17 @@
                   </dt>
                   <dd>
                     <div class="ml-2 mt-2">
-                      <div class="items-center grid grid-cols-2">
+                      <div class="items-center grid grid-cols-3">
                         <div class="text-gray-500 text-sm">Gross</div>
-                        <div class="font-medium text-gray-900 text-lg"><%= format_decimal_as_currency(@data.total_gross_profit) %></div>
+                        <div class="col-span-2 font-medium text-gray-900 text-lg">
+                          <%= format_decimal_as_currency(@current_year_gross_profit) %> / <%= format_decimal_as_currency(@data.total_gross_profit) %>
+                        </div>
                       </div>
-                      <div class="items-center grid grid-cols-2">
+                      <div class="items-center grid grid-cols-3">
                         <div class="text-gray-500 text-sm">Net</div>
-                        <div class="font-medium text-gray-900 text-lg"><%= format_decimal_as_currency(@total_net_profit) %></div>
+                        <div class="col-span-2 font-medium text-gray-900 text-lg">
+                          <%= format_decimal_as_currency(@current_year_net_profit) %> / <%= format_decimal_as_currency(@total_net_profit) %>
+                        </div>
                       </div>
                     </div>
                   </dd>

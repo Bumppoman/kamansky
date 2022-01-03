@@ -7,7 +7,7 @@ defmodule Kamansky.Sales.Orders do
   use Kamansky.Paginate
 
   import Ecto.Query, warn: false
-  import Kamansky.Helpers, only: [filter_query_for_year_and_month: 4]
+  import Kamansky.Helpers, only: [filter_query_for_year: 3, filter_query_for_year_and_month: 4]
 
   alias __MODULE__
   alias Kamansky.Repo
@@ -221,32 +221,43 @@ defmodule Kamansky.Sales.Orders do
     |> Repo.one()
   end
 
-  @spec total_gross_profit(:all) :: integer
+  @spec total_gross_profit(atom | keyword) :: Decimal.t
   def total_gross_profit(:all) do
     Order
     |> select([o], sum(o.item_price + o.shipping_price))
     |> Repo.one()
   end
 
-  @spec total_gross_profit([month: integer, year: integer]) :: Decimal.t
-  def total_gross_profit(month: month, year: year) do
+  def total_gross_profit(year: year, month: month) do
     Order
     |> filter_query_for_year_and_month(year, month, :ordered_at)
     |> select([o], sum(o.item_price + o.shipping_price))
     |> Repo.one()
   end
 
-  @spec total_net_profit(atom) :: Decimal.t
+  def total_gross_profit(year: year) do
+    Order
+    |> filter_query_for_year(year, :ordered_at)
+    |> select([o], sum(o.item_price + o.shipping_price))
+    |> Repo.one()
+  end
+
+  @spec total_net_profit(atom | keyword) :: Decimal.t
   def total_net_profit(:all), do: total_net_profit_calculation(Order)
 
-  @spec total_net_profit([month: integer, year: integer]) :: Decimal.t
   def total_net_profit(year: year, month: month) do
     Order
     |> filter_query_for_year_and_month(year, month, :ordered_at)
     |> total_net_profit_calculation()
   end
 
-  @spec total_stamps_in_orders(atom | [month: integer, year: integer]) :: integer
+  def total_net_profit(year: year) do
+    Order
+    |> filter_query_for_year(year, :ordered_at)
+    |> total_net_profit_calculation()
+  end
+
+  @spec total_stamps_in_orders(atom | [year: integer, month: integer]) :: integer
   def total_stamps_in_orders(:all), do: stamps_in_orders_calculation(Order)
 
   def total_stamps_in_orders(year: year, month: month) do
