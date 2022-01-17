@@ -116,9 +116,7 @@ defmodule Kamansky.Operations.Trends do
   @spec profit_ratio(any, any) :: Decimal.t
   defp profit_ratio(%Decimal{} = total_sales_income, %Decimal{} = total_cost) do
     total_sales_income
-    |> Decimal.sub(total_cost)
-    |> Decimal.div(total_sales_income)
-    |> Decimal.mult(100)
+    |> Decimal.div(total_cost)
     |> Decimal.round(2)
   end
   defp profit_ratio(_, _), do: 0
