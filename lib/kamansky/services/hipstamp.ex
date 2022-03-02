@@ -13,6 +13,7 @@ defmodule Kamansky.Services.Hipstamp do
   plug Tesla.Middleware.Query, [api_key: Application.get_env(:kamansky, :hipstamp_api_key)]
 
   @spec condition(Stamp.t) :: String.t
+  def condition(%Stamp{used: true}), do: "used"
   def condition(%Stamp{hinged: hinged, hinge_remnant: hinge_remnant, no_gum: no_gum}) when hinged == true or hinge_remnant == true or no_gum == true, do: "unused"
   def condition(%Stamp{}), do: "mint-nh"
 

@@ -83,6 +83,7 @@ defmodule Kamansky.Stamps.Stamp do
     ink_transfer: boolean,
     no_gum: boolean,
     pencil: boolean,
+    precanceled: boolean,
     short_perforation: boolean,
     stain: boolean,
     tear: boolean,
@@ -112,11 +113,13 @@ defmodule Kamansky.Stamps.Stamp do
     field :ink_transfer, :boolean, default: false
     field :no_gum, :boolean, default: false
     field :pencil, :boolean, default: false
+    field :precanceled, :boolean, default: false
     field :short_perforation, :boolean, default: false
     field :stain, :boolean, default: false
     field :tear, :boolean, default: false
     field :thin_spot, :boolean, default: false
     field :toning, :boolean, default: false
+    field :used, :boolean, default: false
     timestamps(updated_at: false)
 
     field :add_to, Ecto.Enum, values: [:collection, :stock], virtual: true
@@ -140,8 +143,9 @@ defmodule Kamansky.Stamps.Stamp do
     |> cast(attrs, [:scott_number, :grade, :cost, :purchase_fees,
       :format, :blind_perforation, :crease, :gum_disturbance,
       :gum_skip, :hinge_remnant, :hinged, :inclusion,
-      :ink_transfer, :no_gum, :pencil, :short_perforation,
-      :stain, :tear, :thin_spot, :toning, :status, :add_to])
+      :ink_transfer, :no_gum, :pencil, :precanceled,
+      :short_perforation, :stain, :tear, :thin_spot,
+      :toning, :used, :status, :add_to])
     |> validate_required([:scott_number])
   end
 
@@ -164,11 +168,13 @@ defmodule Kamansky.Stamps.Stamp do
       :ink_transfer,
       :no_gum,
       :pencil,
+      :precanceled,
       :short_perforation,
       :stain,
       :tear,
       :thin_spot,
-      :toning
+      :toning,
+      :used
     ]
   end
 
@@ -259,6 +265,8 @@ defmodule Kamansky.Stamps.Stamp do
   def quality(%Stamp{hinge_remnant: true}), do: "unused HR"
   def quality(%Stamp{hinged: true}), do: "unused hinged"
   def quality(%Stamp{gum_disturbance: true}), do: "unused disturbed gum"
+  def quality(%Stamp{precanceled: true}), do: "unused precanceled"
+  def quality(%Stamp{used: true}), do: "used"
   def quality(%Stamp{}), do: "MNH OG"
 
   @spec sale_description(Stamp.t) :: String.t

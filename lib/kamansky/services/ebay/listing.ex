@@ -87,14 +87,17 @@ defmodule Kamansky.Services.Ebay.Listing do
           <ReturnPolicy>
             <ReturnsAcceptedOption>ReturnsNotAccepted</ReturnsAcceptedOption>
           </ReturnPolicy>
-          <ShippingDetails>
-            <ShippingType>Flat</ShippingType>
-            <ShippingServiceOptions>
-              <ShippingService>USPSFirstClass</ShippingService>
-              <FreeShipping>#{free_shipping?(listing, opts)}</FreeShipping>
-              <ShippingServiceCost>#{shipping_cost(listing, opts)}</ShippingServiceCost>
-            </ShippingServiceOptions>
-          </ShippingDetails>
+          <SellerProfiles>
+            <SellerPaymentProfile>
+              <PaymentProfileName>eBay Payments</PaymentProfileName>
+            </SellerPaymentProfile>
+            <SellerReturnProfile>
+              <ReturnProfileName>No returns accepted</ReturnProfileName>
+            </SellerReturnProfile>
+            <SellerShippingProfile>
+              <ShippingProfileName>#{shipping_profile(listing, opts)}</ShippingProfileName>
+            </SellerShippingProfile>
+          </SellerProfiles>
           <Site>US</Site>
         </Item>
       </AddItemRequest>
@@ -296,9 +299,6 @@ defmodule Kamansky.Services.Ebay.Listing do
   defp description(%Listing{stamp: %Stamp{}}, %{"ebay_description" => description}), do: description
   defp description(%Listing{stamp: %Stamp{} = stamp}, _opts), do: suggested_description(stamp)
 
-  @spec free_shipping?(Listing.t, map) :: boolean
-  defp free_shipping?(%Listing{listing_price: listing_price}, opts), do: Decimal.gt?(Map.get(opts, "auction_price", listing_price), "14.99")
-
   @spec grade(Stamp.t) :: String.t
   defp grade(%Stamp{grade: grade}) when grade in 70..74, do: "F/VF (Fine/Very Fine)"
   defp grade(%Stamp{grade: grade}) when grade in 75..79, do: "VF (Very Fine)"
@@ -314,11 +314,12 @@ defmodule Kamansky.Services.Ebay.Listing do
   defp quality(%Stamp{hinged: true}), do: "Mint Hinged"
   defp quality(%Stamp{hinge_remnant: true}), do: "Hinge Remaining"
   defp quality(%Stamp{no_gum: true}), do: "Mint No Gum/MNG"
+  defp quality(%Stamp{used: true}), do: "Used"
   defp quality(%Stamp{}), do: "Mint Never Hinged/MNH"
 
-  @spec shipping_cost(Listing.t, map) :: String.t
-  defp shipping_cost(%Listing{listing_price: listing_price}, opts) do
-    if Decimal.lt?(Map.get(opts, "auction_price", listing_price), 15), do: "1.00", else: "0.00"
+  @spec shipping_profile(Listing.t, map) :: String.t
+  defp shipping_profile(%Listing{listing_price: listing_price}, opts) do
+    if Decimal.lt?(Map.get(opts, "auction_price", listing_price), 15), do: "Standard", else: "Standard, Domestic Free"
   end
 
   @spec sub_dollar_denomination(Decimal.t) :: Decimal.t | integer | String.t

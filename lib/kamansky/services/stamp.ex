@@ -5,7 +5,9 @@ defmodule Kamansky.Services.Stamp do
   alias Kamansky.Services.{Ebay, Hipstamp}
 
   @spec create_new_external_listing_for_existing_listing(Listing.t, :ebay | :hipstamp, map) :: {:ok, EbayListing.t | HipstampListing.t} | {:error, any}
-  def create_new_external_listing_for_existing_listing(%Listing{} = listing, :ebay, opts \\ %{}), do: Ebay.Listing.list(listing, opts)
+  def create_new_external_listing_for_existing_listing(listing, platform, opts \\ %{})
+  def create_new_external_listing_for_existing_listing(%Listing{} = listing, :ebay, opts), do: Ebay.Listing.list(listing, opts)
+  def create_new_external_listing_for_existing_listing(%Listing{} = listing, :hipstamp, opts), do: Hipstamp.Listing.list(listing, opts)
 
   @spec list_stamp_for_sale(pos_integer, %{required(String.t) => boolean, optional(any) => any}) :: :ok
   def list_stamp_for_sale(listing_id, %{"ebay" => ebay, "hipstamp" => hipstamp} = params) do

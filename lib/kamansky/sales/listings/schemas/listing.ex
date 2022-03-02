@@ -39,7 +39,7 @@ defmodule Kamansky.Sales.Listings.Listing do
   @spec changeset(t, map) :: Ecto.Changeset.t
   def changeset(%Listing{} = listing, attrs) do
     listing
-    |> cast(attrs, [:ebay, :hipstamp, :hipstamp_description, :hipstamp_title, :listing_price, :order_id, :sale_price])
+    |> cast(attrs, [:ebay, :ebay_description, :ebay_title, :hipstamp, :hipstamp_description, :hipstamp_title, :listing_price, :order_id, :sale_price])
     |> validate_required([])
   end
 
