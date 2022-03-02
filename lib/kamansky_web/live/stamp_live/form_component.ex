@@ -57,7 +57,7 @@ defmodule KamanskyWeb.StampLive.FormComponent do
     |> consume_uploaded_entries(photo_name, &Attachments.create_attachment/2)
     |> case do
       [] -> {:ok, nil}
-      [ok: {:ok, attached_photo}] -> {:ok, attached_photo}
+      [{:ok, attached_photo}] -> {:ok, attached_photo}
     end
   end
 
