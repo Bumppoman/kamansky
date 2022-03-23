@@ -27,17 +27,12 @@
     <:col let={listing} label="Inventory Key">
       #<%= listing.stamp.inventory_key %>
     </:col>
-    <:col let={listing} label="Bids">
-      <%= listing.ebay_listing.bid_count %>
-    </:col>
-    <:col let={listing} label="Current Price">
-      <%= format_decimal_as_currency(listing.ebay_listing.current_bid) %>
-    </:col>
     <:col let={listing} label="Ending Date">
       <time datetime={listing.ebay_listing.end_time}><%= formatted_date(listing.ebay_listing.end_time, "%B %-d, %Y %-I:%M %p") %></time>
     </:col>
     <:col let={listing} label="Actions" sort="disabled">
-      <KamanskyWeb.Components.Page.link_with_confirmation
+      <div class="flex gap-2 justify-center">
+        <KamanskyWeb.Components.Page.link_with_confirmation
           action="relist"
           content="Are you sure you want to relist this listing?"
           title="Relist"
@@ -48,6 +43,7 @@
             src={Routes.static_path(@socket, "/images/ebay-logo.svg")} 
           />
         </KamanskyWeb.Components.Page.link_with_confirmation>
+      </div>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />

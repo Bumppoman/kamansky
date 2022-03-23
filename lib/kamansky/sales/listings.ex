@@ -231,6 +231,17 @@ defmodule Kamansky.Sales.Listings do
     )
   end
 
+  def sort(query, %{action: :expired, column: 2, direction: direction}) do
+    order_by(
+      query,
+      [l, s, el],
+      [
+        {^direction, el.end_time},
+        {:asc, s.scott_number}
+      ]
+    )
+  end
+
   def sort(query, %{action: :sold, column: 2, direction: direction}) do
     order_by(
       query,
