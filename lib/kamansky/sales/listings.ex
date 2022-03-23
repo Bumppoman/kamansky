@@ -30,6 +30,15 @@ defmodule Kamansky.Sales.Listings do
   @spec change_listing(Listing.t, map) :: Ecto.Changeset.t
   def change_listing(%Listing{} = listing, attrs \\ %{}), do: Listing.changeset(listing, attrs)
 
+  @spec count_expired_listings(String.t | nil) :: integer
+  def count_expired_listings(search \\ nil) do
+    Listing
+    |> maybe_search(search)
+    |> join(:left, [l], el in assoc(l, :ebay_listing))
+    |> where([l, el], el.end_time < ^DateTime.utc_now())
+    |> Repo.aggregate(:count)
+  end
+
   @spec count_listings(atom, String.t | nil) :: integer
   def count_listings(status, search \\ nil) do
     Listing
@@ -111,6 +120,17 @@ defmodule Kamansky.Sales.Listings do
     |> join(:left, [l], hl in assoc(l, :hipstamp_listing))
     |> maybe_search(params.search)
     |> preload([l, s, el, hl], [stamp: s, ebay_listing: el, hipstamp_listing: hl])
+    |> then(&Paginate.list(Listings, &1, params))
+  end
+
+  @spec list_expired_listings(Paginate.params) :: [Listing.t]
+  def list_expired_listings(params) do
+    Listing
+    |> join(:left, [l], s in assoc(l, :stamp))
+    |> join(:inner, [l], el in assoc(l, :ebay_listing))
+    |> where([l, ..., el], el.end_time < ^DateTime.utc_now())
+    |> maybe_search(params.search)
+    |> preload([l, s, el], stamp: s, ebay_listing: el)
     |> then(&Paginate.list(Listings, &1, params))
   end
 

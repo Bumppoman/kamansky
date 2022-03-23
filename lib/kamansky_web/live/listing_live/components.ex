@@ -155,6 +155,16 @@ defmodule KamanskyWeb.ListingLive.Components do
           end
         )
       %>
+      <%= live_patch "Expired",
+        to: Routes.listing_expired_path(@socket, :index),
+        class: "block mr-1.5 px-4 py-2 text-gray-500" <> (
+          if @socket.view == KamanskyWeb.ListingLive.Expired do
+            " bg-blue-100 rounded-md text-blue-600"
+          else
+            " text-opacity-70"
+          end
+        )
+      %>
       <%= live_patch "Sold",
         to: Routes.listing_sold_path(@socket, :index),
         class: "block ml-1.5 px-4 py-2 text-gray-500" <> (

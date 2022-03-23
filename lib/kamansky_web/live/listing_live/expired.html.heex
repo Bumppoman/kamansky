@@ -1,0 +1,58 @@
+<.live_component 
+  module={KamanskyWeb.Components.Header} 
+  id="kamansky-header"
+  current_user={@current_user}
+  live_action={@live_action}
+  page_title={@page_title}
+/>
+<main>
+  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.DataTable.table
+    rows={@data}
+    pagination={@pagination}
+    socket={@socket}
+    live_action={@live_action}
+    empty_message="There are no listings with bids to display."
+  >
+    <:col let={listing} label="Scott Number">
+      <a
+        class="action-icon"
+        phx-click="open"
+        phx-target="#stamp-detail-modal"
+        phx-value-stamp-id={listing.stamp.id}
+      >
+        <%= listing.stamp.scott_number %>
+      </a>
+    </:col>
+    <:col let={listing} label="Inventory Key">
+      #<%= listing.stamp.inventory_key %>
+    </:col>
+    <:col let={listing} label="Bids">
+      <%= listing.ebay_listing.bid_count %>
+    </:col>
+    <:col let={listing} label="Current Price">
+      <%= format_decimal_as_currency(listing.ebay_listing.current_bid) %>
+    </:col>
+    <:col let={listing} label="Ending Date">
+      <time datetime={listing.ebay_listing.end_time}><%= formatted_date(listing.ebay_listing.end_time, "%B %-d, %Y %-I:%M %p") %></time>
+    </:col>
+    <:col let={listing} label="Actions" sort="disabled">
+      <KamanskyWeb.Components.Page.link_with_confirmation
+          action="relist"
+          content="Are you sure you want to relist this listing?"
+          title="Relist"
+          values={[{"listing-id", listing.id}]}
+        >
+          <img
+            class="h-5 w-5"
+            src={Routes.static_path(@socket, "/images/ebay-logo.svg")} 
+          />
+        </KamanskyWeb.Components.Page.link_with_confirmation>
+    </:col>
+  </KamanskyWeb.Components.DataTable.table>
+  <KamanskyWeb.ListingLive.Components.tabs socket={@socket} />
+</main>
+<.live_component
+  module={KamanskyWeb.StampLive.DetailComponent}
+  id="stamp-detail-modal"
+/>

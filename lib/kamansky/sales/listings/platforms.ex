@@ -30,8 +30,10 @@ defmodule Kamansky.Sales.Listings.Platforms do
     |> Repo.one()
   end
 
-  @spec get_ebay_listing_for_listing(Listing.t) :: EbayListing.t | nil
-  def get_ebay_listing_for_listing(%Listing{id: listing_id}) do
+  @spec get_ebay_listing_for_listing(Listing.t | integer) :: EbayListing.t | nil
+  def get_ebay_listing_for_listing(%Listing{id: listing_id}), do: get_ebay_listing_for_listing(listing_id)
+
+  def get_ebay_listing_for_listing(listing_id) do
     EbayListing
     |> where(listing_id: ^listing_id)
     |> Repo.one()
