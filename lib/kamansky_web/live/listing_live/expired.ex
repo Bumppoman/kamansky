@@ -1,6 +1,6 @@
 defmodule KamanskyWeb.ListingLive.Expired do
   use KamanskyWeb, :live_view
-  use KamanskyWeb.Paginate, sort: {4, :asc}
+  use KamanskyWeb.Paginate, sort: {2, :asc}
 
   import Kamansky.Helpers
 
