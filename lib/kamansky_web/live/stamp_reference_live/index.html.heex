@@ -1,5 +1,5 @@
-<.live_component 
-  module={KamanskyWeb.Components.Header} 
+<.live_component
+  module={KamanskyWeb.Components.Header}
   id="kamansky-header"
   current_user={@current_user}
   live_action={@live_action}
@@ -18,7 +18,7 @@
   </:buttons>
 </.live_component>
 <main>
-  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.Page.flash flash={Phoenix.Flash.get(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -26,13 +26,13 @@
     live_action={@live_action}
     empty_message="There are no stamp references to display."
   >
-    <:col let={stamp_reference} label="Scott Number">
+    <:col :let={stamp_reference} label="Scott Number">
       <%= stamp_reference.scott_number %>
     </:col>
-    <:col let={stamp_reference} label="Description" sort="disabled">
+    <:col :let={stamp_reference} label="Description" sort="disabled">
       <%= StampReference.description(stamp_reference) %>
     </:col>
-    <:col let={stamp_reference} label="Actions" sort="disabled">
+    <:col :let={stamp_reference} label="Actions" sort="disabled">
       <%= unless @live_action == :missing_from_collection do %>
         <a
           class="action-icon"
@@ -47,7 +47,7 @@
     </:col>
   </KamanskyWeb.Components.DataTable.table>
   <%= if @live_action == :missing_from_collection do %>
-    <KamanskyWeb.StampLive.CollectionComponents.types_footer 
+    <KamanskyWeb.StampLive.CollectionComponents.types_footer
       socket={@socket}
       live_action={@live_action}
       parent_index={@parent_index}
