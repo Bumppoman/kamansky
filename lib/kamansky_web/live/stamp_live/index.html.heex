@@ -7,16 +7,16 @@
   </:buttons>
 </.live_component>
 <main>
-  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.Page.flash flash={Phoenix.Flash.get(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table rows={@data} pagination={@pagination} socket={@socket} live_action={@live_action}
     empty_message="There are no stamps to display.">
-    <:col let={stamp} label="Scott Number">
+    <:col :let={stamp} label="Scott Number">
       <a class="action-icon" phx-click="open" phx-target="#stamp-detail-modal" phx-value-stamp-id={stamp.id}><%= stamp.scott_number %></a>
     </:col>
-    <:col let={stamp} label="Grade"><%= Stamp.formatted_grade(stamp) %></:col>
-    <:col let={stamp} label="Price Paid"><%= format_decimal_as_currency(Stamp.total_cost(stamp)) %></:col>
-    <:col let={stamp} label="Flaws" sort="disabled"><%= Stamp.formatted_flaws(stamp) %></:col>
-    <:col let={stamp} label="Actions" sort="disabled">
+    <:col :let={stamp} label="Grade"><%= Stamp.formatted_grade(stamp) %></:col>
+    <:col :let={stamp} label="Price Paid"><%= format_decimal_as_currency(Stamp.total_cost(stamp)) %></:col>
+    <:col :let={stamp} label="Flaws" sort="disabled"><%= Stamp.formatted_flaws(stamp) %></:col>
+    <:col :let={stamp} label="Actions" sort="disabled">
       <a class="action-icon" phx-click="open" phx-target="#stamp-form-modal" phx-value-action="edit" phx-value-stamp-id={stamp.id}
         phx-value-status={stamp.status}>
         <KamanskyWeb.Components.Icons.edit />
