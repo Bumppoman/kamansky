@@ -184,7 +184,7 @@ defmodule KamanskyWeb.Components.DataTable do
           " bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
         end
       )}
-    ><%= page %></.link>
+    ><%= @page %></.link>
     """
   end
 

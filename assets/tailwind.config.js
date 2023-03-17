@@ -3,7 +3,7 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   mode: 'jit',
-  content: ['./ts/**/*.ts', './node_modules/phoenix*/**/*.js', '../lib/*_web/**/*.*ex'],
+  content: ['./ts/**/*.ts', '../lib/*_web/**/*.*ex'],
   theme: {
     extend: {
       colors: {

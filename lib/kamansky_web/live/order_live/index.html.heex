@@ -26,7 +26,7 @@
   </:buttons>
 </.live_component>
 <main>
-  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.Page.flash flash={Phoenix.Flash.get(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
