@@ -1,6 +1,6 @@
 <.live_component module={KamanskyWeb.Components.Header} id="kamansky-header" current_user={@current_user} live_action={@live_action} page_title={@page_title} />
 <main>
-  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.Page.flash flash={Phoenix.Flash.get(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -8,14 +8,14 @@
     live_action={@live_action}
     empty_message="There are no customers to display."
   >
-    <:col let={customer} label="Name"><.link navigate={Routes.customer_show_path(@socket, :show, customer)}><%= customer.name %></.link></:col>
-    <:col let={customer} label="Address" sort="disabled"><%= Customer.full_address(customer) %></:col>
-    <:col let={customer} label="Email" sort="disabled"><%= Customer.formatted_email(customer) %></:col>
-    <:col let={customer} label="Amount Spent YTD"><%= format_decimal_as_currency(customer.amount_spent_ytd) %></:col>
-    <:col let={customer} label="Most Recent Purchase">
+    <:col :let={customer} label="Name"><.link navigate={Routes.customer_show_path(@socket, :show, customer)}><%= customer.name %></.link></:col>
+    <:col :let={customer} label="Address" sort="disabled"><%= Customer.full_address(customer) %></:col>
+    <:col :let={customer} label="Email" sort="disabled"><%= Customer.formatted_email(customer) %></:col>
+    <:col :let={customer} label="Amount Spent YTD"><%= format_decimal_as_currency(customer.amount_spent_ytd) %></:col>
+    <:col :let={customer} label="Most Recent Purchase">
       <time datetime={customer.most_recent_order_date}><%= formatted_date(customer.most_recent_order_date) %></time>
     </:col>
-    <:col let={customer} label="Actions" sort="disabled">
+    <:col :let={customer} label="Actions" sort="disabled">
       <a class="action-icon" phx-click="open" phx-target="#edit-customer-form-modal" phx-value-customer-id={customer.id}>
         <KamanskyWeb.Components.Icons.edit />
       </a>
