@@ -1,13 +1,13 @@
 <.live_component module={KamanskyWeb.Components.Header} id="kamansky-header" current_user={@current_user} live_action={@live_action} page_title={@page_title} />
 <main>
-  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.Page.flash flash={Phoenix.Flash.get(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table rows={@data} pagination={@pagination} socket={@socket} live_action={@live_action}
     empty_message="There are no active listings to display.">
-    <:col let={listing} label="Scott Number">
+    <:col :let={listing} label="Scott Number">
       <a class="action-icon" phx-click="open" phx-target="#stamp-detail-modal" phx-value-stamp-id={listing.stamp.id}><%= listing.stamp.scott_number %></a>
     </:col>
-    <:col let={listing} label="Inventory Key">#<%= listing.stamp.inventory_key %></:col>
-    <:col let={listing} label="Grade">
+    <:col :let={listing} label="Inventory Key">#<%= listing.stamp.inventory_key %></:col>
+    <:col :let={listing} label="Grade">
       <div class="flex md:flex-row flex-col relative items-start w-full">
         <span><%= Stamp.formatted_grade(listing.stamp) %></span>
         <%= if Stamp.flaws?(listing.stamp) do %>
@@ -15,11 +15,11 @@
         <% end %>
       </div>
     </:col>
-    <:col let={listing} label="Price"><%= format_decimal_as_currency(listing.listing_price) %></:col>
-    <:col let={listing} label="Listing Date">
+    <:col :let={listing} label="Price"><%= format_decimal_as_currency(listing.listing_price) %></:col>
+    <:col :let={listing} label="Listing Date">
       <time datetime={listing.inserted_at}><%= formatted_date(listing.inserted_at) %></time>
     </:col>
-    <:col let={listing} label="Listed" class="text-center" sort="disabled">
+    <:col :let={listing} label="Listed" class="text-center" sort="disabled">
       <div class="flex gap-2 justify-center">
         <%= if Listing.ebay?(listing) do %>
           <a href={"https://www.ebay.com/itm/#{listing.ebay_listing.ebay_id}"} class="action-icon" target="_blank" title="View on eBay">
@@ -36,12 +36,12 @@
         <% end %>
       </div>
     </:col>
-    <:col let={listing} label="Actions" class="text-center" sort="disabled">
+    <:col :let={listing} label="Actions" class="text-center" sort="disabled">
       <div class="flex gap-2 justify-center">
         <a class="action-icon" title="Add Listing to Order" phx-click="open" phx-target="#listing-add-to-order-form-modal" phx-value-listing-id={listing.id}>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
             />
           </svg>
         </a>
