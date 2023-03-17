@@ -1,5 +1,5 @@
-<.live_component 
-  module={KamanskyWeb.Components.Header} 
+<.live_component
+  module={KamanskyWeb.Components.Header}
   id="kamansky-header"
   current_user={@current_user}
   live_action={@live_action}
@@ -17,7 +17,7 @@
   </:buttons>
 </.live_component>
 <main>
-  <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
+  <KamanskyWeb.Components.Page.flash flash={Phoenix.Flash.get(@flash, :info)} />
   <KamanskyWeb.Components.DataTable.table
     rows={@data}
     pagination={@pagination}
@@ -25,19 +25,19 @@
     live_action={@live_action}
     empty_message="There are no expenses to display."
   >
-    <:col let={expense} label="Date">
+    <:col :let={expense} label="Date">
       <time datetime={expense.date}><%= formatted_date(expense.date) %></time>
     </:col>
-    <:col let={expense} label="Description">
+    <:col :let={expense} label="Description">
       <%= expense.description %>
     </:col>
-    <:col let={expense} label="Category">
+    <:col :let={expense} label="Category">
       <%= Expense.formatted_category(expense) %>
     </:col>
-    <:col let={expense} label="Amount">
+    <:col :let={expense} label="Amount">
       <%= format_decimal_as_currency(expense.amount) %>
     </:col>
-    <:col let={expense} label="Actions" sort="disabled">
+    <:col :let={expense} label="Actions" sort="disabled">
       <a
         class="action-icon"
         phx-click="open"
