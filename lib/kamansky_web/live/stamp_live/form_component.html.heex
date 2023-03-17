@@ -1,28 +1,11 @@
 <div id={@id}>
   <%= if @open do %>
-    <KamanskyWeb.Components.Modal.modal
-      parent_id={@id}
-      form_id="stamp-form"
-      title={@title}
-    >
-      <.form
-        let={f}
-        for={@changeset}
-        id="stamp-form"
-        phx_target={@myself}
-        phx_change="validate"
-        phx_submit="submit"
-      >
+    <KamanskyWeb.Components.Modal.modal parent_id={@id} form_id="stamp-form" title={@title}>
+      <.form :let={f} for={@changeset} id="stamp-form" phx-target={@myself} phx-change="validate" phx-submit="submit">
         <div class="grid grid-cols-3">
           <div class="col-span-1 form-group required">
             <%= label f, :scott_number, "Scott Number" %>
-            <div class="form-input">
-              <%= text_input f,
-                :scott_number,
-                "phx-blur": "find_in_collection",
-                "phx-target": @myself
-              %>
-            </div>
+            <div class="form-input"><%= text_input f, :scott_number, "phx-blur": "find_in_collection", "phx-target": @myself %></div>
           </div>
           <div class="col-span-2 form-group">
             <h6 class="mb-2">Collection</h6>
@@ -56,18 +39,11 @@
         <div class="grid grid-cols-12">
           <div class="col-span-3 form-group required">
             <%= label f, :grade, "Grade" %>
-            <div class="form-input">
-              <%= number_input f, :grade %>
-            </div>
+            <div class="form-input"><%= number_input f, :grade %></div>
           </div>
           <div class="col-span-4 form-group required">
             <%= label f, :format, "Item Type" %>
-            <div class="form-input">
-              <%= select f,
-                :format,
-                Stamp.formats
-              %>
-            </div>
+            <div class="form-input"><%= select f, :format, Stamp.formats %></div>
           </div>
           <div class="col-span-5 flex flex-col form-group required">
             <%= label f, :add_to, "Add To", class: "w-full" %>
@@ -110,16 +86,9 @@
               <div>
                 <%= for flaw <- flaw_set do %>
                   <div class="flex items-start">
-                    <div>
-                      <%= checkbox f, flaw %>
-                    </div>
+                    <div><%= checkbox f, flaw %></div>
                     <div class="ml-3 text-sm">
-                      <label
-                        class="text-gray-500"
-                        for={"stamp_#{flaw}"}
-                      >
-                        <%= Phoenix.Naming.humanize(flaw) %>
-                      </label>
+                      <label class="text-gray-500" for={"stamp_#{flaw}"}><%= Phoenix.Naming.humanize(flaw) %></label>
                     </div>
                   </div>
                 <% end %>
@@ -130,55 +99,20 @@
         <div class="grid grid-cols-2">
           <div class="form-group">
             <%= label f, :front_photo, "Front" %>
-            <div
-              id="stamp-front-photo-area"
-              class="
-                border-2
-                border-dashed
-                border-gray-300
-                flex
-                justify-center
-                mt-1
-                pb-6
-                pt-5
-                px-6 
-                rounded-md"
+            <div id="stamp-front-photo-area"
+              class="border-2 border-dashed border-gray-300 flex justify-center mt-1 pb-6 pt-5 px-6 rounded-md"
               phx-hook="fileUpload"
             >
-              <div
-                id="stamp-front-photo-file-dropzone"
-                class="drag-and-drop-file-dropzone space-y-1 text-center"
-                phx-drop-target={@uploads.front_photo.ref}
-              >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  class="h-12 mx-auto text-gray-400 w-12" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path 
-                    stroke-linecap="round" 
-                    stroke-linejoin="round" 
-                    stroke-width="2" 
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" 
+              <div id="stamp-front-photo-file-dropzone" class="drag-and-drop-file-dropzone space-y-1 text-center" phx-drop-target={@uploads.front_photo.ref}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 mx-auto text-gray-400 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
                 </svg>
                 <div class="flex text-sm text-gray-600">
-                  <label 
-                    for={input_id(f, :front_photo)} 
-                    class="
-                      relative 
-                      cursor-pointer 
-                      bg-white 
-                      rounded-md 
-                      font-medium 
-                      text-indigo-600 
-                      hover:text-indigo-500 
-                      focus-within:outline-none 
-                      focus-within:ring-2 
-                      focus-within:ring-offset-2 
-                      focus-within:ring-indigo-500"
+                  <label for={input_id(f, :front_photo)}
+                    class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none
+                      focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
                   >
                     <span>Upload a file</span>
                     <%= live_file_input @uploads.front_photo, class: "sr-only" %>
@@ -186,10 +120,7 @@
                   <p class="pl-1">or drag and drop</p>
                 </div>
               </div>
-              <div
-                id="stamp-front-photo-file-preview"
-                class="drag-and-drop-file-preview hidden"
-              >
+              <div id="stamp-front-photo-file-preview" class="drag-and-drop-file-preview hidden">
                 <%= for entry <- @uploads.front_photo.entries do %>
                   <%= live_img_preview entry, class: "h-32 max-w-max" %>
                 <% end %>
@@ -198,55 +129,21 @@
           </div>
           <div class="form-group">
             <%= label f, :rear_photo, "Rear" %>
-            <div
-              id="stamp-rear-photo-area"
-              class="
-                border-2
-                border-dashed
-                border-gray-300
-                flex
-                justify-center
-                mt-1
-                pb-6
-                pt-5
-                px-6 
-                rounded-md"
+            <div id="stamp-rear-photo-area"
+              class="border-2 border-dashed border-gray-300 flex justify-center mt-1 pb-6 pt-5 px-6 rounded-md"
               phx-hook="fileUpload"
             >
-              <div
-                id="stamp-rear-photo-file-dropzone"
-                class="drag-and-drop-file-dropzone space-y-1 text-center"
-                phx-drop-target={@uploads.rear_photo.ref}
-              >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  class="h-12 mx-auto text-gray-400 w-12" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path 
-                    stroke-linecap="round" 
-                    stroke-linejoin="round" 
-                    stroke-width="2" 
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" 
+              <div id="stamp-rear-photo-file-dropzone" class="drag-and-drop-file-dropzone space-y-1 text-center" phx-drop-target={@uploads.rear_photo.ref}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 mx-auto text-gray-400 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
                 </svg>
                 <div class="flex text-sm text-gray-600">
-                  <label 
-                    for={input_id(f, :rear_photo)} 
-                    class="
-                      relative 
-                      cursor-pointer 
-                      bg-white 
-                      rounded-md 
-                      font-medium 
-                      text-indigo-600 
-                      hover:text-indigo-500 
-                      focus-within:outline-none 
-                      focus-within:ring-2 
-                      focus-within:ring-offset-2 
-                      focus-within:ring-indigo-500"
+                  <label
+                    for={input_id(f, :rear_photo)}
+                    class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500
+                      focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
                   >
                     <span>Upload a file</span>
                     <%= live_file_input @uploads.rear_photo, class: "sr-only" %>
@@ -254,12 +151,9 @@
                   <p class="pl-1">or drag and drop</p>
                 </div>
               </div>
-              <div
-                id="stamp-rear-photo-file-preview"
-                class="drag-and-drop-file-preview hidden"
-              >
+              <div id="stamp-rear-photo-file-preview" class="drag-and-drop-file-preview hidden">
                 <%= for entry <- @uploads.rear_photo.entries do %>
-                  <%= live_img_preview entry, class: "h-32 max-w-max" %>
+                  <.live_img_preview entry={entry} class="h-32 max-w-max" />
                 <% end %>
               </div>
             </div>

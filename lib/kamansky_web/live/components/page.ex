@@ -83,8 +83,8 @@ defmodule KamanskyWeb.Components.Page do
               <button
                 type="button"
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white transition ease-in-out duration-150 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                :class="detail.external && 'kamansky-external'"
-                :phx-click="detail.action"
+                x-class="detail.external && 'kamansky-external'"
+                x-phx-click="detail.action"
                 x-ref="success"
               >
                 <div class="kamansky-button-loading">
@@ -252,14 +252,7 @@ defmodule KamanskyWeb.Components.Page do
   end
 
   @spec navbar_link(map) :: Phoenix.LiveView.Rendered.t
-  def navbar_link(assigns) do
-    ~H"""
-    <%= live_redirect @title,
-      to: @to,
-      class: navbar_link_class(@platform, @active)
-    %>
-    """
-  end
+  def navbar_link(assigns), do: ~H"<.link navigate={@to} class={navbar_link_class(@platform, @active)}><%= @title %></.link>"
 
   @spec button_color(String.t) :: String.t
   defp button_color("blue"), do: " bg-indigo-600 border-transparent text-white hover:bg-indigo-700"

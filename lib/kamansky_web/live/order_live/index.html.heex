@@ -6,11 +6,7 @@
   page_title={@page_title}
 >
   <:buttons>
-    <KamanskyWeb.Components.Page.header_button
-      color="gray"
-      display={@live_action == :pending}
-      phx-click="load_new_orders"
-    >
+    <KamanskyWeb.Components.Page.header_button color="gray" display={@live_action == :pending} phx-click="load_new_orders">
       Load New Orders
     </KamanskyWeb.Components.Page.header_button>
     <KamanskyWeb.Components.Page.header_button_with_confirmation
@@ -24,11 +20,7 @@
     >
       Mark All as Shipped
     </KamanskyWeb.Components.Page.header_button_with_confirmation>
-    <KamanskyWeb.Components.Page.header_button
-      display={@live_action == :pending}
-      phx-click="open"
-      phx-target="#new-order-form-modal"
-    >
+    <KamanskyWeb.Components.Page.header_button display={@live_action == :pending} phx-click="open" phx-target="#new-order-form-modal">
       Create Order
     </KamanskyWeb.Components.Page.header_button>
   </:buttons>
@@ -42,18 +34,10 @@
     live_action={@live_action}
     empty_message="There are no orders to display."
   >
-    <:col let={order} label="Order Number">
-      <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
-    </:col>
-    <:col let={order} label="Customer">
-      <%= order.customer.name %>
-    </:col>
-    <:col let={order} label="Date">
-      <time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time>
-    </:col>
-    <:col let={order} label="Total">
-      <%= format_decimal_as_currency(Order.total_paid(order)) %>
-    </:col>
+    <:col let={order} label="Order Number"><.link navigate={Routes.order_show_path(@socket, :show, order)}><%= "##{Order.order_number(order)}" %></.link></:col>
+    <:col let={order} label="Customer"><%= order.customer.name %></:col>
+    <:col let={order} label="Date"><time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time></:col>
+    <:col let={order} label="Total"><%= format_decimal_as_currency(Order.total_paid(order)) %></:col>
     <:col let={order} label="Net Profit/Loss">
       <span class={if Decimal.gt?(Order.net_profit(order), 0), do: "text-green-600", else: "text-red-600"}>
         <%= format_decimal_as_currency(Order.net_profit(order)) %>
@@ -122,11 +106,5 @@
   </KamanskyWeb.Components.DataTable.table>
   <KamanskyWeb.OrderLive.Components.bottom_tabs socket={@socket} live_action={@live_action} />
 </main>
-<.live_component
-  module={KamanskyWeb.OrderLive.EditComponent}
-  id="edit-order-form-modal"
-/>
-<.live_component
-  module={KamanskyWeb.OrderLive.NewComponent}
-  id="new-order-form-modal"
-/>
+<.live_component module={KamanskyWeb.OrderLive.EditComponent} id="edit-order-form-modal" />
+<.live_component module={KamanskyWeb.OrderLive.NewComponent} id="new-order-form-modal" />

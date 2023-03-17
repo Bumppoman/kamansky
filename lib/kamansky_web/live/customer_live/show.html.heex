@@ -1,33 +1,21 @@
 <.live_component 
   module={KamanskyWeb.Components.Header} 
   id="kamansky-header"
-  breadcrumbs={
-    [
-      {"Customer List", Routes.customer_index_path(@socket, :index, show: @customer.id)},
-      "Customer Information"
-    ]
-  }
+  breadcrumbs={[{"Customer List", Routes.customer_index_path(@socket, :index, show: @customer.id)}, "Customer Information"]}
   current_user={@current_user}
   live_action={@live_action}
   page_title={@page_title}
 />
 <main>
-  <KamanskyWeb.Components.DataTable.table
-    rows={@data}
-    pagination={@pagination}
-    socket={@socket}
-    assigns={assigns}
-    live_action={@live_action}
+  <KamanskyWeb.Components.DataTable.table rows={@data} pagination={@pagination} socket={@socket} assigns={assigns} live_action={@live_action}
     empty_message="There are no orders to display."
   >
     <:col let={order} label="Order">
-      <%= live_redirect "##{Order.order_number(order)}", to: Routes.order_show_path(@socket, :show, order) %>
+      <.link navigate={Routes.order_show_path(@socket, :show, order)}>#<%= Order.order_number(order) %></.link>
     </:col>
     <:col let={order} label="Date">
       <time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time>
     </:col>
-    <:col let={order} label="total">
-      <%= format_decimal_as_currency(Order.total_paid(order)) %>
-    </:col>
+    <:col let={order} label="total"><%= format_decimal_as_currency(Order.total_paid(order)) %></:col>
   </KamanskyWeb.Components.DataTable.table>
 </main>

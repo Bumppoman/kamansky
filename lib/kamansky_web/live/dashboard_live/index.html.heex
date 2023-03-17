@@ -1,10 +1,4 @@
-<.live_component 
-  module={KamanskyWeb.Components.Header} 
-  id="kamansky-header"
-  current_user={@current_user}
-  live_action={@live_action}
-  page_title={@page_title}
-/>
+<.live_component module={KamanskyWeb.Components.Header} id="kamansky-header" current_user={@current_user} live_action={@live_action} page_title={@page_title} />
 <main>
   <div class="mt-4">
     <div class="px-4 sm:px-6 lg:px-8">
@@ -15,13 +9,9 @@
             <div class="flex items-center">
               <div class="w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">
-                    Collection
-                  </dt>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Collection</dt>
                   <dd>
-                    <div class="font-medium mt-2 text-center text-gray-900 text-4xl">
-                      <%= format_decimal_as_currency(@data.collection_stamp_cost) %>
-                    </div>
+                    <div class="font-medium mt-2 text-center text-gray-900 text-4xl"><%= format_decimal_as_currency(@data.collection_stamp_cost) %></div>
                   </dd>
                 </dl>
               </div>
@@ -33,13 +23,9 @@
             <div class="flex items-center">
               <div class="w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">
-                    Stock
-                  </dt>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Stock</dt>
                   <dd>
-                    <div class="font-medium mt-2 text-center text-gray-900 text-4xl">
-                      <%= format_decimal_as_currency(@data.stock_stamp_cost) %>
-                    </div>
+                    <div class="font-medium mt-2 text-center text-gray-900 text-4xl"><%= format_decimal_as_currency(@data.stock_stamp_cost) %></div>
                   </dd>
                 </dl>
               </div>
@@ -51,9 +37,7 @@
             <div class="flex items-center">
               <div class="w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">
-                    Listings
-                  </dt>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Listings</dt>
                   <dd>
                     <div class="ml-2 mt-2">
                       <div class="items-center grid grid-cols-2">
@@ -76,9 +60,7 @@
             <div class="flex items-center">
               <div class="w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">
-                    Sales
-                  </dt>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Sales</dt>
                   <dd>
                     <div class="ml-2 mt-2">
                       <div class="items-center grid grid-cols-3">
@@ -112,9 +94,7 @@
               <div class="mx-5 w-0 flex-1">
                 <dl class="flex justify-between">
                   <div>
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                      Collection
-                    </dt>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Collection</dt>
                     <dd>
                       <div class="text-lg font-medium text-gray-900">
                         <%= @stamps_this_month_for_collection %>
@@ -124,9 +104,7 @@
                     </dd>
                   </div>
                   <div>
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                      Stock
-                    </dt>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Stock</dt>
                     <dd>
                       <div class="text-lg font-medium text-gray-900">
                         <%= @stamps_this_month_for_stock %>
@@ -136,9 +114,7 @@
                     </dd>
                   </div>
                   <div>
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                      Listings
-                    </dt>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Listings</dt>
                     <dd>
                       <div class="text-lg font-medium text-gray-900">
                         <%= @stamps_this_month_for_listings %>
@@ -149,19 +125,17 @@
                   </div>
                 </dl>
                 <dl class="mt-2">
-                  <dt class="text-sm font-medium text-gray-500 truncate">
-                      Orders
-                    </dt>
-                    <dd>
-                      <div class="text-lg font-medium text-gray-900">
-                        <%= @orders_this_month %>
-                        <span class="text-sm text-gray-500">orders (</span>
-                        <%= @stamps_in_orders_this_month %>
-                        <span class="text-sm text-gray-500">stamps) for</span>
-                        <%= format_decimal_as_currency(@net_profit_this_month) %>
-                        <span class="text-sm text-gray-500">net profit</span>
-                      </div>
-                    </dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Orders</dt>
+                  <dd>
+                    <div class="text-lg font-medium text-gray-900">
+                      <%= @orders_this_month %>
+                      <span class="text-sm text-gray-500">orders (</span>
+                      <%= @stamps_in_orders_this_month %>
+                      <span class="text-sm text-gray-500">stamps) for</span>
+                      <%= format_decimal_as_currency(@net_profit_this_month) %>
+                      <span class="text-sm text-gray-500">net profit</span>
+                    </div>
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -174,9 +148,7 @@
               <div class="mx-5 w-0 flex-1">
                 <dl class="flex justify-between">
                   <div>
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                      Collection
-                    </dt>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Collection</dt>
                     <dd>
                       <div class="text-lg font-medium text-gray-900">
                         <%= @stamps_last_month_for_collection %>
@@ -186,9 +158,7 @@
                     </dd>
                   </div>
                   <div>
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                      Stock
-                    </dt>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Stock</dt>
                     <dd>
                       <div class="text-lg font-medium text-gray-900">
                         <%= @stamps_last_month_for_stock %>
@@ -198,9 +168,7 @@
                     </dd>
                   </div>
                   <div>
-                    <dt class="text-sm font-medium text-gray-500 truncate">
-                      Listings
-                    </dt>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Listings</dt>
                     <dd>
                       <div class="text-lg font-medium text-gray-900">
                         <%= @stamps_last_month_for_listings %>
@@ -211,19 +179,17 @@
                   </div>
                 </dl>
                 <dl class="mt-2">
-                  <dt class="text-sm font-medium text-gray-500 truncate">
-                      Orders
-                    </dt>
-                    <dd>
-                      <div class="text-lg font-medium text-gray-900">
-                        <%= @orders_last_month %>
-                        <span class="text-sm text-gray-500">orders (</span>
-                        <%= @stamps_in_orders_last_month %>
-                        <span class="text-sm text-gray-500">stamps) for</span>
-                        <%= format_decimal_as_currency(@net_profit_last_month) %>
-                        <span class="text-sm text-gray-500">net profit</span>
-                      </div>
-                    </dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Orders</dt>
+                  <dd>
+                    <div class="text-lg font-medium text-gray-900">
+                      <%= @orders_last_month %>
+                      <span class="text-sm text-gray-500">orders (</span>
+                      <%= @stamps_in_orders_last_month %>
+                      <span class="text-sm text-gray-500">stamps) for</span>
+                      <%= format_decimal_as_currency(@net_profit_last_month) %>
+                      <span class="text-sm text-gray-500">net profit</span>
+                    </div>
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -231,9 +197,7 @@
         </div>
       </div>
     </div>
-    <h2 class="mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-      Unshipped orders
-    </h2>
+    <h2 class="mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">Unshipped orders</h2>
     <div class="hidden sm:block">
       <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col mt-2">
@@ -241,21 +205,11 @@
             <table class="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr>
-                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order Number
-                  </th>
-                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Number</th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -268,25 +222,17 @@
                   <tr class="bg-white">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div class="flex">
-                        <%= live_redirect to: Routes.order_show_path(@socket, :show, order), class: "group inline-flex space-x-2 truncate text-sm" do %>
-                          <p class="text-gray-500 truncate group-hover:text-gray-900">
-                            #<%= Order.order_number(order) %>
-                          </p>
-                        <% end %>
+                        <.link navigate={Routes.order_show_path(@socket, :show, order)} class="group inline-flex space-x-2 truncate text-sm">
+                          <p class="text-gray-500 truncate group-hover:text-gray-900">#<%= Order.order_number(order) %></p>
+                        </.link>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <%= order.customer.name %>
-                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= order.customer.name %></td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <time datetime={order.ordered_at}><%= formatted_date(order.ordered_at) %></time>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <%= format_decimal_as_currency(Order.total_paid(order)) %>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <KamanskyWeb.OrderLive.Components.status_badge status={order.status} />
-                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= format_decimal_as_currency(Order.total_paid(order)) %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><KamanskyWeb.OrderLive.Components.status_badge status={order.status} /></td>
                   </tr>
                 <% end %>
               </tbody>

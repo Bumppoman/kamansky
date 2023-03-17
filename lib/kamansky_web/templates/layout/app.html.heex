@@ -5,9 +5,9 @@
         <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
           <div class="flex-shrink-0 flex items-center px-5">
             <%= link to: Routes.dashboard_index_path(@conn, :index) do %>
-              <img 
-                class="h-8 w-auto" 
-                src={Routes.static_path(@conn, "/images/bumppoman-stamps-logo-white.svg")} 
+              <img
+                class="h-8 w-auto"
+                src={Routes.static_path(@conn, "/images/bumppoman-stamps-logo-white.svg")}
                 alt="Bumppoman Stamps"
               />
             <% end %>
@@ -18,7 +18,7 @@
           <% else %>
             <%= link "Sign in",
               to: Routes.user_session_path(@conn, :new),
-              class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" 
+              class: "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
             %>
           <% end %>
         </div>
@@ -27,6 +27,6 @@
   </nav>
 </header>
 <main role="main" class="bg-white mx-auto my-3 p-8 w-11/12">
-  <KamanskyWeb.Components.Page.flash flash={get_flash(@conn, :info)} />
+  <KamanskyWeb.Components.Page.flash flash={Phoenix.Flash.get(@flash, :info)} />
   <%= @inner_content %>
 </main>

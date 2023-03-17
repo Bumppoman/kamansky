@@ -5,13 +5,13 @@
       form_id="stamp-reference-form"
       title={@title}
     >
-      <.form 
-        let={f}
+      <.form
+        :let={f}
         for={@changeset}
         id="stamp-reference-form"
-        phx_target={@myself}
-        phx_change="validate"
-        phx_submit="submit"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="submit"
       >
         <div class="grid grid-cols-3">
           <div class="form-group required">

@@ -94,7 +94,8 @@ defmodule Kamansky.Operations.Trends do
     )
     |> Repo.one()
     |> case do
-      %{secs: secs, days: days} -> days + (if secs > 43200, do: 1, else: 0)
+      %{secs: secs, days: days} when secs > 43200 -> days + 1
+      %{days: days} -> days
       _ -> 0
     end
   end

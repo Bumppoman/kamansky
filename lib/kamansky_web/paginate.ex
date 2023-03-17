@@ -1,5 +1,5 @@
 defmodule KamanskyWeb.Paginate do
-  import Phoenix.LiveView
+  import Phoenix.{Component, LiveView}
 
   @callback count_data(Phoenix.LiveView.Socket.t, String.t | nil) :: integer
   @callback find_item_in_data(Phoenix.LiveView.Socket.t, pos_integer, integer, :asc | :desc) :: integer

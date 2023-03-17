@@ -45,7 +45,7 @@ defmodule KamanskyWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {KamanskyWeb.LayoutView, "live.html"}
+        layout: {KamanskyWeb.LayoutView, :live}
 
       unquote(view_helpers())
     end
@@ -53,7 +53,7 @@ defmodule KamanskyWeb do
 
   def live_view_without_layout do
     quote do
-      use Phoenix.LiveView, layout: nil
+      use Phoenix.LiveView, layout: false
 
       unquote(view_helpers())
     end
@@ -90,7 +90,7 @@ defmodule KamanskyWeb do
       use Phoenix.HTML
 
       # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
-      import Phoenix.LiveView.Helpers
+      import Phoenix.Component
       import KamanskyWeb.LiveHelpers
 
       # Import basic rendering functionality (render, render_layout, etc)

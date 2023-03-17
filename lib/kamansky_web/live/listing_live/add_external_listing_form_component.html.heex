@@ -7,14 +7,14 @@
       title={"List on #{listing_service(@type)}"}
     >
       <.form
-        let={f}
+        :let={f}
         for={@changeset}
         id="listing-add-external-listing-form"
-        phx_target={@myself}
-        phx_change="validate"
-        phx_submit="submit"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="submit"
       >
-        <%= component form_component(@type), f: f %>
+        <.live_component module={form_component(@type)} f={f} />
       </.form>
     </KamanskyWeb.Components.Modal.modal>
   <% end %>

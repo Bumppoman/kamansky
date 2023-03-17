@@ -53,9 +53,9 @@ defmodule KamanskyWeb.Components.DataTable do
                         <%= if col[:sort] == "disabled" do %>
                           <%= col[:label] %>
                         <% else %>
-                          <%= live_patch col[:label],
-                            to: path(@socket, @live_action, @pagination, sort: index, direction: sort_direction(index, @pagination), show: nil)
-                          %>
+                          <.link patch={path(@socket, @live_action, @pagination, sort: index, direction: sort_direction(index, @pagination), show: nil)}>
+                            <%= col[:label] %>
+                          </.link>
                         <% end %>
                       </th>
                     <% end %>
@@ -82,16 +82,14 @@ defmodule KamanskyWeb.Components.DataTable do
                       <td colspan={Enum.count(@col)}>
                         <div class="px-4 flex items-center justify-between sm:px-6">
                           <div class="flex-1 flex justify-between sm:hidden">
-                            <%= live_patch "Previous",
-                              to: path(@socket, @live_action, @pagination, page: @pagination.page - 1),
-                              class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <>
-                                (if assigns[:current_page] == 1, do: " disabled", else: "")
-                            %>
-                            <%= live_patch "Next",
-                              to: path(@socket, @live_action, @pagination, page: @pagination.page + 1),
-                              class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <>
-                                (if @pagination.page == @pagination.total_pages, do: " disabled", else: "")
-                            %>
+                            <.link patch={path(@socket, @live_action, @pagination, page: @pagination.page - 1)}
+                              class={"relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <>
+                                (if assigns[:current_page] == 1, do: " disabled", else: "")}
+                            >Previous</.link>
+                            <.link patch={path(@socket, @live_action, @pagination, page: @pagination.page + 1)}
+                              class={"ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" <>
+                                (if @pagination.page == @pagination.total_pages, do: " disabled", else: "")}
+                            >Next</.link>
                           </div>
                           <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                             <div>
@@ -108,21 +106,23 @@ defmodule KamanskyWeb.Components.DataTable do
                             <%= if @pagination.total_pages > 1 do %>
                               <div>
                                 <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                  <%= live_patch to: path(@socket, @live_action, @pagination, page: @pagination.page - 1),
-                                    class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
-                                      (if @pagination.page == 1, do: " disabled", else: "")
-                                  do %>
+                                  <.link patch={path(@socket, @live_action, @pagination, page: @pagination.page - 1)}
+                                    class={"relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
+                                      (if @pagination.page == 1, do: " disabled", else: "")}
+                                  >
                                     <span class="sr-only">Previous</span>
                                     <KamanskyWeb.Components.Icons.chevron_left />
+                                  </.link>
+                                  <%= for page_link <- page_links(@socket, @live_action, @pagination) do %>
+                                    <%= page_link %>
                                   <% end %>
-                                  <%= page_links(@socket, @live_action, @pagination) %>
-                                  <%= live_patch to: path(@socket, @live_action, @pagination, page: @pagination.page + 1),
-                                    class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
-                                      (if @pagination.page == @pagination.total_pages, do: " disabled", else: "")
-                                  do %>
+                                  <.link patch={path(@socket, @live_action, @pagination, page: @pagination.page + 1)}
+                                    class={"relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" <>
+                                      (if @pagination.page == @pagination.total_pages, do: " disabled", else: "")}
+                                  >
                                     <span class="sr-only">Next</span>
                                     <KamanskyWeb.Components.Icons.chevron_right />
-                                  <% end %>
+                                  </.link>
                                 </nav>
                               </div>
                             <% end %>
@@ -174,15 +174,18 @@ defmodule KamanskyWeb.Components.DataTable do
 
   @spec link_to_page(Phoenix.LiveView.Socket.t, atom, KamanskyWeb.Paginate.params, pos_integer) :: Phoenix.HTML.safe
   defp link_to_page(socket, action, pagination, page) do
-    live_patch page,
-      to: path(socket, action, pagination, page: page, show: nil),
-      class: "relative inline-flex items-center px-4 py-2 border text-sm font-medium" <> (
+    assigns = %{socket: socket, action: action, pagination: pagination, page: page}
+    ~H"""
+    <.link patch={path(socket, action, pagination, page: page, show: nil)}
+      class={"relative inline-flex items-center px-4 py-2 border text-sm font-medium" <> (
         if page == pagination.page do
           " z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
         else
           " bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
         end
-      )
+      )}
+    ><%= page %></.link>
+    """
   end
 
   @spec page_links(Phoenix.LiveView.Socket.t, atom, KamanskyWeb.Paginate.params) :: [String.t | Phoenix.HTML.safe]

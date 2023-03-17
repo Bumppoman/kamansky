@@ -1,5 +1,5 @@
 defmodule KamanskyWeb.InitAssigns do
-  import Phoenix.LiveView
+  import Phoenix.{Component, LiveView}
 
   alias Kamansky.Operations.Accounts
 

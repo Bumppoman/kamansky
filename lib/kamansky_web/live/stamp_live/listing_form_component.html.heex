@@ -1,19 +1,7 @@
 <div id={@id}>
   <%= if @open do %>
-    <KamanskyWeb.Components.Modal.modal
-      parent_id={@id}
-      external="true"
-      form_id="stamp-listing-form"
-      title="List Stamp for Sale"
-    >
-      <.form
-        let={f}
-        for={@changeset}
-        id="stamp-listing-form"
-        phx_target={@myself}
-        phx_change="validate"
-        phx_submit="submit"
-      >
+    <KamanskyWeb.Components.Modal.modal parent_id={@id} external="true" form_id="stamp-listing-form" title="List Stamp for Sale">
+      <.form :let={f} for={@changeset} id="stamp-listing-form" phx-target={@myself} phx-change="validate" phx-submit="submit">
         <div class="grid grid-cols-4">
           <div class="form-group">
             <label>Scott Number</label>
@@ -36,17 +24,13 @@
           <label>List On</label>
           <div class="flex flex-grow flex-row items-center">
             <div class="flex flex-grow">
-              <div>
-                <%= checkbox f, :hipstamp %>
-              </div>
+              <div><%= checkbox f, :hipstamp %></div>
               <div class="ml-3">
                 <label>Hipstamp</label>
               </div>
             </div>
             <div class="flex flex-grow">
-              <div>
-                <%= checkbox f, :ebay %>
-              </div>
+              <div><%= checkbox f, :ebay %></div>
               <div class="ml-3">
                 <label>eBay</label>
               </div>

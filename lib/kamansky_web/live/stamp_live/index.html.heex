@@ -1,99 +1,43 @@
-<.live_component 
-  module={KamanskyWeb.Components.Header} 
-  id="kamansky-header"
-  current_user={@current_user}
-  live_action={@live_action}
-  page_title={@page_title}
->
+<.live_component module={KamanskyWeb.Components.Header} id="kamansky-header" current_user={@current_user} live_action={@live_action} page_title={@page_title}>
   <:buttons>
-    <KamanskyWeb.Components.Page.header_button
-      phx-click="open"
-      phx-target="#stamp-form-modal"
-      phx-value-action="new"
-      phx-value-stamp-id=""
-      phx-value-status={@live_action}
-    >
+    <KamanskyWeb.Components.Page.header_button phx-click="open" phx-target="#stamp-form-modal" phx-value-action="new" phx-value-stamp-id=""
+      phx-value-status={@live_action}>
       Add New Stamp
     </KamanskyWeb.Components.Page.header_button>
   </:buttons>
 </.live_component>
 <main>
   <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
-  <KamanskyWeb.Components.DataTable.table
-    rows={@data}
-    pagination={@pagination}
-    socket={@socket}
-    live_action={@live_action}
-    empty_message="There are no stamps to display."
-  >
+  <KamanskyWeb.Components.DataTable.table rows={@data} pagination={@pagination} socket={@socket} live_action={@live_action}
+    empty_message="There are no stamps to display.">
     <:col let={stamp} label="Scott Number">
-      <a
-        class="action-icon"
-        phx-click="open"
-        phx-target="#stamp-detail-modal"
-        phx-value-stamp-id={stamp.id}
-      >
-        <%= stamp.scott_number %>
-      </a>
+      <a class="action-icon" phx-click="open" phx-target="#stamp-detail-modal" phx-value-stamp-id={stamp.id}><%= stamp.scott_number %></a>
     </:col>
-    <:col let={stamp} label="Grade">
-      <%= Stamp.formatted_grade(stamp) %>
-    </:col>
-    <:col let={stamp} label="Price Paid">
-      <%= format_decimal_as_currency(Stamp.total_cost(stamp)) %>
-    </:col>
-    <:col let={stamp} label="Flaws" sort="disabled">
-      <%= Stamp.formatted_flaws(stamp) %>
-    </:col>
+    <:col let={stamp} label="Grade"><%= Stamp.formatted_grade(stamp) %></:col>
+    <:col let={stamp} label="Price Paid"><%= format_decimal_as_currency(Stamp.total_cost(stamp)) %></:col>
+    <:col let={stamp} label="Flaws" sort="disabled"><%= Stamp.formatted_flaws(stamp) %></:col>
     <:col let={stamp} label="Actions" sort="disabled">
-      <a
-        class="action-icon"
-        phx-click="open"
-        phx-target="#stamp-form-modal"
-        phx-value-action="edit"
-        phx-value-stamp-id={stamp.id}
-        phx-value-status={stamp.status}
-      >
+      <a class="action-icon" phx-click="open" phx-target="#stamp-form-modal" phx-value-action="edit" phx-value-stamp-id={stamp.id}
+        phx-value-status={stamp.status}>
         <KamanskyWeb.Components.Icons.edit />
       </a>
       <%= if stamp.status == :collection do %>
-        <KamanskyWeb.Components.Page.link_with_confirmation
-          action="move_to_stock"
-          content="Are you sure you want to move this stamp to stock?"
-          title="Move to Stock"
-          values={[{"stamp-id", stamp.id}]}
-        >
+        <KamanskyWeb.Components.Page.link_with_confirmation action="move_to_stock" content="Are you sure you want to move this stamp to stock?"
+          title="Move to Stock"values={[{"stamp-id", stamp.id}]}>
           <KamanskyWeb.Components.Icons.archive />
         </KamanskyWeb.Components.Page.link_with_confirmation>
       <% end %>
       <%= if stamp.status != :listed do %>
-        <a
-          class="action-icon"
-          phx-click="open"
-          phx-target="#listing-form-modal"
-          phx-value-stamp-id={stamp.id}
-        >
+        <a class="action-icon" phx-click="open" phx-target="#listing-form-modal" phx-value-stamp-id={stamp.id}>
           <KamanskyWeb.Components.Icons.money />
         </a>
       <% end %>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
   <%= if @live_action in [:collection, :collection_to_replace] do %>
-    <KamanskyWeb.StampLive.CollectionComponents.types_footer 
-      socket={@socket}
-      live_action={@live_action}
-    />
+    <KamanskyWeb.StampLive.CollectionComponents.types_footer socket={@socket} live_action={@live_action} />
   <% end %>
 </main>
-<.live_component
-  module={KamanskyWeb.StampLive.FormComponent}
-  id="stamp-form-modal"
-/>
-<.live_component
-  module={KamanskyWeb.StampLive.ListingFormComponent}
-  id="listing-form-modal"
-  external="true"
-/>
-<.live_component module={KamanskyWeb.StampLive.DetailComponent}
-  id="stamp-detail-modal"
-/>
+<.live_component module={KamanskyWeb.StampLive.FormComponent} id="stamp-form-modal" />
+<.live_component module={KamanskyWeb.StampLive.ListingFormComponent} id="listing-form-modal" external="true" />
+<.live_component module={KamanskyWeb.StampLive.DetailComponent} id="stamp-detail-modal" />

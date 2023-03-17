@@ -1,23 +1,9 @@
 <div id={@id}>
   <%= if @open do %>
-    <KamanskyWeb.Components.Modal.modal
-      parent_id={@id}
-      form_id="edit-order-form"
-      title="Update Order"
-    >
-      <.form
-        let={f}
-        for={@changeset}
-        id="edit-order-form"
-        phx_target={@myself}
-        phx_change="validate"
-        phx_submit="submit"
-      >
+    <KamanskyWeb.Components.Modal.modal parent_id={@id} form_id="edit-order-form" title="Update Order">
+      <.form :let={f} for={@changeset} id="edit-order-form" phx-target={@myself} phx-change="validate" phx-submit="submit">
         <KamanskyWeb.CustomerLive.RawFormComponent.customer_info customer={@customer} />
-        <KamanskyWeb.OrderLive.Components.order_form 
-          f={f}
-          changeset={@changeset}
-        />
+        <KamanskyWeb.OrderLive.Components.order_form f={f} changeset={@changeset} />
       </.form>
     </KamanskyWeb.Components.Modal.modal>
   <% end %>

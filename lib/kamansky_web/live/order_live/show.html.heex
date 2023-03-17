@@ -1,10 +1,4 @@
-<.live_component 
-  module={KamanskyWeb.Components.Header} 
-  id="kamansky-header"
-  current_user={@current_user}
-  live_action={@live_action}
-  title="false"
-/>
+<.live_component module={KamanskyWeb.Components.Header} id="kamansky-header" current_user={@current_user} live_action={@live_action} title="false" />
 <main class="bg-gray-50">
   <div class="max-w-2xl mx-auto pt-4 pb-6 sm:px-6 lg:max-w-7xl lg:px-8">
     <div class="px-4 space-y-2 sm:px-0 sm:flex sm:items-baseline sm:justify-between sm:space-y-0">
@@ -33,15 +27,9 @@
               </div>
               <div class="sm:flex lg:col-span-7">
                 <div class="mt-6 sm:mt-0 sm:ml-6">
-                  <h3 class="text-base font-medium text-gray-900">
-                    <%= StampReference.description(listing.stamp.stamp_reference) %>
-                  </h3>
-                  <p class="mt-2 text-sm font-medium text-gray-900">
-                    <%= format_decimal_as_currency(listing.sale_price) %>
-                  </p>
-                  <p class="mt-3 text-sm text-gray-500">
-                    Item #<%= listing.stamp.inventory_key %>
-                  </p>
+                  <h3 class="text-base font-medium text-gray-900"><%= StampReference.description(listing.stamp.stamp_reference) %></h3>
+                  <p class="mt-2 text-sm font-medium text-gray-900"><%= format_decimal_as_currency(listing.sale_price) %></p>
+                  <p class="mt-3 text-sm text-gray-500">Item #<%= listing.stamp.inventory_key %></p>
                 </div>
               </div>
             </div>
@@ -84,18 +72,13 @@
             <div class="mt-3">
               <dd class="-ml-4 -mt-4 flex flex-wrap">
                 <div class="ml-4 mt-4">
-                  <p class="text-gray-900">
-                    <%= Order.formatted_platform(@order) %>
-                  </p>
-                  <p class="text-gray-600">
-                    Order ID: <%= Order.platform_id(@order) %>
-                  </p>
+                  <p class="text-gray-900"><%= Order.formatted_platform(@order) %></p>
+                  <p class="text-gray-600">Order ID: <%= Order.platform_id(@order) %></p>
                 </div>
               </dd>
             </div>
           </div>
         </dl>
-
         <dl class="mt-8 divide-y divide-gray-200 text-sm lg:mt-0 lg:col-span-5">
           <div class="pb-4 flex items-center justify-between">
             <dt class="text-gray-600">Subtotal</dt>

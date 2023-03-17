@@ -1,19 +1,7 @@
 <div id={@id}>
   <%= if @open do %>
-    <KamanskyWeb.Components.Modal.modal
-      parent_id={@id}
-      button_text={@button_text}
-      form_id="new-order-form"
-      title="Create Order"
-    >
-      <.form
-        let={f}
-        for={@changeset}
-        id="new-order-form"
-        phx_target={@myself}
-        phx_change={@validate}
-        phx_submit={@submit}
-      >
+    <KamanskyWeb.Components.Modal.modal parent_id={@id} button_text={@button_text} form_id="new-order-form" title="Create Order">
+      <.form :let={f} for={@changeset} id="new-order-form" phx-target={@myself} phx-change={@validate} phx-submit={@submit}>
         <div class="grid grid-cols-2">
           <%= if @order_step == 1 do %>
             <div class="flex flex-col form-group required">
@@ -21,7 +9,7 @@
               <div class="align-middle flex-grow grid grid-cols-2 mt-2">
                 <div class="flex items-center">
                   <%= radio_button f, :existing, true, class: "align-top" %>
-                <label for={input_id f, :existing, true}>Existing</label>
+                  <label for={input_id f, :existing, true}>Existing</label>
                 </div>
                 <div class="flex items-center">
                   <%= radio_button f, :existing, false, class: "align-top" %>
@@ -34,18 +22,15 @@
           <% end %>
         </div>
         <%= if @order_step == 1 do %>
-          <KamanskyWeb.CustomerLive.RawFormComponent.customer_form 
-            f={f} 
+          <KamanskyWeb.CustomerLive.RawFormComponent.customer_form
+            f={f}
             existing={existing_customer(@changeset)}
             matching_customers={@matching_customers}
             searched={@searched}
             target={@myself}
           />
         <% else %>
-          <KamanskyWeb.OrderLive.Components.order_form 
-            f={f}
-            changeset={@changeset}
-          />
+          <KamanskyWeb.OrderLive.Components.order_form f={f} changeset={@changeset} />
         <% end %>
       </.form>
     </KamanskyWeb.Components.Modal.modal>

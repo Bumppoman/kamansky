@@ -6,12 +6,12 @@
       title="Add Listing to Order"
     >
       <.form
-        let={f}
+        :let={f}
         for={@changeset}
         id="listing-add-to-order-form"
-        phx_target={@myself}
-        phx_change="validate"
-        phx_submit="submit"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="submit"
       >
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">

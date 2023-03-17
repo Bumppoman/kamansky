@@ -6,12 +6,12 @@
       form_id="expense-form"
     >
       <.form
-        let={f}
+        :let={f}
         for={@changeset}
         id="expense-form"
-        phx_target={@myself}
-        phx_change="validate"
-        phx_submit="submit"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="submit"
       >
         <div class="grid grid-cols-3">
           <div class="col-span-2 form-group required">

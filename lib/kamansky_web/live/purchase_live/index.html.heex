@@ -1,76 +1,34 @@
-<.live_component 
-  module={KamanskyWeb.Components.Header} 
-  id="kamansky-header"
-  current_user={@current_user}
-  live_action={@live_action}
-  page_title={@page_title}
->
+<.live_component module={KamanskyWeb.Components.Header} id="kamansky-header" current_user={@current_user} live_action={@live_action} page_title={@page_title}>
   <:buttons>
-    <KamanskyWeb.Components.Page.header_button
-      phx-click="open"
-      phx-target="#purchase-form-modal"
-      phx-value-action="new"
-      phx-value-purchase-id=""
-    >
+    <KamanskyWeb.Components.Page.header_button phx-click="open" phx-target="#purchase-form-modal" phx-value-action="new" phx-value-purchase-id="">
       Add New Purchase
     </KamanskyWeb.Components.Page.header_button>
   </:buttons>
 </.live_component>
 <main>
   <KamanskyWeb.Components.Page.flash flash={live_flash(@flash, :info)} />
-  <KamanskyWeb.Components.DataTable.table
-    rows={@data}
-    pagination={@pagination}
-    socket={@socket}
-    live_action={@live_action}
+  <KamanskyWeb.Components.DataTable.table rows={@data} pagination={@pagination} socket={@socket} live_action={@live_action}
     empty_message="There are no purchases to display."
   >
-    <:col let={purchase} label="Date">
-      <%= live_redirect to: Routes.purchase_show_path(@socket, :show, purchase) do %>
+    <:col :let={purchase} label="Date">
+      <.link navigate={Routes.purchase_show_path(@socket, :show, purchase)}>
         <time datetime={purchase.date}><%= formatted_date(purchase.date) %></time>
-      <% end %>
+      </.link>
     </:col>
-    <:col let={purchase} label="Description">
-      <%= purchase.description %>
-    </:col>
-    <:col let={purchase} label="Quantity">
-      <%= purchase.quantity %>
-    </:col>
-    <:col let={purchase} label="In Collection">
-      <%= Purchase.stamps_in_collection(purchase) %>
-    </:col>
-    <:col let={purchase} label="Listed">
-      <%= Purchase.stamps_listed(purchase) %>
-    </:col>
-    <:col let={purchase} label="Sold">
-      <%= Purchase.stamps_sold(purchase) %>
-    </:col>
-    <:col let={purchase} label="Total Cost">
-      <%= format_decimal_as_currency(Purchase.total_cost(purchase)) %>
-    </:col>
-    <:col let={purchase} label="Total Listing Price">
-      <%= format_decimal_as_currency(Purchase.total_listing_price(purchase)) %>
-    </:col>
-    <:col let={purchase} label="Realized Profit">
-      <%= format_decimal_as_currency(Purchase.realized_profit(purchase)) %>
-    </:col>
-    <:col let={purchase} label="Potential Profit">
-      <%= format_decimal_as_currency(Purchase.potential_profit(purchase)) %>
-    </:col>
-    <:col let={purchase} label="Actions" sort="disabled">
-      <a
-        class="action-icon"
-        phx-click="open"
-        phx-target="#purchase-form-modal"
-        phx-value-action="edit"
-        phx-value-purchase-id={purchase.id}
-      >
+    <:col :let={purchase} label="Description"><%= purchase.description %></:col>
+    <:col :let={purchase} label="Quantity"><%= purchase.quantity %></:col>
+    <:col :let={purchase} label="In Collection"><%= Purchase.stamps_in_collection(purchase) %></:col>
+    <:col :let={purchase} label="Listed"><%= Purchase.stamps_listed(purchase) %></:col>
+    <:col :let={purchase} label="Sold"><%= Purchase.stamps_sold(purchase) %></:col>
+    <:col :let={purchase} label="Total Cost"><%= format_decimal_as_currency(Purchase.total_cost(purchase)) %></:col>
+    <:col :let={purchase} label="Total Listing Price"><%= format_decimal_as_currency(Purchase.total_listing_price(purchase)) %></:col>
+    <:col :let={purchase} label="Realized Profit"><%= format_decimal_as_currency(Purchase.realized_profit(purchase)) %></:col>
+    <:col :let={purchase} label="Potential Profit"><%= format_decimal_as_currency(Purchase.potential_profit(purchase)) %></:col>
+    <:col :let={purchase} label="Actions" sort="disabled">
+      <a class="action-icon" phx-click="open" phx-target="#purchase-form-modal" phx-value-action="edit" phx-value-purchase-id={purchase.id}>
         <KamanskyWeb.Components.Icons.edit />
       </a>
     </:col>
   </KamanskyWeb.Components.DataTable.table>
 </main>
-<.live_component 
-  module={KamanskyWeb.PurchaseLive.FormComponent} 
-  id="purchase-form-modal"
-/>
+<.live_component module={KamanskyWeb.PurchaseLive.FormComponent} id="purchase-form-modal" />
